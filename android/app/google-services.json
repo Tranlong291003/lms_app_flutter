@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "203223131122",
+    "project_id": "lmsdoan",
+    "storage_bucket": "lmsdoan.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:203223131122:android:058002c55abeda6574416b",
+        "android_client_info": {
+          "package_name": "com.example.lms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "203223131122-slqfenlsa7b05qmm4i1pi4tjqhiprll9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.lms",
+            "certificate_hash": "bff733a5ce6a05eb641e2f8588268351eaa142da"
+          }
+        },
+        {
+          "client_id": "203223131122-cmgoqgafoc73d8dtebk2boj86res2mjr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBS1hZb4McK8IFxAzng7IBwAbCekfKTfZo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "203223131122-cmgoqgafoc73d8dtebk2boj86res2mjr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

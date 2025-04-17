@@ -13,7 +13,7 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
+        backgroundColor: Color(0xFF335ef7),
         foregroundColor: Colors.white,
       ),
     ),
@@ -24,7 +24,7 @@ class AppTheme {
   static final ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
     primaryColor: Colors.green,
-    scaffoldBackgroundColor: const Color(0xFF1F1F39),
+    scaffoldBackgroundColor: const Color(0xFF18191f),
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.black,
       foregroundColor: Colors.white,
@@ -32,10 +32,11 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.green,
+        backgroundColor: Color(0xFF335ef7),
         foregroundColor: Colors.white,
       ),
     ),
-    textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.white70)),
+
+    textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.white)),
   );
 }

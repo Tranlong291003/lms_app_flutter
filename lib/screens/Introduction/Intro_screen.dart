@@ -4,9 +4,14 @@ import 'package:introduction_screen/introduction_screen.dart';
 import 'package:lms/screens/Introduction/cubit/intro_cubit.dart';
 import 'package:lms/screens/login/login_screen.dart';
 
-class IntroScreen extends StatelessWidget {
+class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
 
+  @override
+  State<IntroScreen> createState() => _IntroScreenState();
+}
+
+class _IntroScreenState extends State<IntroScreen> {
   PageViewModel buildPage(String title, String body, String imageAsset) {
     return PageViewModel(
       title: title,
@@ -89,17 +94,17 @@ class IntroScreen extends StatelessWidget {
               buildPage(
                 "Chào mừng bạn đến với LearnPro",
                 "Ứng dụng học tập với hàng trăm khoá học chất lượng, phù hợp với mọi đối tượng.",
-                'assets/images/light/illustration1.png',
+                'assets/images/illustration1.png',
               ),
               buildPage(
                 "Theo dõi tiến độ học tập",
                 "Hệ thống giúp bạn dễ dàng theo dõi lộ trình và kết quả học tập của mình.",
-                'assets/images/light/illustration2.png',
+                'assets/images/illustration2.png',
               ),
               buildPage(
                 "Chứng chỉ hoàn thành",
                 "Nhận ngay chứng chỉ uy tín khi hoàn thành mỗi khoá học.",
-                'assets/images/light/illustration3.png',
+                'assets/images/illustration3.png',
               ),
             ],
             next: const Icon(Icons.arrow_forward, color: Colors.white),
