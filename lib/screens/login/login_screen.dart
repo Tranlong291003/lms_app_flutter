@@ -101,10 +101,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/utils/ElevatedButtonsocial.dart';
 import 'package:lms/apps/utils/app_bar.dart';
 import 'package:lms/apps/utils/botton.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
-import 'package:lms/blocs/theme/theme_state.dart'; // Import ThemeBloc
+import 'package:lms/blocs/theme/theme_state.dart';
+import 'package:lms/screens/login/loginWithPassword_screen.dart';
+import 'package:lms/screens/signup/signup_screen.dart'; // Import ThemeBloc
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -112,7 +115,6 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeBloc, ThemeState>(
-      // Đọc trạng thái theme
       builder: (context, themeState) {
         return Scaffold(
           appBar: appBar(context, "Đăng nhập"), // AppBar
@@ -140,53 +142,41 @@ class LoginScreen extends StatelessWidget {
                 const SizedBox(height: 35),
 
                 // Button sections for Facebook, Google, Apple
-                socialLoginButton(
+                SocialLoginButton(
                   context: context, // Truyền context
-                  icon: Image.asset(
-                    'assets/icons/facebook.png',
-                    height: 20,
-                    width: 20,
-                  ),
+                  assetPath: 'assets/icons/facebook.png',
                   text: 'Tiếp tục với Facebook',
                   onPressed: () {
-                    print('Facebook button pressed');
+                    print('fb');
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Facebook button pressed')),
+                      SnackBar(content: Text('Apple button pressed')),
                     );
                   },
                 ),
                 const SizedBox(height: 16),
 
-                socialLoginButton(
+                SocialLoginButton(
                   context: context, // Truyền context
-                  icon: Image.asset(
-                    'assets/icons/google.png',
-                    height: 20,
-                    width: 20,
-                  ),
-                  text: 'Tiếp tục với Google',
+                  assetPath: 'assets/icons/google.png',
+                  text: 'Tiếp tục với google',
                   onPressed: () {
-                    print('Google button pressed');
+                    print('google');
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Google button pressed')),
+                      SnackBar(content: Text('Apple button pressed')),
                     );
                   },
                 ),
                 const SizedBox(height: 16),
-
-                socialLoginButton(
+                SocialLoginButton(
                   context: context, // Truyền context
-                  icon: Image.asset(
-                    'assets/icons/apple.png',
-                    height: 20,
-                    width: 20,
-                    color:
-                        Theme.of(context).brightness == Brightness.light
-                            ? Colors
-                                .black // Màu nền cho theme sáng
-                            : Colors.white, // Màu nền cho theme tối,
-                  ),
+                  assetPath: 'assets/icons/apple.png',
                   text: 'Tiếp tục với Apple',
+                  finalIconColor:
+                      Theme.of(context).brightness == Brightness.light
+                          ? Colors
+                              .black // Màu icon cho theme sáng
+                          : Colors.white, // Màu icon cho theme tối
+
                   onPressed: () {
                     print('Apple button pressed');
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -194,23 +184,24 @@ class LoginScreen extends StatelessWidget {
                     );
                   },
                 ),
-
                 const SizedBox(height: 20),
                 const Text("hoặc"),
                 const SizedBox(height: 20),
-
                 // Sign in with password
                 botton(
                   themeState: themeState,
                   text: 'Đăng nhập với mật khẩu',
                   onPressed: () {
-                    // Hành động cho nút Facebook
-                    print('Nút Facebook đã được nhấn');
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Nút Facebook đã được nhấn')),
+                    // Điều hướng đến màn hình LoginWithPasswordScreen khi nhấn nút
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginWithPasswordScreen(),
+                      ),
                     );
                   },
                 ),
+
                 const SizedBox(height: 20),
 
                 // Don't have an account section
@@ -220,7 +211,12 @@ class LoginScreen extends StatelessWidget {
                     const Text("Chưa có tài khoản? "),
                     TextButton(
                       onPressed: () {
-                        // Navigate to Sign Up
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SignUpScreen(),
+                          ),
+                        );
                       },
                       child: const Text("Đăng ký"),
                     ),
@@ -231,43 +227,6 @@ class LoginScreen extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  ElevatedButton socialLoginButton({
-    required BuildContext context, // Tham số context
-    required Widget icon, // Tham số icon
-    required String text, // Tham số text
-    required VoidCallback onPressed, // Hàm callback khi nhấn nút
-  }) {
-    return ElevatedButton.icon(
-      onPressed: onPressed, // Gọi hàm callback khi nhấn nút
-      icon: icon, // Sử dụng icon tùy chỉnh
-      label: Text(
-        text, // Sử dụng text tùy chỉnh
-        style: TextStyle(
-          color:
-              Theme.of(context).brightness == Brightness.light
-                  ? Colors
-                      .black // Màu chữ cho theme sáng
-                  : Colors.white, // Màu chữ cho theme tối
-        ),
-      ),
-      style: ElevatedButton.styleFrom(
-        minimumSize: const Size(double.infinity, 50),
-        backgroundColor:
-            Theme.of(context).brightness == Brightness.light
-                ? Colors
-                    .white // Màu nền cho theme sáng
-                : Color(0xFF1F222A), // Màu nền cho theme tối
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-          side: BorderSide(
-            color: Colors.grey.withOpacity(0.2), // Màu viền mờ
-            width: 1, // Độ dày viền
-          ),
-        ),
-      ),
     );
   }
 }

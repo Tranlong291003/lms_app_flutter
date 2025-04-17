@@ -5,7 +5,7 @@ import 'package:lms/blocs/theme/theme_event.dart';
 
 AppBar appBar(BuildContext context, String title) {
   return AppBar(
-    title: Text(title), // Sử dụng title truyền vào từ tham số
+    title: Text(title),
     actions: [
       IconButton(
         icon: const Icon(Icons.brightness_6),

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/apps/utils/app_bar.dart';
 import 'package:lms/screens/login/login_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -34,7 +35,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Trang Chủ')),
+      appBar: appBar(context, 'title'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
