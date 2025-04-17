@@ -5,6 +5,7 @@ import 'package:lms/blocs/theme/theme_event.dart';
 
 AppBar appBar(BuildContext context, String title) {
   return AppBar(
+    automaticallyImplyLeading: false,
     title: Text(title),
     actions: [
       IconButton(

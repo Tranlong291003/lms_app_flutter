@@ -13,11 +13,29 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0xFF335ef7),
-        foregroundColor: Colors.white,
+        backgroundColor: const Color(0xFF335ef7), // Màu nút cho light mode
+        foregroundColor: Colors.white, // Màu chữ nút
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
-    textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.black)),
+    textTheme: const TextTheme(
+      bodyLarge: TextStyle(color: Colors.black, fontSize: 16),
+      bodyMedium: TextStyle(color: Colors.black87, fontSize: 14),
+      displayLarge: TextStyle(
+        color: Colors.black,
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        color: Colors.black,
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+    iconTheme: const IconThemeData(
+      color: Colors.blue,
+    ), // Màu icon cho light mode
   );
 
   /// Theme cho Dark Mode
@@ -32,11 +50,28 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0xFF335ef7),
-        foregroundColor: Colors.white,
+        backgroundColor: const Color(0xFF335ef7), // Màu nút cho dark mode
+        foregroundColor: Colors.white, // Màu chữ nút
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
-
-    textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.white)),
+    textTheme: const TextTheme(
+      bodyLarge: TextStyle(color: Colors.white, fontSize: 16),
+      bodyMedium: TextStyle(color: Colors.white70, fontSize: 14),
+      displayLarge: TextStyle(
+        color: Colors.white,
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        color: Colors.white,
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+    iconTheme: const IconThemeData(
+      color: Colors.green,
+    ), // Màu icon cho dark mode
   );
 }

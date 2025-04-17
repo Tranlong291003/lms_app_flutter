@@ -11,10 +11,8 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     on<ThemeToggled>(_onThemeToggled);
   }
 
-  // Khai báo key SharedPreferences
   static const String _themeKey = 'theme_mode';
 
-  // Khi app khởi động (ThemeStarted), đọc chế độ theme đã lưu
   Future<void> _onThemeStarted(
     ThemeStarted event,
     Emitter<ThemeState> emit,
@@ -36,11 +34,13 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     }
   }
 
-  // Khi người dùng nhấn nút chuyển theme (ThemeToggled), đảo light <-> dark và lưu
   Future<void> _onThemeToggled(
     ThemeToggled event,
     Emitter<ThemeState> emit,
   ) async {
+    // Emit loading state
+    emit(state.copyWith(isLoading: true));
+
     final currentMode = state.themeMode;
     late ThemeMode newMode;
 
@@ -50,12 +50,12 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
       newMode = ThemeMode.light;
     }
 
-    // Lưu vào SharedPreferences
+    // Save to SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     final newModeStr = (newMode == ThemeMode.dark) ? 'dark' : 'light';
     await prefs.setString(_themeKey, newModeStr);
 
-    // Phát ra state mới
-    emit(ThemeState(themeMode: newMode));
+    // Emit the updated theme and stop loading
+    emit(state.copyWith(themeMode: newMode, isLoading: false));
   }
 }

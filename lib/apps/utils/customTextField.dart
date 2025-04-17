@@ -33,8 +33,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      cursorColor: Colors.blue, // Màu con trỏ
       controller: widget.controller, // Sử dụng controller truyền vào
       obscureText: _isObscure, // Kiểm tra xem văn bản có bị ẩn hay không
+      style: TextStyle(
+        color:
+            Theme.of(context).brightness == Brightness.light
+                ? Colors
+                    .black // Màu văn bản trong TextField cho theme sáng
+                : Colors.white, // Màu văn bản trong TextField cho theme tối
+      ),
       decoration: InputDecoration(
         labelText: widget.labelText, // Sử dụng labelText được truyền vào
         // Nếu không truyền prefixAsset thì mặc định dùng icon email cho trường email hoặc icon khóa cho mật khẩu

@@ -4,9 +4,7 @@ import 'package:lms/apps/utils/app_bar.dart';
 import 'package:lms/screens/login/login_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  final String customToken;
-
-  const HomeScreen({super.key, required this.customToken});
+  const HomeScreen({super.key});
 
   // Hàm đăng xuất
   Future<void> _signOut(BuildContext context) async {
@@ -42,7 +40,7 @@ class HomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Hiển thị token của người dùng
-            Text('Token của bạn: $customToken'),
+            Text('Token của bạn: ${FirebaseAuth.instance.currentUser?.uid}'),
             const SizedBox(height: 20),
 
             // Nút Đăng xuất

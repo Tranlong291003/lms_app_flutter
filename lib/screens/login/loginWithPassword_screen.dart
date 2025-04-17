@@ -1,119 +1,196 @@
-import 'package:dio/dio.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:lms/apps/config/api_config.dart';
-import 'package:lms/screens/home_screen.dart'; // Import HomeScreen
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/utils/ElevatedButtonsocial.dart';
+import 'package:lms/apps/utils/botton.dart';
+import 'package:lms/apps/utils/customTextField.dart';
+import 'package:lms/blocs/theme/theme_bloc.dart';
+import 'package:lms/screens/forgotpassword/forgotpassword_screen.dart';
+import 'package:lms/screens/home_screen.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
+import 'package:lms/screens/signup/signup_screen.dart';
+import 'package:page_transition/page_transition.dart';
 
-class LoginWithPasswordScreen extends StatefulWidget {
-  const LoginWithPasswordScreen({super.key});
-
-  @override
-  State<LoginWithPasswordScreen> createState() =>
-      _LoginWithPasswordScreenState();
-}
-
-class _LoginWithPasswordScreenState extends State<LoginWithPasswordScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-
-  // Khởi tạo Dio để gửi yêu cầu HTTP
-  final Dio _dio = Dio();
-
-  Future<void> _onLoginPressed() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-
-    try {
-      // Đăng nhập Firebase bằng email và mật khẩu
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-
-      // Lấy ID Token sau khi đăng nhập thành công
-      String? idToken = await userCredential.user!.getIdToken();
-
-      if (idToken == null) {
-        // Xử lý trường hợp idToken là null
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Lỗi: Không thể lấy ID Token')));
-        return;
-      }
-
-      // Gửi ID Token đến backend để xác thực và nhận Custom Token
-      final response = await _dio.post(
-        ApiConfig.login,
-        data: {'idToken': idToken},
-      );
-
-      if (response.statusCode == 200) {
-        // Đăng nhập thành công, lấy Custom Token
-        String customToken = response.data['custom_token'];
-
-        // Chuyển đến HomeScreen và truyền Custom Token
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomeScreen(customToken: customToken),
-          ),
-        );
-      } else {
-        // Lỗi từ backend
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Lỗi từ backend')));
-      }
-    } catch (e) {
-      // Xử lý lỗi đăng nhập
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Lỗi khi đăng nhập: $e')));
-    }
-  }
+class LoginWithPasswordScreen extends StatelessWidget {
+  LoginWithPasswordScreen({super.key});
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Đăng nhập với mật khẩu')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Nhập email
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is AuthSuccess) {
+          // Navigate to the main screen after successful login
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HomeScreen(),
+            ), // HomeScreen là trang chính bạn muốn chuyển đến
+          );
+        } else if (state is AuthFailure) {
+          // Show error message if login fails
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+      },
+
+      builder: (context, state) {
+        return Scaffold(
+          body: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 100),
+                  Center(
+                    child: const Text(
+                      'Chào mừng bạn trở lại!\nĐăng nhập để tiếp tục',
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  // TextField for email
+                  CustomTextField(
+                    labelText: 'Email',
+                    controller: _emailController,
+                    prefixAsset: 'assets/icons/email.png',
+                  ),
+                  const SizedBox(height: 20),
+                  // TextField for password
+                  CustomTextField(
+                    labelText: 'Mật khẩu',
+                    controller: _passwordController,
+                    showVisibilityIcon: true,
+                    obscureText: true,
+                    prefixAsset: 'assets/icons/padlock.png',
+                  ),
+                  const SizedBox(height: 25),
+
+                  // Login button
+                  botton(
+                    themeState: context.read<ThemeBloc>().state,
+                    text: 'Đăng nhập',
+                    onPressed: () {
+                      // Trigger the login Cubit with email and password
+                      final email = _emailController.text;
+                      final password = _passwordController.text;
+                      if (email.isNotEmpty && password.isNotEmpty) {
+                        context.read<AuthCubit>().loginWithEmailPassword(
+                          email,
+                          password,
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Please enter both email and password',
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            PageTransition(
+                              type: PageTransitionType.fade,
+                              child: ForgotpasswordScreen(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "Quên mật khẩu",
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.displayLarge?.color,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  const Text(
+                    'Hoặc đăng nhập bằng',
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Social login buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SocialLoginButton(
+                        width: 70,
+                        context: context,
+                        assetPath: 'assets/icons/facebook.png',
+                        onPressed: () {
+                          // Handle Facebook login
+                        },
+                      ),
+                      const SizedBox(width: 16),
+                      SocialLoginButton(
+                        width: 70,
+                        context: context,
+                        assetPath: 'assets/icons/google.png',
+                        onPressed: () {
+                          // Handle Google login
+                        },
+                      ),
+                      const SizedBox(width: 16),
+                      SocialLoginButton(
+                        width: 70,
+                        context: context,
+                        assetPath: 'assets/icons/apple.png',
+                        finalIconColor:
+                            Theme.of(context).brightness == Brightness.light
+                                ? Colors.black
+                                : Colors.white,
+                        onPressed: () {
+                          // Handle Apple login
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Chưa có tài khoản? "),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SignUpScreen(),
+                            ),
+                          );
+                        },
+                        child: const Text("Đăng ký"),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            // Nhập mật khẩu
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Mật khẩu'),
-              obscureText: true, // Ẩn mật khẩu
-            ),
-            const SizedBox(height: 32),
-            // Nút đăng nhập
-            ElevatedButton(
-              onPressed: _onLoginPressed,
-              child: const Text('Đăng nhập'),
-            ),
-            const SizedBox(height: 16),
-            // Tạo tài khoản mới
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Chưa có tài khoản? "),
-                TextButton(
-                  onPressed: () {
-                    // Điều hướng đến màn hình đăng ký (Sign Up)
-                    // Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpScreen()));
-                  },
-                  child: const Text("Đăng ký"),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

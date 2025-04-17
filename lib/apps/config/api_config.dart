@@ -3,4 +3,5 @@ class ApiConfig {
 
   // users
   static String get login => "$baseUrl/api/users/login";
+  static String get signUp => "$baseUrl/api/users/create";
 }
