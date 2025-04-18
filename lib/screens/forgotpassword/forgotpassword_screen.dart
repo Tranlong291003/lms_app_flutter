@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:lms/apps/config/app_theme.dart';
 
 class ForgotpasswordScreen extends StatefulWidget {
   const ForgotpasswordScreen({super.key});
@@ -73,11 +72,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
             Text(
               'Nhập email để khôi phục mật khẩu',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.bodyMedium,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
             ),
             SizedBox(height: 30),
 

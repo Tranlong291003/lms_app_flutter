@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:meta/meta.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 
 part 'auth_state.dart';
 
@@ -55,6 +56,11 @@ class AuthCubit extends Cubit<AuthState> {
             String role =
                 response.data['role'] ??
                 'Unknown'; // Điều chỉnh theo cấu trúc phản hồi API của bạn
+
+            // Lưu role vào SharedPreferences
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setString('role', role); // Lưu role
+
             print('Role: $role'); // In role ra console
 
             emit(AuthSuccess(user!)); // Đăng nhập thành công
@@ -85,5 +91,11 @@ class AuthCubit extends Cubit<AuthState> {
       await _firebaseAuth.signOut(); // Gọi hàm đăng xuất khi có lỗi
       emit(AuthFailure('Đăng nhập thất bại, vui lòng thử lại sau'));
     }
+  }
+
+  // Hàm lấy role từ SharedPreferences
+  Future<String?> getRoleFromPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('role');
   }
 }

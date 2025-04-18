@@ -34,7 +34,7 @@ class AppTheme {
       ),
     ),
     iconTheme: const IconThemeData(
-      color: Colors.blue,
+      color: Colors.black,
     ), // Màu icon cho light mode
   );
 
@@ -71,9 +71,7 @@ class AppTheme {
       ),
     ),
     iconTheme: const IconThemeData(
-      color: Colors.green,
+      color: Colors.white,
     ), // Màu icon cho dark mode
   );
-
-  static var bodyMedium;
 }

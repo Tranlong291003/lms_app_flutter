@@ -67,7 +67,15 @@ AppBar appBar(BuildContext context, String title) {
                 context.read<ThemeBloc>().add(ThemeToggled());
               },
             ),
-            // Có thể thêm các icon khác ở đây nếu cần
+            IconButton(
+              icon: Image.asset(
+                'assets/icons/notification.png',
+                color: Theme.of(context).iconTheme.color,
+              ),
+              onPressed: () {
+                // Hành động khi nhấn nút thông báo
+              },
+            ),
           ],
         ),
       ],
