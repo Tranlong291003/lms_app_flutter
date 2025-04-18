@@ -5,9 +5,10 @@ import 'package:lms/apps/utils/botton.dart';
 import 'package:lms/apps/utils/customTextField.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/screens/forgotpassword/forgotpassword_screen.dart';
-import 'package:lms/screens/home_screen.dart';
+import 'package:lms/screens/home/home_screen.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/signup/signup_screen.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart'; // Import the loading animation package
 import 'package:page_transition/page_transition.dart';
 
 class LoginWithPasswordScreen extends StatelessWidget {
@@ -23,9 +24,7 @@ class LoginWithPasswordScreen extends StatelessWidget {
           // Navigate to the main screen after successful login
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const HomeScreen(),
-            ), // HomeScreen là trang chính bạn muốn chuyển đến
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
           );
         } else if (state is AuthFailure) {
           // Show error message if login fails
@@ -34,7 +33,6 @@ class LoginWithPasswordScreen extends StatelessWidget {
           ).showSnackBar(SnackBar(content: Text(state.message)));
         }
       },
-
       builder: (context, state) {
         return Scaffold(
           body: Padding(
@@ -73,30 +71,39 @@ class LoginWithPasswordScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 25),
 
-                  // Login button
-                  botton(
-                    themeState: context.read<ThemeBloc>().state,
-                    text: 'Đăng nhập',
-                    onPressed: () {
-                      // Trigger the login Cubit with email and password
-                      final email = _emailController.text;
-                      final password = _passwordController.text;
-                      if (email.isNotEmpty && password.isNotEmpty) {
-                        context.read<AuthCubit>().loginWithEmailPassword(
-                          email,
-                          password,
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Please enter both email and password',
+                  // If loading, show a loading animation
+                  if (state is AuthLoading)
+                    Center(
+                      child: LoadingAnimationWidget.fourRotatingDots(
+                        color: Colors.blue,
+                        size: 50,
+                      ),
+                    )
+                  else
+                    // Login button
+                    botton(
+                      themeState: context.read<ThemeBloc>().state,
+                      text: 'Đăng nhập',
+                      onPressed: () {
+                        // Trigger the login Cubit with email and password
+                        final email = _emailController.text;
+                        final password = _passwordController.text;
+                        if (email.isNotEmpty && password.isNotEmpty) {
+                          context.read<AuthCubit>().loginWithEmailPassword(
+                            email,
+                            password,
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Please enter both email and password',
+                              ),
                             ),
-                          ),
-                        );
-                      }
-                    },
-                  ),
+                          );
+                        }
+                      },
+                    ),
                   SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

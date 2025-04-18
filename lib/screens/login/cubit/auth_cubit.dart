@@ -12,7 +12,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   AuthCubit(this._firebaseAuth, this._dio) : super(AuthInitial());
 
-  // Login function
+  // Hàm đăng nhập
   Future<void> loginWithEmailPassword(String email, String password) async {
     try {
       emit(AuthLoading());
@@ -40,35 +40,50 @@ class AuthCubit extends Cubit<AuthState> {
 
         // Xử lý response từ API
         if (response.statusCode == 200) {
-          // Extract role from the response (assuming the response contains the role in the 'role' field)
-          String role =
-              response
-                  .data['role']; // Adjust based on your API response structure
-          print('User role: $role'); // Print the role to the console
+          // Kiểm tra xem API có trả về success = false không
+          bool success = response.data['success'] ?? false;
+          if (!success) {
+            // Tài khoản bị khóa, chỉ hiển thị thông báo đăng nhập thất bại
+            await _firebaseAuth.signOut(); // Gọi hàm đăng xuất khi có lỗi
+            emit(
+              AuthFailure(
+                'Tài khoản đã bị khoá, vui lòng liên hệ admin để được xử lý',
+              ),
+            );
+          } else {
+            // Nếu success = true, lấy thông tin role từ response
+            String role =
+                response.data['role'] ??
+                'Unknown'; // Điều chỉnh theo cấu trúc phản hồi API của bạn
+            print('Role: $role'); // In role ra console
 
-          emit(AuthSuccess(user!));
+            emit(AuthSuccess(user!)); // Đăng nhập thành công
+          }
         } else {
-          // Gửi API thất bại
-          print('API Error: Status Code ${response.statusCode}');
-          emit(
-            AuthFailure(
-              'Failed to send data to API. Status Code: ${response.statusCode}',
-            ),
-          );
+          // Nếu API trả về bất kỳ mã trạng thái nào khác ngoài 200
+          await _firebaseAuth.signOut(); // Gọi hàm đăng xuất khi có lỗi
+          emit(AuthFailure('Đăng nhập thất bại, vui lòng thử lại'));
         }
       } else {
-        // UID hoặc token null
-        print('Error: UID or Token is null');
-        emit(AuthFailure('UID or token is null'));
+        // Nếu UID hoặc Token là null
+        await _firebaseAuth.signOut(); // Gọi hàm đăng xuất khi có lỗi
+        emit(AuthFailure('Đăng nhập thất bại, vui lòng thử lại'));
       }
     } on FirebaseAuthException catch (e) {
       // Lỗi Firebase
-      print('Firebase Auth Error: ${e.message}');
-      emit(AuthFailure('Firebase login failed: ${e.message}'));
+      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+        // Nếu tài khoản hoặc mật khẩu sai
+        emit(AuthFailure('Tài khoản hoặc mật khẩu không đúng'));
+      } else {
+        // Các lỗi khác của Firebase
+        emit(AuthFailure('Đăng nhập thất bại, vui lòng thử lại sau'));
+      }
+      await _firebaseAuth.signOut(); // Gọi hàm đăng xuất khi có lỗi
     } catch (e) {
       // Lỗi bất kỳ khác
-      print('Unexpected Error: ${e.toString()}');
-      emit(AuthFailure('Unexpected error: ${e.toString()}'));
+      print('Lỗi không xác định: $e');
+      await _firebaseAuth.signOut(); // Gọi hàm đăng xuất khi có lỗi
+      emit(AuthFailure('Đăng nhập thất bại, vui lòng thử lại sau'));
     }
   }
 }

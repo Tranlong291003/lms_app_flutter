@@ -7,8 +7,8 @@ class AppTheme {
     primaryColor: Colors.blue,
     scaffoldBackgroundColor: Colors.white,
     appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.blue,
-      foregroundColor: Colors.white,
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black,
       elevation: 0,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
@@ -44,7 +44,7 @@ class AppTheme {
     primaryColor: Colors.green,
     scaffoldBackgroundColor: const Color(0xFF18191f),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.black,
+      backgroundColor: Color(0xFF181a20),
       foregroundColor: Colors.white,
       elevation: 0,
     ),
