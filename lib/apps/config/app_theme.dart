@@ -74,4 +74,6 @@ class AppTheme {
       color: Colors.green,
     ), // Màu icon cho dark mode
   );
+
+  static var bodyMedium;
 }

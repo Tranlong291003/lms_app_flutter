@@ -139,6 +139,10 @@ class SignUpScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: 16),
                         SocialLoginButton(
+                          finalIconColor:
+                              Theme.of(context).brightness == Brightness.light
+                                  ? Colors.black
+                                  : Colors.white,
                           width: 70,
                           context: context,
                           assetPath: 'assets/icons/apple.png',

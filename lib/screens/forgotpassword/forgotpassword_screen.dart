@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:lms/apps/utils/app_bar.dart';
+import 'package:lms/apps/config/app_theme.dart';
 
 class ForgotpasswordScreen extends StatefulWidget {
   const ForgotpasswordScreen({super.key});
@@ -58,23 +58,29 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(context, 'lấy lại mật khẩu'),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Image.asset(
+              Theme.of(context).brightness == Brightness.light
+                  ? 'assets/images/forgotpassword_light.png'
+                  : 'assets/images/forgotpassword_dark.png',
+            ),
+            SizedBox(height: 30),
             Text(
               'Nhập email để khôi phục mật khẩu',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                color: AppTheme.bodyMedium,
               ),
             ),
             SizedBox(height: 30),
+
             TextField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
