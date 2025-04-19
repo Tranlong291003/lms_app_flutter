@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
-import 'package:lms/screens/home/widget/app_bar.dart';
-import 'package:lms/screens/home/widget/discountSlider.dart';
-import 'package:lms/screens/home/widget/topMentors.dart';
+import 'package:lms/screens/home/widget/appBar_widget.dart';
+import 'package:lms/screens/home/widget/courseCategory_widget.dart';
+import 'package:lms/screens/home/widget/discountSlider_widget.dart';
+import 'package:lms/screens/home/widget/listCourses_widget.dart';
+import 'package:lms/screens/home/widget/topMentors_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -11,18 +13,20 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarHome(context, 'title'),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SearchBarWidget(),
-              const SizedBox(height: 10),
-              DiscountSlider(),
-              const SizedBox(height: 10),
-              TopMentors(),
-            ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SearchBarWidget(),
+                DiscountSlider(),
+                TopMentors(),
+                CourseCategory(),
+                ListCoursesList(),
+              ],
+            ),
           ),
         ),
       ),
