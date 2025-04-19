@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_event.dart';
 
-AppBar appBar(BuildContext context, String title) {
+AppBar AppBarHome(BuildContext context, String title) {
   // Lấy giờ hiện tại
   int currentHour = DateTime.now().hour;
 
@@ -80,6 +80,6 @@ AppBar appBar(BuildContext context, String title) {
         ),
       ],
     ),
-    toolbarHeight: 80, // Tăng chiều cao của AppBar
+    toolbarHeight: 80, // Tăng chiều cao của AppBarHome
   );
 }

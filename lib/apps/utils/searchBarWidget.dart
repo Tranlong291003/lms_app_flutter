@@ -6,6 +6,7 @@ class SearchBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 60,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15), // Bo góc cho thanh tìm kiếm
         color:
@@ -17,7 +18,7 @@ class SearchBarWidget extends StatelessWidget {
         children: [
           // Biểu tượng tìm kiếm
           Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(8.0),
             child: Icon(
               Icons.search,
               color: Colors.grey, // Màu biểu tượng tìm kiếm
@@ -34,12 +35,13 @@ class SearchBarWidget extends StatelessWidget {
                 border: InputBorder.none, // Loại bỏ viền
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 0,
-                ), // Đảm bảo không có khoảng cách thừa
+                  horizontal: 8,
+                ),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(8.0), // Giảm padding
             child: IconButton(
               icon: Image.asset('assets/icons/filter.png'),
               onPressed: () {},
