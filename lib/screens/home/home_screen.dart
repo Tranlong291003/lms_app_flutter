@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
 import 'package:lms/screens/home/widget/app_bar.dart';
 import 'package:lms/screens/home/widget/discountSlider.dart';
+import 'package:lms/screens/home/widget/topMentors.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -19,6 +20,8 @@ class HomeScreen extends StatelessWidget {
               SearchBarWidget(),
               const SizedBox(height: 10),
               DiscountSlider(),
+              const SizedBox(height: 10),
+              TopMentors(),
             ],
           ),
         ),
