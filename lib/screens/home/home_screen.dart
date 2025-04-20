@@ -22,14 +22,65 @@ class HomeScreen extends StatelessWidget {
               children: [
                 SearchBarWidget(),
                 DiscountSlider(),
+                SizedBox(height: 5),
+                SectionHeader(
+                  title: "Danh sách giáo viên",
+                  onTap: () {
+                    Navigator.pushNamed(context, '/listmentor');
+                  },
+                ),
+                SizedBox(height: 10),
                 TopMentors(),
+                SizedBox(height: 5),
+                SectionHeader(
+                  title: "Danh sách khoá học",
+                  onTap: () {
+                    Navigator.pushNamed(context, '/listcourse');
+                  },
+                ),
+                SizedBox(height: 10),
                 CourseCategory(),
-                ListCoursesList(),
+                ListCoursesWidget(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class SectionHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback onTap;
+
+  const SectionHeader({super.key, required this.title, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Roboto',
+          ),
+        ),
+        InkWell(
+          onTap: onTap,
+          child: const Text(
+            "Xem tất cả",
+            style: TextStyle(
+              color: Color(0xFF2F56DD),
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Roboto',
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

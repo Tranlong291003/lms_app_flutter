@@ -14,35 +14,9 @@ class CourseCategory extends StatelessWidget {
       {"label": "Âm nhạc", "emoji": "🎵"},
       {"label": "Trí tuệ nhân tạo", "emoji": "🤖"},
     ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Tiêu đề và nút xem tất cả
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
-            Text(
-              "Khoá học phổ biến",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Roboto',
-              ),
-            ),
-            Text(
-              "Xem tất cả",
-              style: TextStyle(
-                color: Color(0xFF2F56DD),
-                fontWeight: FontWeight.w500,
-                fontFamily: 'Roboto',
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-
-        // Danh sách chip cuộn ngang
         SizedBox(
           height: 40,
           child: ListView.separated(

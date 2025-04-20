@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 
-class TopMentorScreen extends StatelessWidget {
-  TopMentorScreen({super.key});
+class ListMentorScreen extends StatelessWidget {
+  ListMentorScreen({super.key});
 
   final List<Map<String, String>> mentors = [
     {

@@ -4,12 +4,9 @@ import 'package:lms/apps/utils/ElevatedButtonsocial.dart';
 import 'package:lms/apps/utils/botton.dart';
 import 'package:lms/apps/utils/customTextField.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
-import 'package:lms/screens/forgotpassword/forgotpassword_screen.dart';
 import 'package:lms/screens/home/home_screen.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
-import 'package:lms/screens/signup/signup_screen.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart'; // Import the loading animation package
-import 'package:page_transition/page_transition.dart';
 
 class LoginWithPasswordScreen extends StatelessWidget {
   LoginWithPasswordScreen({super.key});
@@ -110,13 +107,7 @@ class LoginWithPasswordScreen extends StatelessWidget {
                     children: [
                       TextButton(
                         onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            PageTransition(
-                              type: PageTransitionType.fade,
-                              child: ForgotpasswordScreen(),
-                            ),
-                          );
+                          Navigator.pushNamed(context, '/forgotpassword');
                         },
                         child: Text(
                           "Quên mật khẩu",
@@ -181,12 +172,7 @@ class LoginWithPasswordScreen extends StatelessWidget {
                       const Text("Chưa có tài khoản? "),
                       TextButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SignUpScreen(),
-                            ),
-                          );
+                          Navigator.pushNamed(context, '/signup');
                         },
                         child: const Text("Đăng ký"),
                       ),

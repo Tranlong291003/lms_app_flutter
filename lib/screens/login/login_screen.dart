@@ -4,7 +4,6 @@ import 'package:lms/apps/utils/ElevatedButtonsocial.dart';
 import 'package:lms/apps/utils/botton.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_state.dart';
-import 'package:lms/screens/login/loginWithPassword_screen.dart';
 import 'package:lms/screens/signup/signup_screen.dart'; // Import ThemeBloc
 
 class LoginScreen extends StatelessWidget {
@@ -89,13 +88,7 @@ class LoginScreen extends StatelessWidget {
                   themeState: themeState,
                   text: 'Đăng nhập với mật khẩu',
                   onPressed: () {
-                    // Điều hướng đến màn hình LoginWithPasswordScreen khi nhấn nút
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LoginWithPasswordScreen(),
-                      ),
-                    );
+                    Navigator.pushNamed(context, '/loginwithpassword');
                   },
                 ),
                 const SizedBox(height: 20),

@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import to adjust system UI
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_theme.dart'; // Import AppTheme to use themes
-import 'package:lms/apps/utils/BottomNavigationBarExampleApp.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_state.dart';
-import 'package:lms/screens/Introduction/Intro_screen.dart';
+import 'package:lms/routes/app_router.dart';
 import 'package:lms/screens/Introduction/cubit/intro_cubit.dart';
-import 'package:lms/screens/login/login_screen.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart'; // Import LoadingAnimationWidget
 
 class MyApp extends StatelessWidget {
@@ -49,7 +47,8 @@ class MyApp extends StatelessWidget {
                     theme: AppTheme.lightTheme,
                     darkTheme: AppTheme.darkTheme,
                     themeMode: themeState.themeMode,
-                    home: BottomNavigationBarExample(),
+                    initialRoute: '/',
+                    onGenerateRoute: AppRouter.generateRoute,
                   );
                 }
 
@@ -62,8 +61,8 @@ class MyApp extends StatelessWidget {
                         title: 'Custom Light/Dark Theme Demo',
                         theme: AppTheme.lightTheme,
                         darkTheme: AppTheme.darkTheme,
-                        themeMode: themeState.themeMode,
-                        home: const LoginScreen(),
+                        initialRoute: '/login',
+                        onGenerateRoute: AppRouter.generateRoute,
                       );
                     } else {
                       return MaterialApp(
@@ -71,8 +70,8 @@ class MyApp extends StatelessWidget {
                         title: 'Custom Light/Dark Theme Demo',
                         theme: AppTheme.lightTheme,
                         darkTheme: AppTheme.darkTheme,
-                        themeMode: themeState.themeMode,
-                        home: const IntroScreen(),
+                        initialRoute: '/intro',
+                        onGenerateRoute: AppRouter.generateRoute,
                       );
                     }
                   },

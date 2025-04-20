@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lms/screens/topMentor/topMentor_screen.dart';
 
 class TopMentors extends StatelessWidget {
   const TopMentors({super.key});
@@ -21,38 +20,8 @@ class TopMentors extends StatelessWidget {
 
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              "Giáo viên nổi bật",
-              style: TextStyle(
-                fontFamily: 'Roboto',
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TopMentorScreen()),
-                );
-              },
-              child: const Text(
-                "Xem tất cả",
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  color: Color(0xFF2F56DD),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
         SizedBox(
-          height: 110,
+          height: 90,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: fakeMentors.length,
