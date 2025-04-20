@@ -84,6 +84,6 @@ AppBar AppBarHome(BuildContext context, String title) {
         ),
       ],
     ),
-    toolbarHeight: 80, // Tăng chiều cao AppBar
+    toolbarHeight: 60, // Tăng chiều cao AppBar
   );
 }

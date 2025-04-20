@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/screens/topMentor/topMentor_screen.dart';
 
 class TopMentors extends StatelessWidget {
   const TopMentors({super.key});
@@ -33,7 +34,10 @@ class TopMentors extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () {
-                // TODO: chuyển trang Xem tất cả
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TopMentorScreen()),
+                );
               },
               child: const Text(
                 "Xem tất cả",
