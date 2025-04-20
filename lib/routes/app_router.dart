@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lms/screens/bookmark/bookmark_screen.dart';
 import 'package:lms/screens/forgotpassword/forgotpassword_screen.dart';
-import 'package:lms/screens/home/widget/listCourses_widget.dart';
+import 'package:lms/screens/listCourse/listCourse_screen.dart';
 import 'package:lms/screens/login/loginWithPassword_screen.dart';
+import 'package:lms/screens/notification/notification_screen.dart';
 import 'package:lms/screens/signup/signup_screen.dart';
 import 'package:lms/screens/topMentor/listMentor_screen.dart';
 
@@ -24,10 +26,14 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => SignUpScreen());
       case '/forgotpassword':
         return MaterialPageRoute(builder: (_) => ForgotpasswordScreen());
-      case '/listcourse':
-        return MaterialPageRoute(builder: (_) => ListCoursesWidget());
       case '/listmentor':
         return MaterialPageRoute(builder: (_) => ListMentorScreen());
+      case '/listcourse':
+        return MaterialPageRoute(builder: (_) => ListCoursescreen());
+      case '/notification':
+        return MaterialPageRoute(builder: (_) => NotificationScreen());
+      case '/bookmark':
+        return MaterialPageRoute(builder: (_) => BookmarkScreen());
 
       default:
         return MaterialPageRoute(

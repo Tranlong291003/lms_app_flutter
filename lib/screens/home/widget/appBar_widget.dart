@@ -73,11 +73,20 @@ AppBar AppBarHome(BuildContext context, String title) {
             ),
             IconButton(
               icon: Image.asset(
+                'assets/icons/bookmark.png',
+                color: Theme.of(context).iconTheme.color,
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, '/bookmark');
+              },
+            ),
+            IconButton(
+              icon: Image.asset(
                 'assets/icons/notification.png',
                 color: Theme.of(context).iconTheme.color,
               ),
               onPressed: () {
-                // Xử lý khi nhấn nút thông báo
+                Navigator.pushNamed(context, '/notification');
               },
             ),
           ],

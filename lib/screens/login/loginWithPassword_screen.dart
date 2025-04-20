@@ -21,7 +21,7 @@ class LoginWithPasswordScreen extends StatelessWidget {
           // Navigate to the main screen after successful login
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            MaterialPageRoute(builder: (context) => HomeScreen()),
           );
         } else if (state is AuthFailure) {
           // Show error message if login fails

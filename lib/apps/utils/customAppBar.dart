@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -9,12 +7,12 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? onBack;
 
   const CustomAppBar({
-    Key? key,
+    super.key,
     required this.title,
     this.showSearch = true,
     this.onSearchChanged,
     this.onBack,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
@@ -40,8 +38,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.black,
       elevation: 1,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new),

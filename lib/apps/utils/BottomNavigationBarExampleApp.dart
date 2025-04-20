@@ -18,7 +18,7 @@ class _BottomNavigationBarExampleState
   int _selectedIndex = 0; // Chỉ số mặc định, "Trang chủ" được chọn đầu tiên
 
   // Các màn hình cho mỗi tab trong thanh điều hướng
-  static const List<Widget> _widgetOptions = <Widget>[
+  static final List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
     MyCourseScreen(),
     InboxScreen(),
