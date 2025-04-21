@@ -7,7 +7,7 @@ import 'package:lms/screens/notification/notification_screen.dart';
 import 'package:lms/screens/signup/signup_screen.dart';
 import 'package:lms/screens/topMentor/listMentor_screen.dart';
 
-import '../apps/utils/BottomNavigationBarExampleApp.dart';
+import '../apps/utils/bottomNavigationBar.dart';
 import '../screens/Introduction/intro_screen.dart';
 import '../screens/login/login_screen.dart';
 

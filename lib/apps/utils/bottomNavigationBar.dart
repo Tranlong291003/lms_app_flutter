@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_state.dart';
 import 'package:lms/screens/home/home_screen.dart';
+import 'package:lms/screens/myCourse/myCourse_screen.dart';
 
 class BottomNavigationBarExample extends StatefulWidget {
   const BottomNavigationBarExample({super.key});
@@ -103,16 +104,6 @@ class _BottomNavigationBarExampleState
         );
       },
     );
-  }
-}
-
-// Các màn hình ví dụ
-class MyCourseScreen extends StatelessWidget {
-  const MyCourseScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Màn hình Khoá học'));
   }
 }
 

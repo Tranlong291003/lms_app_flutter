@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/utils/courseCategory_widget.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/listCourses_widget.dart';
 
@@ -32,7 +33,12 @@ class ListCoursescreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child: ListCoursesWidget(courses: sampleCourses),
+          child: Column(
+            children: [
+              CourseCategoryWidget(),
+              ListCoursesWidget(courses: sampleCourses),
+            ],
+          ),
         ),
       ),
     );

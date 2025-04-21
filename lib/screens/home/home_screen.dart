@@ -34,7 +34,7 @@ class HomeScreen extends StatelessWidget {
               children: [
                 SearchBarWidget(),
                 DiscountSlider(),
-                SizedBox(height: 5),
+                SizedBox(height: 10),
                 SectionHeader(
                   title: "Danh sách giáo viên",
                   onTap: () {
@@ -43,7 +43,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 TopMentors(),
-                SizedBox(height: 5),
+                SizedBox(height: 10),
                 SectionHeader(
                   title: "Danh sách khoá học",
                   onTap: () {
@@ -51,7 +51,7 @@ class HomeScreen extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 10),
-                CourseCategory(),
+                CourseCategoryWidget(),
                 ListCoursesWidget(courses: sampleCourses),
               ],
             ),
