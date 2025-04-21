@@ -5,6 +5,7 @@ import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_state.dart';
 import 'package:lms/screens/home/home_screen.dart';
 import 'package:lms/screens/myCourse/myCourse_screen.dart';
+import 'package:lms/screens/profile/profile_screen.dart';
 
 class BottomNavigationBarExample extends StatefulWidget {
   const BottomNavigationBarExample({super.key});
@@ -23,7 +24,7 @@ class _BottomNavigationBarExampleState
     HomeScreen(),
     MyCourseScreen(),
     InboxScreen(),
-    TransactionScreen(),
+    ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -113,23 +114,5 @@ class InboxScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(child: Text('Màn hình Hộp thư đến'));
-  }
-}
-
-class TransactionScreen extends StatelessWidget {
-  const TransactionScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Màn hình Giao dịch'));
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Màn hình Cá nhân'));
   }
 }

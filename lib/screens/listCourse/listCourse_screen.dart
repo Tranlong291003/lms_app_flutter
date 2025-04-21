@@ -23,6 +23,9 @@ class ListCoursescreen extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
+        showBack: true,
+        showSearch: true,
+        showMenu: true,
         title: 'Danh sách khoá học',
         onSearchChanged: (value) {
           // Gọi API tìm kiếm ở đây

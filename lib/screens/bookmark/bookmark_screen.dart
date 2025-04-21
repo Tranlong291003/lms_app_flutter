@@ -23,12 +23,9 @@ class BookmarkScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Danh sách khoá học yêu thích',
-        onSearchChanged: (value) {
-          // Gọi API tìm kiếm ở đây
-          // Có thể debounce bằng Bloc hoặc timer
-          print('Đang tìm kiếm: $value');
-        },
+        showBack: true,
+        showMenu: true,
+        title: 'DS khoá học yêu thích',
       ),
       body: SingleChildScrollView(
         child: Padding(

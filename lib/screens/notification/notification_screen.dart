@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/utils/customAppBar.dart';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
@@ -45,13 +46,7 @@ class NotificationScreen extends StatelessWidget {
     };
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Thông báo'),
-        leading: const BackButton(),
-        actions: [
-          IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
-        ],
-      ),
+      appBar: CustomAppBar(showBack: true, title: 'Thông báo', showMenu: true),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children:

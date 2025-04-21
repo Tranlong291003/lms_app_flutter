@@ -111,6 +111,8 @@ class ListMentorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
+        showBack: true,
+        showSearch: true,
         title: 'Danh sách giảng viên',
         onSearchChanged: (value) {
           // Gọi API tìm kiếm ở đây
