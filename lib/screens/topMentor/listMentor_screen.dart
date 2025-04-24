@@ -109,7 +109,11 @@ class ListMentorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
+      backgroundColor: isDarkMode ? colorScheme.surface : Colors.grey[50],
       appBar: CustomAppBar(
         showBack: true,
         showSearch: true,
@@ -120,30 +124,89 @@ class ListMentorScreen extends StatelessWidget {
           print('Đang tìm kiếm: $value');
         },
       ),
-
       body: ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 12),
         itemCount: mentors.length,
         itemBuilder: (context, index) {
           final mentor = mentors[index];
-          return ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 8,
+          return Card(
+            elevation: 2,
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            leading: CircleAvatar(
-              radius: 28,
-              backgroundImage: NetworkImage(mentor['avatar']!),
-            ),
-            title: Text(
-              mentor['name']!,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(mentor['description']!),
-            trailing: IconButton(
-              icon: const Icon(Icons.chat_bubble_outline, color: Colors.blue),
-              onPressed: () {
-                // Mở hộp thoại trò chuyện
+            child: InkWell(
+              onTap: () {
+                // Handle mentor selection
               },
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Hero(
+                      tag: 'mentor-${mentor['name']}',
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(30),
+                          child: Image.network(
+                            mentor['avatar']!,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (context, error, stackTrace) =>
+                                    const Icon(Icons.person),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            mentor['name']!,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            mentor['description']!,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.chat_bubble_outline,
+                        color: colorScheme.primary,
+                      ),
+                      onPressed: () {
+                        // Mở hộp thoại trò chuyện
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ),
           );
         },
