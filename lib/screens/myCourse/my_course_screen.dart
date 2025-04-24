@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
-import 'package:lms/screens/myCourse/widgets/myCompletedCourses_Widget.dart';
-import 'package:lms/screens/myCourse/widgets/myOngoingCourses_Widget.dart';
+import 'package:lms/screens/myCourse/my_completed_courses.dart';
+import 'package:lms/screens/myCourse/my_ongoing_courses.dart';
 
 class MyCourseScreen extends StatefulWidget {
   const MyCourseScreen({super.key});

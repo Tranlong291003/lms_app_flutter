@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lms/screens/myCourse/widgets/CourseCard_Widget.dart';
+import 'package:lms/screens/myCourse/course_card_widget.dart';
 
 class MyOngoingCoursesScreen extends StatelessWidget {
   final bool showCircular;

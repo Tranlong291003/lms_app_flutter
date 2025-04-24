@@ -7,9 +7,9 @@ import 'package:lms/apps/utils/searchBarWidget.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/blocs/user/user_state.dart';
-import 'package:lms/screens/home/widget/appBar_widget.dart';
-import 'package:lms/screens/home/widget/discountSlider_widget.dart';
-import 'package:lms/screens/home/widget/topMentors_widget.dart';
+import 'package:lms/screens/home/appBar_widget.dart';
+import 'package:lms/screens/home/discountSlider_widget.dart';
+import 'package:lms/screens/home/topMentors_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

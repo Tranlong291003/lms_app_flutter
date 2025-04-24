@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_state.dart';
 import 'package:lms/screens/home/home_screen.dart';
-import 'package:lms/screens/myCourse/myCourse_screen.dart';
+import 'package:lms/screens/myCourse/my_course_screen.dart';
 import 'package:lms/screens/profile/profile_screen.dart';
 import 'package:lms/screens/quiz/quiz_screen.dart';
 

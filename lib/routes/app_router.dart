@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lms/screens/CourseDetail/courseDetail_screen.dart';
+import 'package:lms/screens/course_detail/course_detail_screen.dart';
 import 'package:lms/screens/bookmark/bookmark_screen.dart';
 import 'package:lms/screens/forgotpassword/forgotpassword_screen.dart';
 import 'package:lms/screens/listCourse/listCourse_screen.dart';
