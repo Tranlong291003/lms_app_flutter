@@ -75,11 +75,7 @@ class SectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Roboto',
-          ),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         InkWell(
           onTap: onTap,
@@ -88,7 +84,6 @@ class SectionHeader extends StatelessWidget {
             style: TextStyle(
               color: Color(0xFF2F56DD),
               fontWeight: FontWeight.w500,
-              fontFamily: 'Roboto',
             ),
           ),
         ),

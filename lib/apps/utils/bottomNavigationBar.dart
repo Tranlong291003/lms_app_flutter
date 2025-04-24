@@ -6,6 +6,7 @@ import 'package:lms/blocs/theme/theme_state.dart';
 import 'package:lms/screens/home/home_screen.dart';
 import 'package:lms/screens/myCourse/myCourse_screen.dart';
 import 'package:lms/screens/profile/profile_screen.dart';
+import 'package:lms/screens/quiz/quiz_screen.dart';
 
 class BottomNavigationBarExample extends StatefulWidget {
   const BottomNavigationBarExample({super.key});
@@ -23,7 +24,7 @@ class _BottomNavigationBarExampleState
   static final List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
     MyCourseScreen(),
-    InboxScreen(),
+    QuizScreen(),
     ProfileScreen(),
   ];
 
@@ -105,14 +106,5 @@ class _BottomNavigationBarExampleState
         );
       },
     );
-  }
-}
-
-class InboxScreen extends StatelessWidget {
-  const InboxScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Màn hình Hộp thư đến'));
   }
 }

@@ -44,8 +44,16 @@ class MyApp extends StatelessWidget {
                   return MaterialApp(
                     debugShowCheckedModeBanner: false,
                     title: 'Custom Light/Dark Theme Demo',
-                    theme: AppTheme.lightTheme,
-                    darkTheme: AppTheme.darkTheme,
+                    theme: AppTheme.lightTheme.copyWith(
+                      textTheme: AppTheme.lightTheme.textTheme.apply(
+                        fontFamily: 'Roboto',
+                      ),
+                    ),
+                    darkTheme: AppTheme.darkTheme.copyWith(
+                      textTheme: AppTheme.darkTheme.textTheme.apply(
+                        fontFamily: 'Roboto',
+                      ),
+                    ),
                     themeMode: themeState.themeMode,
                     initialRoute: '/',
                     onGenerateRoute: AppRouter.generateRoute,

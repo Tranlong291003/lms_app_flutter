@@ -17,8 +17,6 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> loginWithEmailPassword(String email, String password) async {
     try {
       emit(AuthLoading());
-
-      // Đăng nhập với email và mật khẩu
       UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
 

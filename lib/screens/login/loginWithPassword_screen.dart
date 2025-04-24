@@ -4,7 +4,6 @@ import 'package:lms/apps/utils/ElevatedButtonsocial.dart';
 import 'package:lms/apps/utils/botton.dart';
 import 'package:lms/apps/utils/customTextField.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
-import 'package:lms/screens/home/home_screen.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart'; // Import the loading animation package
 
@@ -18,11 +17,7 @@ class LoginWithPasswordScreen extends StatelessWidget {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthSuccess) {
-          // Navigate to the main screen after successful login
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
-          );
+          Navigator.pushReplacementNamed(context, '/');
         } else if (state is AuthFailure) {
           // Show error message if login fails
           ScaffoldMessenger.of(

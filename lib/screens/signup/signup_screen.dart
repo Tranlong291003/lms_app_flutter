@@ -38,7 +38,6 @@ class SignUpScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 30, // Kích thước chữ
                         fontWeight: FontWeight.bold, // Chữ đậm
-                        fontFamily: 'Roboto', // Kiểu chữ (font family)
                         letterSpacing: 1.5, // Khoảng cách giữa các ký tự
                         color:
                             Theme.of(context).brightness == Brightness.dark

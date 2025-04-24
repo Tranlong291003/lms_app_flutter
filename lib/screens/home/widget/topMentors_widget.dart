@@ -35,10 +35,7 @@ class TopMentors extends StatelessWidget {
                     backgroundImage: NetworkImage(mentor["imageUrl"]),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    mentor["name"],
-                    style: const TextStyle(fontFamily: 'Roboto', fontSize: 14),
-                  ),
+                  Text(mentor["name"], style: const TextStyle(fontSize: 14)),
                 ],
               );
             },
