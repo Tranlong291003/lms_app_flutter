@@ -1,13 +1,24 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/courseCategory_widget.dart';
 import 'package:lms/apps/utils/listCourses_widget.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
+import 'package:lms/blocs/user/user_bloc.dart';
+import 'package:lms/blocs/user/user_event.dart';
+import 'package:lms/blocs/user/user_state.dart';
 import 'package:lms/screens/home/widget/appBar_widget.dart';
 import 'package:lms/screens/home/widget/discountSlider_widget.dart';
 import 'package:lms/screens/home/widget/topMentors_widget.dart';
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final List<Map<String, dynamic>> sampleCourses = List.generate(10, (index) {
     return {
       "title": "Khoá học Flutter nâng cao số ${index + 1}",
@@ -22,41 +33,61 @@ class HomeScreen extends StatelessWidget {
   });
 
   @override
+  void initState() {
+    super.initState();
+    // Lấy uid của user hiện tại và gọi API lấy thông tin user
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      context.read<UserBloc>().add(GetUserByUidEvent(currentUser.uid));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarHome(context, 'title'),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SearchBarWidget(),
-                DiscountSlider(),
-                SizedBox(height: 10),
-                SectionHeader(
-                  title: "Danh sách giáo viên",
-                  onTap: () {
-                    Navigator.pushNamed(context, '/listmentor');
-                  },
+      body: BlocBuilder<UserBloc, UserState>(
+        builder: (context, state) {
+          if (state is UserLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is UserError) {
+            return Center(child: Text('Lỗi: ${state.message}'));
+          }
+
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SearchBarWidget(),
+                    DiscountSlider(),
+                    const SizedBox(height: 10),
+                    SectionHeader(
+                      title: "Danh sách giáo viên",
+                      onTap: () {
+                        Navigator.pushNamed(context, '/listmentor');
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    TopMentors(),
+                    const SizedBox(height: 10),
+                    SectionHeader(
+                      title: "Danh sách khoá học",
+                      onTap: () {
+                        Navigator.pushNamed(context, '/listcourse');
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    CourseCategoryWidget(),
+                    ListCoursesWidget(courses: sampleCourses),
+                  ],
                 ),
-                SizedBox(height: 10),
-                TopMentors(),
-                SizedBox(height: 10),
-                SectionHeader(
-                  title: "Danh sách khoá học",
-                  onTap: () {
-                    Navigator.pushNamed(context, '/listcourse');
-                  },
-                ),
-                SizedBox(height: 10),
-                CourseCategoryWidget(),
-                ListCoursesWidget(courses: sampleCourses),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

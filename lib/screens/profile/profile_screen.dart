@@ -1,53 +1,114 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_event.dart';
+import 'package:lms/blocs/user/user_bloc.dart';
+import 'package:lms/blocs/user/user_state.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    const defaultAvatar =
+        'https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=';
+
     return Scaffold(
       appBar: CustomAppBar(title: 'Hồ sơ cá nhân', showMenu: true),
       body: Column(
         children: [
           const SizedBox(height: 16),
           Center(
-            child: Column(
-              children: [
-                Stack(
+            child: BlocBuilder<UserBloc, UserState>(
+              builder: (context, state) {
+                if (state is UserLoaded) {
+                  return Column(
+                    children: [
+                      Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 48,
+                            backgroundImage:
+                                state.user.avatarUrl != null &&
+                                        state.user.avatarUrl!.isNotEmpty
+                                    ? NetworkImage(
+                                      '${ApiConfig.baseUrl}${state.user.avatarUrl}',
+                                    )
+                                    : const NetworkImage(defaultAvatar),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: CircleAvatar(
+                              radius: 14,
+                              backgroundColor: Colors.white,
+                              child: Icon(
+                                Icons.edit,
+                                size: 16,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        state.user.name ?? 'Chưa cập nhật tên',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        state.user.email ?? 'Chưa cập nhật email',
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  );
+                }
+                return Column(
                   children: [
-                    const CircleAvatar(
-                      radius: 48,
-                      backgroundImage: NetworkImage(
-                        'https://randomuser.me/api/portraits/men/32.jpg',
+                    Stack(
+                      children: [
+                        const CircleAvatar(
+                          radius: 48,
+                          backgroundImage: NetworkImage(defaultAvatar),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: CircleAvatar(
+                            radius: 14,
+                            backgroundColor: Colors.white,
+                            child: Icon(
+                              Icons.edit,
+                              size: 16,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Đang tải...',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: CircleAvatar(
-                        radius: 14,
-                        backgroundColor: Colors.white,
-                        child: Icon(Icons.edit, size: 16, color: Colors.blue),
-                      ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Đang tải...',
+                      style: TextStyle(color: Colors.grey),
                     ),
                   ],
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Andrew Ainsley',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'andrew_ainsley@yourdomain.com',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ],
+                );
+              },
             ),
           ),
           const SizedBox(height: 24),

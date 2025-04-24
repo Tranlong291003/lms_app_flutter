@@ -1,10 +1,16 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_event.dart';
+import 'package:lms/blocs/user/user_bloc.dart';
+import 'package:lms/blocs/user/user_state.dart';
 
 AppBar AppBarHome(BuildContext context, String title) {
+  const defaultAvatar =
+      'https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=';
+
   // Lấy giờ hiện tại
   int gioHienTai = DateTime.now().hour;
 
@@ -26,11 +32,23 @@ AppBar AppBarHome(BuildContext context, String title) {
       children: [
         Row(
           children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(
-                // Đường dẫn ảnh đại diện
-                'https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=',
-              ),
+            BlocBuilder<UserBloc, UserState>(
+              builder: (context, state) {
+                if (state is UserLoaded) {
+                  return CircleAvatar(
+                    backgroundImage:
+                        state.user.avatarUrl != null &&
+                                state.user.avatarUrl!.isNotEmpty
+                            ? NetworkImage(
+                              '${ApiConfig.baseUrl}${state.user.avatarUrl}',
+                            )
+                            : const NetworkImage(defaultAvatar),
+                  );
+                }
+                return const CircleAvatar(
+                  backgroundImage: NetworkImage(defaultAvatar),
+                );
+              },
             ),
             SizedBox(width: 10),
             Column(
@@ -51,12 +69,25 @@ AppBar AppBarHome(BuildContext context, String title) {
                   ],
                   pause: Duration(milliseconds: 1000), // Dừng 1 giây
                 ),
-                Text(
-                  'Trần Khánh Long', // Tên người dùng
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold, // Chữ đậm
-                  ),
+                BlocBuilder<UserBloc, UserState>(
+                  builder: (context, state) {
+                    if (state is UserLoaded) {
+                      return Text(
+                        state.user.name ?? 'User', // Tên người dùng từ UserBloc
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold, // Chữ đậm
+                        ),
+                      );
+                    }
+                    return const Text(
+                      'User',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
