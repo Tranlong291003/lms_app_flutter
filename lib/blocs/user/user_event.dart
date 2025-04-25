@@ -1,3 +1,5 @@
+import 'dart:io';
+
 abstract class UserEvent {}
 
 class GetUserByUidEvent extends UserEvent {
@@ -7,16 +9,16 @@ class GetUserByUidEvent extends UserEvent {
 
 class UpdateUserProfileEvent extends UserEvent {
   final String uid;
-  final String? name;
-  final String? avatarUrl;
-  final String? bio;
-  final String? phone;
+  final String name;
+  final String phone;
+  final String bio;
+  final File? avatarFile; //  thêm dòng này
 
   UpdateUserProfileEvent({
     required this.uid,
-    this.name,
-    this.avatarUrl,
-    this.bio,
-    this.phone,
+    required this.name,
+    required this.phone,
+    required this.bio,
+    this.avatarFile, //  thêm dòng này
   });
 }

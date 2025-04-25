@@ -102,7 +102,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       )
                                       : avatarUrl.isNotEmpty
                                       ? Image.network(
-                                        'http://192.168.10.203:3000/$avatarUrl',
+                                        'http://192.168.10.203:3000$avatarUrl',
                                         fit: BoxFit.cover,
                                         errorBuilder:
                                             (_, __, ___) =>
@@ -130,7 +130,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 name: name,
                                 phone: phone,
                                 bio: bio,
-                                avatarUrl: avatarUrl,
+                                avatarFile:
+                                    imageFile, //  👈 gửi hẳn file (null nếu chưa đổi)
                               ),
                             );
                           }

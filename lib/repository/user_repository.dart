@@ -1,38 +1,48 @@
+/// lib/repository/user_repository.dart
+library;
+
+import 'dart:io';
+
 import 'package:lms/models/user_model.dart';
 import 'package:lms/services/user_service.dart';
 
 class UserRepository {
-  final UserService _userService;
+  final UserService _service; // đổi tên nhất quán
+  UserRepository(this._service);
 
-  UserRepository(this._userService);
-
-  // Lấy thông tin người dùng
+  /* ---------- Lấy thông tin người dùng ---------- */
   Future<User> getUserByUid(String uid) async {
     try {
-      return await _userService.getUserByUid(uid);
+      return await _service.getUserByUid(uid);
     } catch (e) {
-      throw Exception('Không thể lấy thông tin người dùng từ kho dữ liệu: $e');
+      throw Exception('Không thể lấy thông tin người dùng: $e');
     }
   }
 
-  // Cập nhật hồ sơ người dùng
-  Future<void> updateUserProfile({
+  /* ---------- Cập nhật hồ sơ (tự quyết định gửi file hay không) ---------- */
+  Future<User> updateUserProfile({
     required String uid,
-    String? name,
-    String? avatarUrl,
-    String? bio,
-    String? phone,
-  }) async {
-    try {
-      await _userService.updateUserProfile(
-        uid: uid,
-        name: name,
-        avatarUrl: avatarUrl,
-        bio: bio,
-        phone: phone,
-      );
-    } catch (e) {
-      throw Exception('Không thể cập nhật hồ sơ người dùng: $e');
-    }
+    required String name,
+    required String phone,
+    required String bio,
+    File? avatarFile, // null = không đổi ảnh
+  }) {
+    return avatarFile == null
+        // 1️⃣ chỉ gửi text – server giữ avatar cũ
+        ? _service.updateProfile(
+          uid: uid,
+          name: name,
+          phone: phone,
+          bio: bio,
+          avatarUrl: '', // chuỗi rỗng → server bỏ qua
+        )
+        // 2️⃣ gửi multipart – file + text
+        : _service.multipartUpdateProfile(
+          uid: uid,
+          name: name,
+          phone: phone,
+          bio: bio,
+          avatarFile: avatarFile,
+        );
   }
 }

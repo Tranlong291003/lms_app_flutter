@@ -32,13 +32,15 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   ) async {
     try {
       emit(UserLoading());
+
       await _userRepository.updateUserProfile(
         uid: event.uid,
         name: event.name,
-        avatarUrl: event.avatarUrl,
-        bio: event.bio,
         phone: event.phone,
+        bio: event.bio,
+        avatarFile: event.avatarFile, // 👈 truyền file (có thể null)
       );
+
       emit(UserUpdateSuccess(message: event.uid));
     } catch (e) {
       emit(UserUpdateFailure('Cập nhật hồ sơ thất bại: $e'));
