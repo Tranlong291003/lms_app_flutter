@@ -6,11 +6,33 @@ class UserRepository {
 
   UserRepository(this._userService);
 
+  // Lấy thông tin người dùng
   Future<User> getUserByUid(String uid) async {
     try {
       return await _userService.getUserByUid(uid);
     } catch (e) {
-      throw Exception('Failed to get user from repository: $e');
+      throw Exception('Không thể lấy thông tin người dùng từ kho dữ liệu: $e');
+    }
+  }
+
+  // Cập nhật hồ sơ người dùng
+  Future<void> updateUserProfile({
+    required String uid,
+    String? name,
+    String? avatarUrl,
+    String? bio,
+    String? phone,
+  }) async {
+    try {
+      await _userService.updateUserProfile(
+        uid: uid,
+        name: name,
+        avatarUrl: avatarUrl,
+        bio: bio,
+        phone: phone,
+      );
+    } catch (e) {
+      throw Exception('Không thể cập nhật hồ sơ người dùng: $e');
     }
   }
 }

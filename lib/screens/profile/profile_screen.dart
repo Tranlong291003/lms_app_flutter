@@ -6,6 +6,7 @@ import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_event.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
+import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/blocs/user/user_state.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -121,7 +122,13 @@ class ProfileScreen extends StatelessWidget {
                   "Chỉnh sửa hồ sơ",
                   context: context,
                   onTap: () {
-                    Navigator.pushNamed(context, '/editprofile');
+                    final currentUser = FirebaseAuth.instance.currentUser;
+                    if (currentUser != null) {
+                      context.read<UserBloc>().add(
+                        GetUserByUidEvent(currentUser.uid),
+                      );
+                      Navigator.pushNamed(context, '/editprofile');
+                    }
                   },
                 ),
                 _buildMenuItem(

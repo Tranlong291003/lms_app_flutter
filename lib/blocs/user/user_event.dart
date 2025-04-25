@@ -1,5 +1,3 @@
-// lib/blocs/user/user_event.dart
-
 abstract class UserEvent {}
 
 class GetUserByUidEvent extends UserEvent {
@@ -7,7 +5,18 @@ class GetUserByUidEvent extends UserEvent {
   GetUserByUidEvent(this.uid);
 }
 
-class GetUserByIdEvent extends UserEvent {
-  final String userId;
-  GetUserByIdEvent(this.userId);
+class UpdateUserProfileEvent extends UserEvent {
+  final String uid;
+  final String? name;
+  final String? avatarUrl;
+  final String? bio;
+  final String? phone;
+
+  UpdateUserProfileEvent({
+    required this.uid,
+    this.name,
+    this.avatarUrl,
+    this.bio,
+    this.phone,
+  });
 }
