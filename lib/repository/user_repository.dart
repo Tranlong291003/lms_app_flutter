@@ -1,13 +1,10 @@
-/// lib/repository/user_repository.dart
-library;
-
 import 'dart:io';
 
 import 'package:lms/models/user_model.dart';
 import 'package:lms/services/user_service.dart';
 
 class UserRepository {
-  final UserService _service; // đổi tên nhất quán
+  final UserService _service; // Đảm bảo dùng tên nhất quán
   UserRepository(this._service);
 
   /* ---------- Lấy thông tin người dùng ---------- */
@@ -19,30 +16,27 @@ class UserRepository {
     }
   }
 
-  /* ---------- Cập nhật hồ sơ (tự quyết định gửi file hay không) ---------- */
-  Future<User> updateUserProfile({
+  /* ---------- Cập nhật hồ sơ và nhận thông báo ---------- */
+  Future<Map<String, dynamic>> updateUserProfile({
     required String uid,
     required String name,
     required String phone,
     required String bio,
-    File? avatarFile, // null = không đổi ảnh
-  }) {
-    return avatarFile == null
-        // 1️⃣ chỉ gửi text – server giữ avatar cũ
-        ? _service.updateProfile(
-          uid: uid,
-          name: name,
-          phone: phone,
-          bio: bio,
-          avatarUrl: '', // chuỗi rỗng → server bỏ qua
-        )
-        // 2️⃣ gửi multipart – file + text
-        : _service.multipartUpdateProfile(
-          uid: uid,
-          name: name,
-          phone: phone,
-          bio: bio,
-          avatarFile: avatarFile,
-        );
+    File? avatarFile,
+  }) async {
+    // Gọi service để cập nhật hồ sơ người dùng và nhận thông báo
+    final result = await _service.updateProfile(
+      uid: uid,
+      name: name,
+      phone: phone,
+      bio: bio,
+      avatarFile: avatarFile, // Truyền file nếu có
+    );
+
+    if (result['user'] == null) {
+      throw Exception('Không thể cập nhật thông tin người dùng');
+    }
+
+    return result;
   }
 }

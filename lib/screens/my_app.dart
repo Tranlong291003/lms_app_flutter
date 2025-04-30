@@ -7,10 +7,13 @@ import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_state.dart';
 import 'package:lms/routes/app_router.dart';
 import 'package:lms/screens/Introduction/cubit/intro_cubit.dart';
+import 'package:lms/services/notification_service.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart'; // Import LoadingAnimationWidget
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final NotificationService notificationService;
+
+  const MyApp({super.key, required this.notificationService});
 
   @override
   Widget build(BuildContext context) {

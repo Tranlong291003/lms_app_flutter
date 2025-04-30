@@ -1,9 +1,9 @@
-// lib/screens/edit_profile_screen.dart
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lms/blocs/cubit/notification_cubit.dart'; // Import NotificationCubit
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/blocs/user/user_state.dart';
@@ -11,6 +11,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
+
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
@@ -41,9 +42,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       body: BlocListener<UserBloc, UserState>(
         listener: (context, state) {
           if (state is UserUpdateSuccess) {
-            context.read<UserBloc>().add(GetUserByUidEvent(state.message));
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Cập nhật thành công')),
+            context.read<UserBloc>().add(GetUserByUidEvent(state.user.uid));
+
+            // Hiển thị thông báo cục bộ sau khi cập nhật thành công
+            final notification = state.notification;
+            context.read<NotificationCubit>().showNotification(
+              notification['title'],
+              notification['body'],
+              notification['noti_id'],
             );
             Navigator.pop(context);
           } else if (state is UserUpdateFailure) {

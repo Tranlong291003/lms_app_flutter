@@ -1,8 +1,21 @@
+import 'package:flutter/material.dart';
 import 'package:lms/models/user_model.dart';
 
+@immutable
 abstract class UserState {}
 
-class UserInitial extends UserState {}
+class UserUpdateSuccess extends UserState {
+  final User user;
+  final Map<String, dynamic> notification;
+
+  UserUpdateSuccess(this.user, this.notification);
+}
+
+class UserUpdateFailure extends UserState {
+  final String message;
+
+  UserUpdateFailure(this.message);
+}
 
 class UserLoading extends UserState {}
 
@@ -16,16 +29,4 @@ class UserError extends UserState {
   final String message;
 
   UserError(this.message);
-}
-
-class UserUpdateSuccess extends UserState {
-  final String message;
-
-  UserUpdateSuccess({this.message = 'Cập nhật hồ sơ thành công'});
-}
-
-class UserUpdateFailure extends UserState {
-  final String message;
-
-  UserUpdateFailure(this.message);
 }
