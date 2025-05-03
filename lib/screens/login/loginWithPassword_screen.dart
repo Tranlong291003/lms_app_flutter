@@ -17,7 +17,7 @@ class LoginWithPasswordScreen extends StatelessWidget {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthSuccess) {
-          Navigator.pushReplacementNamed(context, '/');
+          Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
         } else if (state is AuthFailure) {
           // Show error message if login fails
           ScaffoldMessenger.of(

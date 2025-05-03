@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import to adjust system UI
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_theme.dart'; // Import AppTheme to use themes
+import 'package:lms/apps/utils/route_observer.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_state.dart';
 import 'package:lms/routes/app_router.dart';
@@ -31,8 +32,12 @@ class MyApp extends StatelessWidget {
                 // Hiển thị vòng quay loading khi đang chờ
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Scaffold(
-                    backgroundColor:
-                        Colors.blueGrey, // Semi-transparent black background
+                    backgroundColor: const Color.fromARGB(
+                      255,
+                      136,
+                      173,
+                      192,
+                    ), // Semi-transparent black background
                     body: Center(
                       child: LoadingAnimationWidget.beat(
                         color: Colors.white,
@@ -60,6 +65,7 @@ class MyApp extends StatelessWidget {
                     themeMode: themeState.themeMode,
                     initialRoute: '/',
                     onGenerateRoute: AppRouter.generateRoute,
+                    navigatorObservers: [routeObserver],
                   );
                 }
 

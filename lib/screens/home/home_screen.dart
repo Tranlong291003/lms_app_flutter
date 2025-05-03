@@ -1,8 +1,11 @@
+// lib/screens/home/home_screen.dart
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/courseCategory_widget.dart';
 import 'package:lms/apps/utils/listCourses_widget.dart';
+import 'package:lms/apps/utils/route_observer.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
@@ -15,10 +18,10 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with RouteAware {
   final List<Map<String, dynamic>> sampleCourses = List.generate(10, (index) {
     return {
       "title": "Khoá học Flutter nâng cao số ${index + 1}",
@@ -35,55 +38,76 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Lấy uid của user hiện tại và gọi API lấy thông tin user
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      context.read<UserBloc>().add(GetUserByUidEvent(currentUser.uid));
+    _loadCurrentUser();
+  }
+
+  void _loadCurrentUser() {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      context.read<UserBloc>().add(GetUserByUidEvent(uid));
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Đăng ký observer
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    // Hủy đăng ký observer
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Khi pop về từ màn con, reload data
+    _loadCurrentUser();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarHome(context, 'title'),
+      appBar: AppBarHome(context, 'Home'),
       body: BlocBuilder<UserBloc, UserState>(
         builder: (context, state) {
           if (state is UserLoading) {
             return const Center(child: CircularProgressIndicator());
-          } else if (state is UserError) {
-            return Center(child: Text('Lỗi: ${state.message}'));
+            // } else if (state is UserFailure) {
+            //   return Center(child: Text('Lỗi: ${state.message}'));
           }
 
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SearchBarWidget(),
-                    DiscountSlider(),
-                    const SizedBox(height: 10),
-                    SectionHeader(
-                      title: "Danh sách giáo viên",
-                      onTap: () {
-                        Navigator.pushNamed(context, '/listmentor');
-                      },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SearchBarWidget(),
+                  const SizedBox(height: 16),
+                  DiscountSlider(),
+                  const SizedBox(height: 24),
+                  _buildSection(
+                    title: 'Danh sách giảng viên',
+                    onTap: () => Navigator.pushNamed(context, '/listmentor'),
+                    child: TopMentors(),
+                  ),
+                  const SizedBox(height: 24),
+                  _buildSection(
+                    title: 'Danh sách khoá học',
+                    onTap: () => Navigator.pushNamed(context, '/listcourse'),
+                    child: Column(
+                      children: [
+                        CourseCategoryWidget(),
+                        const SizedBox(height: 12),
+                        ListCoursesWidget(courses: sampleCourses),
+                      ],
                     ),
-                    const SizedBox(height: 10),
-                    TopMentors(),
-                    const SizedBox(height: 10),
-                    SectionHeader(
-                      title: "Danh sách khoá học",
-                      onTap: () {
-                        Navigator.pushNamed(context, '/listcourse');
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    CourseCategoryWidget(),
-                    ListCoursesWidget(courses: sampleCourses),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );
@@ -91,33 +115,27 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-}
 
-class SectionHeader extends StatelessWidget {
-  final String title;
-  final VoidCallback onTap;
-
-  const SectionHeader({super.key, required this.title, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildSection({
+    required String title,
+    required VoidCallback onTap,
+    required Widget child,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        InkWell(
-          onTap: onTap,
-          child: const Text(
-            "Xem tất cả",
-            style: TextStyle(
-              color: Color(0xFF2F56DD),
-              fontWeight: FontWeight.w500,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-          ),
+            TextButton(onPressed: onTap, child: const Text('Xem tất cả')),
+          ],
         ),
+        const SizedBox(height: 8),
+        child,
       ],
     );
   }

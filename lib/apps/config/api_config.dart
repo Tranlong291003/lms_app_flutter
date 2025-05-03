@@ -7,4 +7,5 @@ class ApiConfig {
   static String get signUp => "$baseUrl/api/users/create";
   static String get getUserByUid => "$baseUrl/api/users";
   static String get updateUserByUid => "$baseUrl/api/users/update";
+  static String get getAllMentor => "$baseUrl/api/users/listmentor";
 }

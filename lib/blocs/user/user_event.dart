@@ -22,3 +22,8 @@ class UpdateUserProfileEvent extends UserEvent {
     this.avatarFile, //  thêm dòng này
   });
 }
+
+class GetAllMentorsEvent extends UserEvent {
+  final String? search;
+  GetAllMentorsEvent({this.search});
+}

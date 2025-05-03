@@ -2,14 +2,11 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
-import 'package:lms/blocs/theme/theme_bloc.dart';
-import 'package:lms/blocs/theme/theme_event.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_state.dart';
 
 AppBar AppBarHome(BuildContext context, String title) {
-  const defaultAvatar =
-      'https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=';
+  const defaultAvatar = 'https://www.gravatar.com/avatar/?d=mp';
 
   // Lấy giờ hiện tại
   int gioHienTai = DateTime.now().hour;
@@ -34,22 +31,29 @@ AppBar AppBarHome(BuildContext context, String title) {
           children: [
             BlocBuilder<UserBloc, UserState>(
               builder: (context, state) {
-                if (state is UserLoaded) {
-                  return CircleAvatar(
+                final role = (state is UserLoaded) ? state.user.role : null;
+                return InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () {
+                    if (role == 'admin' || role == 'mentor') {
+                      // điều hướng tới Dashboard
+                      Navigator.pushNamed(context, '/dashBoard');
+                    } else {
+                      // điều hướng tới Profile bình thường
+                    }
+                  },
+                  child: CircleAvatar(
                     backgroundImage:
-                        state.user.avatarUrl != null &&
-                                state.user.avatarUrl!.isNotEmpty
+                        (state is UserLoaded && state.user.avatarUrl.isNotEmpty)
                             ? NetworkImage(
                               '${ApiConfig.baseUrl}${state.user.avatarUrl}',
                             )
                             : const NetworkImage(defaultAvatar),
-                  );
-                }
-                return const CircleAvatar(
-                  backgroundImage: NetworkImage(defaultAvatar),
+                  ),
                 );
               },
             ),
+
             SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,13 +99,6 @@ AppBar AppBarHome(BuildContext context, String title) {
         ),
         Row(
           children: [
-            IconButton(
-              icon: const Icon(Icons.brightness_6),
-              onPressed: () {
-                // Chuyển theme sáng/tối
-                context.read<ThemeBloc>().add(ThemeToggled());
-              },
-            ),
             IconButton(
               icon: Image.asset(
                 'assets/icons/bookmark.png',

@@ -1,58 +1,63 @@
+// src/models/user_model.dart
+
 class User {
-  final String uid; // Firebase UID làm PK
-  final String email; // Email người dùng
-  final String? name; // Tên hiển thị
-  final String? avatarUrl; // Ảnh đại diện
-  final String? bio; // Tiểu sử
-  final String? phone; // SĐT
-  final String role; // Vai trò: user | mentor | admin
-  final bool isActive; // Trạng thái hoạt động
-  final DateTime createdAt; // Ngày tạo
-  final DateTime? updatedAt; // Ngày cập nhật
+  final String uid;
+  final String email;
+  final String name;
+  final String avatarUrl;
+  final String bio;
+  final String phone;
+  final String gender;
+  final DateTime? birthdate;
+  final String role;
+  final String fcmToken;
+  final bool isActive;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   User({
     required this.uid,
     required this.email,
-    this.name,
-    this.avatarUrl,
-    this.bio,
-    this.phone,
+    required this.name,
+    required this.avatarUrl,
+    required this.bio,
+    required this.phone,
+    required this.gender,
+    this.birthdate,
     required this.role,
+    required this.fcmToken,
     required this.isActive,
-    required this.createdAt,
+    this.createdAt,
     this.updatedAt,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      uid: json['uid'],
-      email: json['email'],
-      name: json['name'],
-      avatarUrl: json['avatar_url'],
-      bio: json['bio'],
-      phone: json['phone'],
-      role: json['role'],
-      isActive: json['is_active'] == 1,
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt:
-          json['updated_at'] != null
-              ? DateTime.parse(json['updated_at'])
-              : null,
-    );
-  }
+    DateTime? parseDate(dynamic value) {
+      if (value == null) return null;
+      try {
+        return DateTime.parse(value.toString());
+      } catch (_) {
+        return null;
+      }
+    }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'uid': uid,
-      'email': email,
-      'name': name,
-      'avatar_url': avatarUrl,
-      'bio': bio,
-      'phone': phone,
-      'role': role,
-      'is_active': isActive ? 1 : 0,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
-    };
+    return User(
+      uid: json['uid']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      avatarUrl: json['avatar_url']?.toString() ?? '',
+      bio: json['bio']?.toString() ?? '',
+      phone: json['phone']?.toString() ?? '',
+      gender: json['gender']?.toString() ?? '',
+      birthdate: parseDate(json['birthdate']),
+      role: json['role']?.toString() ?? '',
+      fcmToken: json['fcm_token']?.toString() ?? '',
+      isActive:
+          json['is_active'] is bool
+              ? json['is_active']
+              : (json['is_active']?.toString().toLowerCase() == 'true'),
+      createdAt: parseDate(json['created_at']),
+      updatedAt: parseDate(json['updated_at']),
+    );
   }
 }

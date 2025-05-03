@@ -47,6 +47,9 @@ Future<void> main() async {
   // Khởi tạo NotificationService
   await notificationService.initialize();
 
+  // Kiểm tra trạng thái intro khi mở app
+  await introCubit.checkIntroStatus();
+
   // Chạy ứng dụng Flutter và cung cấp các Bloc và Cubit
   runApp(
     MultiBlocProvider(

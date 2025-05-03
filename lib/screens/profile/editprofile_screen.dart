@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/cubit/notification_cubit.dart'; // Import NotificationCubit
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/blocs/user/user_state.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -61,12 +61,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: BlocBuilder<UserBloc, UserState>(
           builder: (context, state) {
             if (state is UserLoading) {
-              return Center(
-                child: LoadingAnimationWidget.staggeredDotsWave(
-                  color: theme.colorScheme.primary,
-                  size: 60,
-                ),
-              );
+              return LoadingIndicator();
             }
             if (state is! UserLoaded) {
               return const Center(child: Text('Không có dữ liệu người dùng'));

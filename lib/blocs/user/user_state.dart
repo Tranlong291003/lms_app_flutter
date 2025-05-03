@@ -30,3 +30,15 @@ class UserError extends UserState {
 
   UserError(this.message);
 }
+
+class MentorsLoading extends UserState {}
+
+class MentorsLoaded extends UserState {
+  final List<User> mentors;
+  MentorsLoaded(this.mentors);
+}
+
+class MentorsError extends UserState {
+  final String message;
+  MentorsError(this.message);
+}

@@ -8,7 +8,7 @@ class UserService {
   final Dio _dio;
   UserService(this._dio);
 
-  /* ───────────────── GET USER ───────────────── */
+  /* ───────────────── GET USER BY ID ───────────────── */
   Future<User> getUserByUid(String uid) async {
     try {
       final res = await _dio.get('${ApiConfig.getUserByUid}/$uid');
@@ -57,6 +57,24 @@ class UserService {
     } on DioException catch (e) {
       final msg = e.response?.data['message'] ?? 'Không kết nối được server';
       throw Exception('Cập nhật thất bại: $msg');
+    }
+  }
+
+  /* ───────────────── GET ALL MENTORS ───────────────── */
+  Future<List<Map<String, dynamic>>> fetchAllMentors({String? search}) async {
+    try {
+      final res = await _dio.get(
+        ApiConfig.getAllMentor,
+        queryParameters: {
+          if (search != null && search.isNotEmpty) 'search': search,
+        },
+      );
+      if (res.statusCode == 200 && res.data['mentors'] is List) {
+        return List<Map<String, dynamic>>.from(res.data['mentors']);
+      }
+      throw Exception('Không thể tải danh sách mentor');
+    } catch (e) {
+      throw Exception('Lỗi khi tải danh sách mentor: \$e');
     }
   }
 }

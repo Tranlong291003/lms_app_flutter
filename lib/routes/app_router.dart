@@ -12,7 +12,7 @@ import 'package:lms/screens/quiz/quiz_detail_screen.dart';
 import 'package:lms/screens/quiz/quiz_questions_screen.dart';
 import 'package:lms/screens/quiz/quiz_screen.dart';
 import 'package:lms/screens/signup/signup_screen.dart';
-import 'package:lms/screens/topMentor/listMentor_screen.dart';
+import 'package:lms/screens/listMentor/listMentor_screen.dart';
 
 import '../apps/utils/bottomNavigationBar.dart';
 import '../screens/Introduction/intro_screen.dart';
@@ -37,52 +37,91 @@ class AppRouter {
   static const String courseDetail = '/courseDetail';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
+    Widget page;
     switch (settings.name) {
       case home:
-        return MaterialPageRoute(builder: (_) => BottomNavigationBarExample());
+        page = BottomNavigationBarExample();
+        break;
       case login:
-        return MaterialPageRoute(builder: (_) => const LoginScreen());
+        page = const LoginScreen();
+        break;
       case intro:
-        return MaterialPageRoute(builder: (_) => const IntroScreen());
+        page = const IntroScreen();
+        break;
       case loginWithPassword:
-        return MaterialPageRoute(builder: (_) => LoginWithPasswordScreen());
+        page = LoginWithPasswordScreen();
+        break;
       case signup:
-        return MaterialPageRoute(builder: (_) => SignUpScreen());
+        page = SignUpScreen();
+        break;
       case forgotPassword:
-        return MaterialPageRoute(builder: (_) => ForgotpasswordScreen());
+        page = ForgotpasswordScreen();
+        break;
       case listMentor:
-        return MaterialPageRoute(builder: (_) => ListMentorScreen());
+        page = ListMentorScreen();
+        break;
       case listCourse:
-        return MaterialPageRoute(builder: (_) => ListCoursescreen());
+        page = ListCoursescreen();
+        break;
       case notification:
-        return MaterialPageRoute(builder: (_) => NotificationScreen());
+        page = NotificationScreen();
+        break;
       case bookmark:
-        return MaterialPageRoute(builder: (_) => BookmarkScreen());
+        page = BookmarkScreen();
+        break;
       case profile:
-        return MaterialPageRoute(builder: (_) => ProfileScreen());
+        page = ProfileScreen();
+        break;
       case editProfile:
-        return MaterialPageRoute(builder: (_) => EditProfileScreen());
+        page = EditProfileScreen();
+        break;
       case quiz:
-        return MaterialPageRoute(builder: (_) => const QuizScreen());
+        page = const QuizScreen();
+        break;
       case quizDetail:
-        return MaterialPageRoute(
-          builder: (_) => const QuizDetailScreen(),
-          settings: settings, // Pass the arguments
-        );
+        page = const QuizDetailScreen();
+        break;
       case quizQuestions:
-        return MaterialPageRoute(
-          builder: (_) => const QuizQuestionsScreen(),
-          settings: settings, // Pass the arguments
-        );
+        page = const QuizQuestionsScreen();
+        break;
       case courseDetail:
-        return MaterialPageRoute(builder: (_) => const CourseDetailScreen());
+        page = const CourseDetailScreen();
+        break;
       default:
-        return MaterialPageRoute(
-          builder:
-              (_) => const Scaffold(
-                body: Center(child: Text('Không tìm thấy trang')),
-              ),
+        page = const Scaffold(
+          body: Center(child: Text('Không tìm thấy trang')),
         );
     }
+
+    return _buildAnimatedRoute(page, settings);
+  }
+
+  /// Helper để tạo PageRoute với hiệu ứng slide + fade.
+  static PageRouteBuilder _buildAnimatedRoute(
+    Widget page,
+    RouteSettings settings,
+  ) {
+    return PageRouteBuilder(
+      settings: settings,
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionDuration: const Duration(milliseconds: 300),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        // slide từ phải sang
+        final slideAnim = Tween<Offset>(
+          begin: const Offset(1, 0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut));
+        // đồng thời fade-in
+        final fadeAnim = Tween<double>(
+          begin: 0.0,
+          end: 1.0,
+        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeIn));
+
+        return SlideTransition(
+          position: slideAnim,
+          child: FadeTransition(opacity: fadeAnim, child: child),
+        );
+      },
+    );
   }
 }
