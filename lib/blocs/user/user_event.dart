@@ -12,18 +12,17 @@ class UpdateUserProfileEvent extends UserEvent {
   final String name;
   final String phone;
   final String bio;
-  final File? avatarFile; //  thêm dòng này
+  final String gender; // thêm trường gender
+  final DateTime? birthdate; // thêm trường birthdate
+  final File? avatarFile; // thêm trường avatarFile
 
   UpdateUserProfileEvent({
     required this.uid,
     required this.name,
     required this.phone,
     required this.bio,
-    this.avatarFile, //  thêm dòng này
+    required this.gender,
+    this.birthdate,
+    this.avatarFile,
   });
-}
-
-class GetAllMentorsEvent extends UserEvent {
-  final String? search;
-  GetAllMentorsEvent({this.search});
 }

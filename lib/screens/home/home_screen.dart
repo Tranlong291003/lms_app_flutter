@@ -1,12 +1,14 @@
-// lib/screens/home/home_screen.dart
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/courseCategory_widget.dart';
 import 'package:lms/apps/utils/listCourses_widget.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/apps/utils/route_observer.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
+import 'package:lms/blocs/mentors/mentors_bloc.dart';
+import 'package:lms/blocs/mentors/mentors_event.dart';
+import 'package:lms/blocs/mentors/mentors_state.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/blocs/user/user_state.dart';
@@ -39,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   void initState() {
     super.initState();
     _loadCurrentUser();
+    _loadMentor();
   }
 
   void _loadCurrentUser() {
@@ -48,36 +51,40 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     }
   }
 
+  void _loadMentor() {
+    context.read<MentorsBloc>().add(GetAllMentorsEvent());
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Đăng ký observer
     routeObserver.subscribe(this, ModalRoute.of(context)!);
   }
 
   @override
   void dispose() {
-    // Hủy đăng ký observer
     routeObserver.unsubscribe(this);
     super.dispose();
   }
 
   @override
   void didPopNext() {
-    // Khi pop về từ màn con, reload data
     _loadCurrentUser();
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
     return Scaffold(
       appBar: AppBarHome(context, 'Home'),
       body: BlocBuilder<UserBloc, UserState>(
         builder: (context, state) {
           if (state is UserLoading) {
-            return const Center(child: CircularProgressIndicator());
-            // } else if (state is UserFailure) {
-            //   return Center(child: Text('Lỗi: ${state.message}'));
+            // return const LoadingIndicator();
+          } else if (state is UserError) {
+            return Center(child: Text('Lỗi: ${state.message}'));
           }
 
           return SingleChildScrollView(
@@ -87,22 +94,32 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SearchBarWidget(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 5),
                   DiscountSlider(),
-                  const SizedBox(height: 24),
                   _buildSection(
                     title: 'Danh sách giảng viên',
                     onTap: () => Navigator.pushNamed(context, '/listmentor'),
-                    child: TopMentors(),
+                    child: BlocBuilder<MentorsBloc, MentorsState>(
+                      builder: (context, state) {
+                        if (state is MentorsLoading) {
+                          return const LoadingIndicator();
+                        } else if (state is MentorsLoaded) {
+                          return TopMentors(mentors: state.mentors);
+                        } else if (state is MentorsError) {
+                          return Center(child: Text('Lỗi: ${state.message}'));
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 5),
                   _buildSection(
                     title: 'Danh sách khoá học',
                     onTap: () => Navigator.pushNamed(context, '/listcourse'),
                     child: Column(
                       children: [
                         CourseCategoryWidget(),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 5),
                         ListCoursesWidget(courses: sampleCourses),
                       ],
                     ),
@@ -121,6 +138,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     required VoidCallback onTap,
     required Widget child,
   }) {
+    final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -129,7 +147,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
           children: [
             Text(
               title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             TextButton(onPressed: onTap, child: const Text('Xem tất cả')),
           ],

@@ -22,6 +22,8 @@ class UserRepository {
     required String name,
     required String phone,
     required String bio,
+    required String gender,
+    DateTime? birthdate,
     File? avatarFile,
   }) async {
     // Gọi service để cập nhật hồ sơ người dùng và nhận thông báo
@@ -30,8 +32,9 @@ class UserRepository {
       name: name,
       phone: phone,
       bio: bio,
-
-      avatarFile: avatarFile, // Truyền file nếu có
+      gender: gender,
+      birthdate: birthdate,
+      avatarFile: avatarFile,
     );
 
     if (result['user'] == null) {
@@ -39,19 +42,5 @@ class UserRepository {
     }
 
     return result;
-  }
-
-  Future<List<User>> getAllMentors({String? search}) async {
-    final raw = await _service.fetchAllMentors(search: search);
-    return raw.map((json) {
-      // Null-safe mapping
-      final safe = {
-        'name': json['name'],
-        'bio': json['bio'],
-        'avatarUrl': json['avatar_url'],
-        'phone': json['phone'],
-      };
-      return User.fromJson(safe);
-    }).toList();
   }
 }

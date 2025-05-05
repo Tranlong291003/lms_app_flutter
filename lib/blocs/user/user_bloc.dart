@@ -9,7 +9,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   UserBloc(this._userRepository) : super(UserLoading()) {
     on<GetUserByUidEvent>(_onGetUserByUid);
     on<UpdateUserProfileEvent>(_onUpdateUserProfile);
-    on<GetAllMentorsEvent>(_onGetAllMentors);
   }
 
   // Lấy thông tin user từ UID
@@ -39,6 +38,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         name: event.name,
         phone: event.phone,
         bio: event.bio,
+        gender: event.gender,
+        birthdate: event.birthdate,
         avatarFile: event.avatarFile,
       );
 
@@ -53,19 +54,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(UserUpdateSuccess(user, notification));
     } catch (e) {
       emit(UserUpdateFailure('Cập nhật hồ sơ thất bại: $e'));
-    }
-  }
-
-  Future<void> _onGetAllMentors(
-    GetAllMentorsEvent e,
-    Emitter<UserState> emit,
-  ) async {
-    emit(MentorsLoading());
-    try {
-      final list = await _userRepository.getAllMentors(search: e.search);
-      emit(MentorsLoaded(list));
-    } catch (e) {
-      emit(MentorsError('Không thể tải danh sách mentor: $e'));
     }
   }
 }

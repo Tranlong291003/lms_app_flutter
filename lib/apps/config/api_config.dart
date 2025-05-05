@@ -1,6 +1,6 @@
 class ApiConfig {
   // static const String baseUrl = "http://172.20.10.5:3000";
-  static const String baseUrl = "http://192.168.10.203:3000";
+  static const String baseUrl = "http://192.168.1.6:3000";
 
   // users
   static String get login => "$baseUrl/api/users/login";

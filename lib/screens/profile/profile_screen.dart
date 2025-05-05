@@ -33,8 +33,7 @@ class ProfileScreen extends StatelessWidget {
                           CircleAvatar(
                             radius: 48,
                             backgroundImage:
-                                state.user.avatarUrl != null &&
-                                        state.user.avatarUrl!.isNotEmpty
+                                state.user.avatarUrl.isNotEmpty
                                     ? NetworkImage(
                                       '${ApiConfig.baseUrl}${state.user.avatarUrl}',
                                     )

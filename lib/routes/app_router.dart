@@ -3,6 +3,8 @@ import 'package:lms/screens/bookmark/bookmark_screen.dart';
 import 'package:lms/screens/course_detail/course_detail_screen.dart';
 import 'package:lms/screens/forgotpassword/forgotpassword_screen.dart';
 import 'package:lms/screens/listCourse/listCourse_screen.dart';
+import 'package:lms/screens/listMentor/listMentor_screen.dart';
+import 'package:lms/screens/listMentor/mentor_detail_screen.dart';
 import 'package:lms/screens/login/loginWithPassword_screen.dart';
 import 'package:lms/screens/login/login_screen.dart';
 import 'package:lms/screens/notification/notification_screen.dart';
@@ -12,7 +14,6 @@ import 'package:lms/screens/quiz/quiz_detail_screen.dart';
 import 'package:lms/screens/quiz/quiz_questions_screen.dart';
 import 'package:lms/screens/quiz/quiz_screen.dart';
 import 'package:lms/screens/signup/signup_screen.dart';
-import 'package:lms/screens/listMentor/listMentor_screen.dart';
 
 import '../apps/utils/bottomNavigationBar.dart';
 import '../screens/Introduction/intro_screen.dart';
@@ -35,9 +36,11 @@ class AppRouter {
   static const String quizDetail = '/quizdetail';
   static const String quizQuestions = '/quiz/questions';
   static const String courseDetail = '/courseDetail';
+  static const String mentorDetail = '/mentordetail';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     Widget page;
+
     switch (settings.name) {
       case home:
         page = BottomNavigationBarExample();
@@ -87,6 +90,15 @@ class AppRouter {
       case courseDetail:
         page = const CourseDetailScreen();
         break;
+      case mentorDetail:
+        final args = settings.arguments;
+        if (args is String) {
+          page = MentorDetailScreen(uid: args);
+        } else {
+          page = const Scaffold(
+            body: Center(child: Text('Không tìm thấy Mentor UID')),
+          );
+        }
       default:
         page = const Scaffold(
           body: Center(child: Text('Không tìm thấy trang')),
@@ -106,12 +118,10 @@ class AppRouter {
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionDuration: const Duration(milliseconds: 300),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        // slide từ phải sang
         final slideAnim = Tween<Offset>(
           begin: const Offset(1, 0),
           end: Offset.zero,
         ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut));
-        // đồng thời fade-in
         final fadeAnim = Tween<double>(
           begin: 0.0,
           end: 1.0,

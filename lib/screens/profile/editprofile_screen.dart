@@ -1,10 +1,16 @@
+// lib/screens/profile/editprofile_screen.dart
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
+    as picker;
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
-import 'package:lms/blocs/cubit/notification_cubit.dart'; // Import NotificationCubit
+import 'package:lms/blocs/cubit/notification_cubit.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/blocs/user/user_state.dart';
@@ -18,9 +24,15 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  String name = '', phone = '', bio = '';
-  File? imageFile;
+  String _name = '';
+  String _phone = '';
+  String _bio = '';
+  String? _gender;
+  DateTime? _birthdate;
+  File? _imageFile;
   final _picker = ImagePicker();
+
+  static const List<String> _genderOptions = ['Nam', 'Nữ', 'Khác'];
 
   Future<void> _pickImage() async {
     final picked = await _picker.pickImage(
@@ -30,21 +42,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       imageQuality: 85,
     );
     if (!mounted || picked == null) return;
-    setState(() => imageFile = File(picked.path));
+    setState(() => _imageFile = File(picked.path));
+  }
+
+  void _pickDate() {
+    final now = DateTime.now();
+    final initial = _birthdate ?? DateTime(now.year - 18);
+    picker.DatePicker.showDatePicker(
+      context,
+      locale: picker.LocaleType.vi,
+      minTime: DateTime(1900),
+      maxTime: now,
+      currentTime: initial,
+      onChanged: (date) {},
+      onConfirm: (date) {
+        setState(() => _birthdate = date);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final dateFmt = DateFormat('dd MMMM yyyy', 'vi_VN');
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Chỉnh sửa hồ sơ')),
+      appBar: AppBar(title: const Text('Chỉnh sửa hồ sơ'), centerTitle: true),
       body: BlocListener<UserBloc, UserState>(
         listener: (context, state) {
           if (state is UserUpdateSuccess) {
             context.read<UserBloc>().add(GetUserByUidEvent(state.user.uid));
-
-            // Hiển thị thông báo cục bộ sau khi cập nhật thành công
             final notification = state.notification;
             context.read<NotificationCubit>().showNotification(
               notification['title'],
@@ -61,17 +88,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: BlocBuilder<UserBloc, UserState>(
           builder: (context, state) {
             if (state is UserLoading) {
-              return LoadingIndicator();
+              return const LoadingIndicator();
             }
             if (state is! UserLoaded) {
               return const Center(child: Text('Không có dữ liệu người dùng'));
             }
-
             final user = state.user;
-            name = name.isEmpty ? user.name ?? '' : name;
-            phone = phone.isEmpty ? user.phone ?? '' : phone;
-            bio = bio.isEmpty ? user.bio ?? '' : bio;
-            final avatarPath = user.avatarUrl ?? '';
+            // Khởi tạo các giá trị khi lần đầu build
+            _name = _name.isEmpty ? user.name : _name;
+            _phone = _phone.isEmpty ? user.phone : _phone;
+            _bio = _bio.isEmpty ? user.bio : _bio;
+            _gender ??=
+                _genderOptions.contains(user.gender)
+                    ? user.gender
+                    : _genderOptions.first;
+            _birthdate ??= user.birthdate;
+            final avatarUrl =
+                user.avatarUrl.startsWith('http')
+                    ? user.avatarUrl
+                    : '${ApiConfig.baseUrl}${user.avatarUrl}';
 
             return SingleChildScrollView(
               padding:
@@ -81,111 +116,150 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 12),
-
-                    /* ----------------- Avatar ----------------- */
                     Center(
                       child: GestureDetector(
                         onTap: _pickImage,
                         child: Stack(
-                          alignment: Alignment.center,
+                          alignment: Alignment.bottomRight,
                           children: [
-                            // ① ẢNH (giữ nguyên như trước)
-                            Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(.2),
-                                    blurRadius: 6,
-                                  ),
-                                ],
-                              ),
-                              child: CircleAvatar(
-                                radius: 70,
-                                backgroundColor:
-                                    theme.colorScheme.secondaryContainer,
-                                child: ClipOval(
-                                  child: SizedBox(
-                                    width: 140,
-                                    height: 140,
-                                    child:
-                                        imageFile != null
-                                            ? Image.file(
-                                              imageFile!,
-                                              fit: BoxFit.cover,
-                                            )
-                                            : avatarPath.isNotEmpty
-                                            ? Image.network(
-                                              'http://192.168.10.203:3000$avatarPath',
-                                              fit: BoxFit.cover,
-                                              errorBuilder:
-                                                  (_, __, ___) => const Icon(
-                                                    Icons.person,
-                                                    size: 48,
-                                                  ),
-                                            )
-                                            : const Icon(
-                                              Icons.person,
-                                              size: 48,
-                                            ),
-                                  ),
-                                ),
-                              ),
+                            CircleAvatar(
+                              radius: 70,
+                              backgroundColor:
+                                  theme.colorScheme.secondaryContainer,
+                              backgroundImage:
+                                  _imageFile != null
+                                      ? FileImage(_imageFile!)
+                                      : (user.avatarUrl.isNotEmpty
+                                              ? NetworkImage(avatarUrl)
+                                              : null)
+                                          as ImageProvider?,
+                              child:
+                                  user.avatarUrl.isEmpty && _imageFile == null
+                                      ? const Icon(Icons.person, size: 70)
+                                      : null,
                             ),
-
-                            // ② ICON góc phải-dưới
-                            Positioned(
-                              bottom: 4,
-                              right: 4,
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(.2),
-                                      blurRadius: 4,
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  Icons.camera_alt_rounded, // hoặc Icons.edit
-                                  size: 20,
-                                  color: theme.colorScheme.primary,
-                                ),
+                            CircleAvatar(
+                              radius: 20,
+                              backgroundColor: theme.scaffoldBackgroundColor,
+                              child: Icon(
+                                Icons.camera_alt,
+                                color: theme.colorScheme.primary,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 24),
                     Text(
                       'Thông tin cơ bản',
-                      style: theme.textTheme.titleMedium!.copyWith(
+                      style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 16),
-
-                    _field('Họ và tên', name, (v) => name = v, theme),
-                    _field('Số điện thoại', phone, (v) => phone = v, theme),
-                    _field('Tiểu sử', bio, (v) => bio = v, theme, maxLines: 3),
-                    const SizedBox(height: 40),
-
+                    // Họ và tên
+                    _buildField(
+                      'Họ và tên',
+                      _name,
+                      (v) => setState(() => _name = v),
+                      theme,
+                    ),
+                    // Số điện thoại với validator mới
+                    _buildField(
+                      'Số điện thoại',
+                      _phone,
+                      (v) => setState(() => _phone = v),
+                      theme,
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return 'Không được để trống';
+                        }
+                        final phoneRegExp = RegExp(r'^0\d{9}$');
+                        if (!phoneRegExp.hasMatch(v.trim())) {
+                          return 'Số điện thoại không hợp lệ (10 chữ số và bắt đầu bằng 0)';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            value: _gender,
+                            decoration: InputDecoration(
+                              labelText: 'Giới tính',
+                              filled: true,
+                              fillColor: theme.colorScheme.surfaceContainer,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            items:
+                                _genderOptions
+                                    .map(
+                                      (g) => DropdownMenuItem(
+                                        value: g,
+                                        child: Text(g),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (v) => setState(() => _gender = v),
+                            validator:
+                                (v) =>
+                                    v == null
+                                        ? 'Vui lòng chọn giới tính'
+                                        : null,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: InkWell(
+                            onTap: _pickDate,
+                            child: InputDecorator(
+                              decoration: InputDecoration(
+                                labelText: 'Ngày sinh',
+                                filled: true,
+                                fillColor: theme.colorScheme.surfaceContainer,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              child: Text(
+                                _birthdate != null
+                                    ? dateFmt.format(_birthdate!)
+                                    : 'Chọn ngày sinh',
+                                style: theme.textTheme.bodyLarge,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    _buildField(
+                      'Tiểu sử',
+                      _bio,
+                      (v) => setState(() => _bio = v),
+                      theme,
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           context.read<UserBloc>().add(
                             UpdateUserProfileEvent(
                               uid: user.uid,
-                              name: name,
-                              phone: phone,
-                              bio: bio,
-                              avatarFile: imageFile, // null nếu không đổi
+                              name: _name,
+                              phone: _phone,
+                              bio: _bio,
+                              gender: _gender!,
+                              birthdate: _birthdate,
+                              avatarFile: _imageFile,
                             ),
                           );
                         }
@@ -202,7 +276,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       child: const Text('Lưu thay đổi'),
                     ),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -213,25 +286,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _field(
+  // Hàm build chung cho các field, giờ có thêm validator tuỳ chọn
+  Widget _buildField(
     String label,
     String init,
     Function(String) onChanged,
     ThemeData theme, {
     int maxLines = 1,
+    String? Function(String?)? validator,
   }) {
+    // Validator mặc định: không được để trống
+    defaultValidator(v) =>
+        v == null || v.trim().isEmpty ? 'Không được để trống' : null;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
       child: TextFormField(
         initialValue: init,
         maxLines: maxLines,
         onChanged: onChanged,
-        validator:
-            (v) => v == null || v.trim().isEmpty ? 'Không được để trống' : null,
+        validator: validator ?? defaultValidator,
         decoration: InputDecoration(
           labelText: label,
           filled: true,
-          fillColor: theme.colorScheme.surfaceContainerHighest,
+          fillColor: theme.colorScheme.surfaceContainer,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,

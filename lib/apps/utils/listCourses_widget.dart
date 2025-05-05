@@ -12,7 +12,7 @@ class ListCoursesWidget extends StatelessWidget {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(12),
+      // padding: const EdgeInsets.all(12),
       itemCount: courses.length,
       separatorBuilder: (_, __) => const SizedBox(height: 16),
       itemBuilder: (context, index) {

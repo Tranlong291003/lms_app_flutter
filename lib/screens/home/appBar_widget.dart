@@ -1,4 +1,7 @@
+// lib/apps/utils/app_bar_home.dart
+
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
@@ -23,7 +26,7 @@ AppBar AppBarHome(BuildContext context, String title) {
 
   return AppBar(
     automaticallyImplyLeading: false,
-    elevation: 0, // Gỡ bỏ bóng đổ
+    elevation: 0,
     title: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -32,55 +35,55 @@ AppBar AppBarHome(BuildContext context, String title) {
             BlocBuilder<UserBloc, UserState>(
               builder: (context, state) {
                 final role = (state is UserLoaded) ? state.user.role : null;
+                final avatarUrl =
+                    (state is UserLoaded && state.user.avatarUrl.isNotEmpty)
+                        ? '${ApiConfig.baseUrl}${state.user.avatarUrl}'
+                        : defaultAvatar;
+
                 return InkWell(
                   borderRadius: BorderRadius.circular(20),
                   onTap: () {
                     if (role == 'admin' || role == 'mentor') {
-                      // điều hướng tới Dashboard
                       Navigator.pushNamed(context, '/dashBoard');
                     } else {
-                      // điều hướng tới Profile bình thường
+                      Navigator.pushNamed(context, '/profile');
                     }
                   },
                   child: CircleAvatar(
-                    backgroundImage:
-                        (state is UserLoaded && state.user.avatarUrl.isNotEmpty)
-                            ? NetworkImage(
-                              '${ApiConfig.baseUrl}${state.user.avatarUrl}',
-                            )
-                            : const NetworkImage(defaultAvatar),
+                    radius: 18,
+                    backgroundColor: Colors.transparent,
+                    backgroundImage: CachedNetworkImageProvider(avatarUrl),
                   ),
                 );
               },
             ),
-
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AnimatedTextKit(
                   animatedTexts: [
                     TypewriterAnimatedText(
-                      // Hiển thị lời chào động
                       loiChao,
-                      textStyle: TextStyle(
+                      textStyle: const TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold, // Chữ đậm
+                        fontWeight: FontWeight.bold,
                         color: Colors.grey,
                       ),
-                      speed: Duration(milliseconds: 300), // Tốc độ gõ
+                      speed: const Duration(milliseconds: 300),
                     ),
                   ],
-                  pause: Duration(milliseconds: 1000), // Dừng 1 giây
+                  pause: const Duration(milliseconds: 1000),
+                  isRepeatingAnimation: false,
                 ),
                 BlocBuilder<UserBloc, UserState>(
                   builder: (context, state) {
                     if (state is UserLoaded) {
                       return Text(
-                        state.user.name ?? 'User', // Tên người dùng từ UserBloc
-                        style: TextStyle(
+                        state.user.name,
+                        style: const TextStyle(
                           fontSize: 18,
-                          fontWeight: FontWeight.bold, // Chữ đậm
+                          fontWeight: FontWeight.bold,
                         ),
                       );
                     }
@@ -104,23 +107,19 @@ AppBar AppBarHome(BuildContext context, String title) {
                 'assets/icons/bookmark.png',
                 color: Theme.of(context).iconTheme.color,
               ),
-              onPressed: () {
-                Navigator.pushNamed(context, '/bookmark');
-              },
+              onPressed: () => Navigator.pushNamed(context, '/bookmark'),
             ),
             IconButton(
               icon: Image.asset(
                 'assets/icons/notification.png',
                 color: Theme.of(context).iconTheme.color,
               ),
-              onPressed: () {
-                Navigator.pushNamed(context, '/notification');
-              },
+              onPressed: () => Navigator.pushNamed(context, '/notification'),
             ),
           ],
         ),
       ],
     ),
-    toolbarHeight: 60, // Tăng chiều cao AppBar
+    toolbarHeight: 60,
   );
 }

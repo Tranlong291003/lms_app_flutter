@@ -1,4 +1,4 @@
-// src/models/user_model.dart
+// lib/models/user_model.dart
 
 class User {
   final String uid;
@@ -59,5 +59,25 @@ class User {
       createdAt: parseDate(json['created_at']),
       updatedAt: parseDate(json['updated_at']),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    String? formatDate(DateTime? date) => date?.toIso8601String();
+
+    return {
+      'uid': uid,
+      'email': email,
+      'name': name,
+      'avatar_url': avatarUrl,
+      'bio': bio,
+      'phone': phone,
+      'gender': gender,
+      'birthdate': formatDate(birthdate),
+      'role': role,
+      'fcm_token': fcmToken,
+      'is_active': isActive,
+      'created_at': formatDate(createdAt),
+      'updated_at': formatDate(updatedAt),
+    };
   }
 }
