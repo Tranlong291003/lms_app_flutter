@@ -1,3 +1,4 @@
+// lib/models/courses/course_model.dart
 class Course {
   final int courseId;
   final String title;
@@ -11,6 +12,8 @@ class Course {
   final DateTime updatedAt;
   final String instructorName;
   final String categoryName;
+  final double rating; // Trung bình đánh giá
+  final int enrollCount; // Số người đăng ký
 
   Course({
     required this.courseId,
@@ -25,6 +28,8 @@ class Course {
     required this.updatedAt,
     required this.instructorName,
     required this.categoryName,
+    required this.rating,
+    required this.enrollCount,
   });
 
   factory Course.fromJson(Map<String, dynamic> json) {
@@ -41,6 +46,8 @@ class Course {
       updatedAt: DateTime.parse(json['updated_at'] as String),
       instructorName: json['instructor_name'] as String,
       categoryName: json['category_name'] as String,
+      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      enrollCount: json['enroll_count'] as int? ?? 0,
     );
   }
 
@@ -57,5 +64,7 @@ class Course {
     'updated_at': updatedAt.toIso8601String(),
     'instructor_name': instructorName,
     'category_name': categoryName,
+    'rating': rating,
+    'enroll_count': enrollCount,
   };
 }

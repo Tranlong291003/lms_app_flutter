@@ -1,9 +1,11 @@
+// lib/apps/widgets/courseCategory_widget.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/cubit/category/category_cubit.dart';
 import 'package:lms/blocs/cubit/category/category_state.dart';
+import 'package:lms/models/category_model.dart';
 
 class CourseCategoryWidget extends StatelessWidget {
   const CourseCategoryWidget({super.key});
@@ -13,7 +15,7 @@ class CourseCategoryWidget extends StatelessWidget {
     return BlocBuilder<CategoryCubit, CategoryState>(
       builder: (context, state) {
         if (state is CategoryLoading) {
-          return LoadingIndicator();
+          return const LoadingIndicator();
         }
         if (state is CategoryError) {
           return SizedBox(
@@ -22,33 +24,35 @@ class CourseCategoryWidget extends StatelessWidget {
           );
         }
         if (state is CategoryLoaded) {
-          final cats = state.categories;
-          final selId = state.selectedId;
+          // Tạo thêm mục All với id = 0
+          const allId = 0;
+          final allCat = CourseCategory(categoryId: allId, name: '🔥 Tất cả');
+
+          final cats = [allCat, ...state.categories];
+          final selId = state.selectedId; // null => All
 
           return SizedBox(
             height: 40,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: cats.length,
               separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (ctx, i) {
+              itemCount: cats.length,
+              itemBuilder: (_, i) {
                 final cat = cats[i];
-                final isSelected = cat.categoryId == selId;
+                // nếu selectedId==null và cat.id==0 thì All được chọn;
+                final isSelected =
+                    (selId == null && cat.categoryId == allId) ||
+                    (selId != null && cat.categoryId == selId);
 
-                // Xác định widget cho icon
                 Widget iconWidget = const SizedBox.shrink();
-                final icon = cat.icon;
-                if (icon != null && icon.isNotEmpty) {
-                  // Nếu icon đã là URL đầy đủ thì xài luôn,
-                  // còn không thì prefix bằng ApiConfig.baseUrl
+                if (cat.icon?.isNotEmpty == true) {
                   final fullUrl =
-                      icon.contains(RegExp(r'^https?://'))
-                          ? icon
-                          : '${ApiConfig.baseUrl}$icon';
-
+                      (cat.icon != null && cat.icon!.startsWith('http'))
+                          ? cat.icon
+                          : '${ApiConfig.baseUrl}${cat.icon}';
                   iconWidget = Image.network(
-                    fullUrl,
+                    fullUrl ?? '',
                     width: 16,
                     height: 16,
                     errorBuilder: (_, __, ___) => const SizedBox.shrink(),
@@ -57,9 +61,12 @@ class CourseCategoryWidget extends StatelessWidget {
 
                 return GestureDetector(
                   onTap: () {
-                    context.read<CategoryCubit>().selectCategory(
-                      cat.categoryId,
+                    print(
+                      'Chọn danh mục: id=${cat.categoryId}, name=${cat.name}',
                     );
+                    final newSel =
+                        (cat.categoryId == allId) ? null : cat.categoryId;
+                    context.read<CategoryCubit>().selectCategory(newSel);
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(

@@ -58,7 +58,7 @@ class AppTheme {
     ),
     textTheme: const TextTheme(
       bodyLarge: TextStyle(color: Colors.white, fontSize: 16),
-      bodyMedium: TextStyle(color: Colors.white70, fontSize: 14),
+      bodyMedium: TextStyle(color: Colors.white, fontSize: 14),
       displayLarge: TextStyle(
         color: Colors.white,
         fontSize: 32,

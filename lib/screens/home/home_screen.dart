@@ -6,12 +6,14 @@ import 'package:lms/apps/utils/listCourses_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/apps/utils/route_observer.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
+import 'package:lms/blocs/cubit/courses/course_cubit.dart';
 import 'package:lms/blocs/mentors/mentors_bloc.dart';
 import 'package:lms/blocs/mentors/mentors_event.dart';
 import 'package:lms/blocs/mentors/mentors_state.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/blocs/user/user_state.dart';
+import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/screens/home/appBar_widget.dart';
 import 'package:lms/screens/home/discountSlider_widget.dart';
 import 'package:lms/screens/home/topMentors_widget.dart';
@@ -82,11 +84,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       body: BlocBuilder<UserBloc, UserState>(
         builder: (context, state) {
           if (state is UserLoading) {
-            // return const LoadingIndicator();
           } else if (state is UserError) {
             return Center(child: Text('Lỗi: ${state.message}'));
           }
-
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -94,7 +94,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SearchBarWidget(),
-                  const SizedBox(height: 5),
                   DiscountSlider(),
                   _buildSection(
                     title: 'Danh sách giảng viên',
@@ -112,15 +111,34 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                       },
                     ),
                   ),
-                  const SizedBox(height: 5),
                   _buildSection(
                     title: 'Danh sách khoá học',
                     onTap: () => Navigator.pushNamed(context, '/listcourse'),
                     child: Column(
                       children: [
                         CourseCategoryWidget(),
-                        const SizedBox(height: 5),
-                        ListCoursesWidget(),
+                        const SizedBox(height: 20),
+                        BlocBuilder<CourseCubit, CourseState>(
+                          builder: (context, state) {
+                            if (state is CourseLoading) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else if (state is CourseLoaded) {
+                              // Tạo bản sao, xáo trộn và giữ 10 phần tử đầu
+                              final randomList = List<Course>.from(
+                                state.courses,
+                              )..shuffle();
+                              final limitedList = randomList.take(10).toList();
+                              return ListCoursesWidget(courses: limitedList);
+                            } else if (state is CourseError) {
+                              return Center(
+                                child: Text('Lỗi: ${state.message}'),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
                       ],
                     ),
                   ),

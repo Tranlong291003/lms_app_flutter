@@ -37,7 +37,7 @@ class ListCoursescreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Column(
-            children: [CourseCategoryWidget(), ListCoursesWidget()],
+            children: [CourseCategoryWidget(), ListCoursesWidget(courses: [])],
           ),
         ),
       ),

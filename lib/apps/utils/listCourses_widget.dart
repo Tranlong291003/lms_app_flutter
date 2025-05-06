@@ -1,42 +1,27 @@
+// lib/widgets/list_courses_widget.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:lms/blocs/cubit/courses/course_cubit.dart';
+import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/models/courses/courses_model.dart';
 
 class ListCoursesWidget extends StatelessWidget {
-  const ListCoursesWidget({super.key});
+  final List<Course> courses;
+  const ListCoursesWidget({super.key, required this.courses});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CourseCubit, CourseState>(
-      builder: (context, state) {
-        if (state is CourseLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is CourseLoaded) {
-          return _buildList(state.courses);
-        } else if (state is CourseError) {
-          return Center(child: Text('Lỗi: ${state.message}'));
-        }
-        return const SizedBox.shrink();
-      },
-    );
-  }
-
-  Widget _buildList(List<Course> courses) {
-    final formatter = NumberFormat('#,###');
+    final priceFmt = NumberFormat('#,###');
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: courses.length,
       separatorBuilder: (_, __) => const SizedBox(height: 16),
-      itemBuilder: (context, index) {
-        final course = courses[index];
-        final int actualPrice =
-            course.discountPrice > 0 ? course.discountPrice : course.price;
+      itemBuilder: (context, i) {
+        final c = courses[i];
+        final actualPrice = c.discountPrice > 0 ? c.discountPrice : c.price;
 
         return Container(
-          height: 150,
+          height: 140,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color:
@@ -55,18 +40,19 @@ class ListCoursesWidget extends StatelessWidget {
           child: Stack(
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
-                      course.thumbnailUrl ?? '',
-                      height: 120,
+                      '${ApiConfig.baseUrl}${c.thumbnailUrl}' ?? '',
                       width: 120,
+                      height: 120,
                       fit: BoxFit.cover,
                       errorBuilder:
-                          (ctx, _, __) => Container(
-                            height: 120,
+                          (_, __, ___) => Container(
                             width: 120,
+                            height: 120,
                             color: Colors.grey[200],
                             child: const Icon(
                               Icons.broken_image,
@@ -77,71 +63,90 @@ class ListCoursesWidget extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 32),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
-                            children: [
-                              _tag(
-                                course.categoryName,
-                                const Color(0xFFE6ECFD),
-                                const Color(0xFF2F56DD),
-                              ),
-                              const SizedBox(width: 8),
-                              _tag(
-                                course.level,
-                                _getLevelColor(course.level),
-                                Colors.white,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            course.title,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Tags
+                        Row(
+                          children: [
+                            _tag(
+                              c.categoryName,
+                              const Color(0xFFE6ECFD),
+                              const Color(0xFF2F56DD),
                             ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                            const SizedBox(width: 8),
+                            _tag(
+                              c.level,
+                              _getLevelColor(c.level),
+                              Colors.white,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+
+                        // Title
+                        Text(
+                          c.title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
+                          maxLines: 1,
+                          overflow: TextOverflow.clip,
+                        ),
+                        const SizedBox(height: 6),
+
+                        // Price row
+                        Row(
+                          children: [
+                            Text(
+                              "${priceFmt.format(actualPrice)} VND",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF2F56DD),
+                              ),
+                            ),
+                            if (c.discountPrice > 0) ...[
+                              const SizedBox(width: 8),
                               Text(
-                                "${formatter.format(actualPrice)} VND",
+                                "${priceFmt.format(c.price)} VND",
                                 style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF2F56DD),
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                  decoration: TextDecoration.lineThrough,
                                 ),
                               ),
-                              if (course.discountPrice > 0) ...[
-                                const SizedBox(width: 8),
-                                Flexible(
-                                  child: Text(
-                                    "${formatter.format(course.price)} VND",
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      decoration: TextDecoration.lineThrough,
-                                      color: Colors.grey,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                ),
-                              ],
                             ],
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+
+                        // Rating and Enroll count
+                        Row(
+                          children: [
+                            Icon(Icons.star, size: 16, color: Colors.amber),
+                            const SizedBox(width: 4),
+                            Text(
+                              c.rating.toStringAsFixed(1),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            const SizedBox(width: 16),
+                            Icon(Icons.person, size: 16, color: Colors.grey),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${c.enrollCount} người học',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
+              // Bookmark
               Positioned(
                 top: 0,
                 right: 0,
@@ -189,7 +194,6 @@ class BookmarkButton extends StatefulWidget {
 
 class _BookmarkButtonState extends State<BookmarkButton> {
   late bool isSaved;
-
   @override
   void initState() {
     super.initState();
