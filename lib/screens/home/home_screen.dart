@@ -120,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                       children: [
                         CourseCategoryWidget(),
                         const SizedBox(height: 5),
-                        ListCoursesWidget(courses: sampleCourses),
+                        ListCoursesWidget(),
                       ],
                     ),
                   ),

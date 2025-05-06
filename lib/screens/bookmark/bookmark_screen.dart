@@ -30,7 +30,7 @@ class BookmarkScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child: ListCoursesWidget(courses: sampleCourses),
+          child: ListCoursesWidget(),
         ),
       ),
     );

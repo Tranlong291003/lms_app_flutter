@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/blocs/cubit/category/category_cubit.dart';
+import 'package:lms/blocs/cubit/courses/course_cubit.dart';
 import 'package:lms/blocs/cubit/notification/notification_cubit.dart';
 import 'package:lms/blocs/mentors/mentors_bloc.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
@@ -78,6 +79,7 @@ Future<void> main() async {
                     CategoryCubit(context.read<CategoryRepository>())
                       ..loadCategories(),
           ),
+          BlocProvider(create: (_) => CourseCubit()),
         ],
         child: MyApp(notificationService: notificationService),
       ),
