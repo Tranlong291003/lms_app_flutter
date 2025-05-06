@@ -13,7 +13,7 @@ class UserService {
     try {
       final res = await _dio.get('${ApiConfig.getUserByUid}/$uid');
       if (res.statusCode == 200) {
-        print('object');
+        // print('object');
 
         return User.fromJson(res.data['user']);
       }
