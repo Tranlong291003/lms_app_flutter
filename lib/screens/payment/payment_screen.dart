@@ -69,7 +69,7 @@ class PaymentScreen extends StatelessWidget {
       child: Text(
         title,
         style: theme.textTheme.titleMedium?.copyWith(
-          color: theme.colorScheme.onSurface.withOpacity(0.7),
+          color: theme.textTheme.titleMedium?.color?.withOpacity(0.7),
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -85,9 +85,9 @@ class PaymentScreen extends StatelessWidget {
   }) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 0,
+      elevation: 4,
       color: theme.cardColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
@@ -106,13 +106,15 @@ class PaymentScreen extends StatelessWidget {
         subtitle: Text(
           subtitle,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
           ),
         ),
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          size: 16,
-          color: theme.colorScheme.onSurface.withOpacity(0.5),
+        trailing: Text(
+          'Connected',
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: theme.primaryColor,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         onTap: onTap,
       ),
@@ -129,9 +131,9 @@ class PaymentScreen extends StatelessWidget {
   }) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 0,
+      elevation: 4,
       color: theme.cardColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -161,7 +163,7 @@ class PaymentScreen extends StatelessWidget {
                 Text(
                   date,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
                   ),
                 ),
                 Container(
@@ -172,14 +174,14 @@ class PaymentScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color:
                         isSuccess
-                            ? Colors.green.withOpacity(0.1)
+                            ? theme.primaryColor.withOpacity(0.1)
                             : Colors.orange.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     status,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: isSuccess ? Colors.green : Colors.orange,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: isSuccess ? theme.primaryColor : Colors.orange,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

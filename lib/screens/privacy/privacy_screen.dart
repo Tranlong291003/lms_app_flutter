@@ -7,7 +7,6 @@ class PrivacyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       appBar: CustomAppBar(title: 'Chính sách bảo mật'),
       body: ListView(
@@ -15,7 +14,6 @@ class PrivacyScreen extends StatelessWidget {
         children: [
           _buildSectionTitle('Thông tin cá nhân', theme),
           _buildPrivacyCard(
-            context,
             icon: Icons.person_outline,
             title: 'Thông tin cá nhân',
             content:
@@ -23,7 +21,6 @@ class PrivacyScreen extends StatelessWidget {
             theme: theme,
           ),
           _buildPrivacyCard(
-            context,
             icon: Icons.devices_other,
             title: 'Thông tin thiết bị',
             content:
@@ -32,7 +29,6 @@ class PrivacyScreen extends StatelessWidget {
           ),
           _buildSectionTitle('Sử dụng thông tin', theme),
           _buildPrivacyCard(
-            context,
             icon: Icons.settings,
             title: 'Cung cấp dịch vụ',
             content:
@@ -40,7 +36,6 @@ class PrivacyScreen extends StatelessWidget {
             theme: theme,
           ),
           _buildPrivacyCard(
-            context,
             icon: Icons.security,
             title: 'Bảo mật',
             content:
@@ -48,7 +43,6 @@ class PrivacyScreen extends StatelessWidget {
             theme: theme,
           ),
           _buildPrivacyCard(
-            context,
             icon: Icons.share,
             title: 'Chia sẻ thông tin',
             content:
@@ -56,7 +50,6 @@ class PrivacyScreen extends StatelessWidget {
             theme: theme,
           ),
           _buildPrivacyCard(
-            context,
             icon: Icons.verified_user,
             title: 'Quyền của bạn',
             content:
@@ -74,29 +67,33 @@ class PrivacyScreen extends StatelessWidget {
       child: Text(
         title,
         style: theme.textTheme.titleMedium?.copyWith(
-          color: Colors.grey,
+          color: theme.textTheme.titleMedium?.color?.withOpacity(0.7),
           fontWeight: FontWeight.bold,
         ),
       ),
     );
   }
 
-  Widget _buildPrivacyCard(
-    BuildContext context, {
+  Widget _buildPrivacyCard({
     required IconData icon,
     required String title,
     required String content,
     required ThemeData theme,
   }) {
-    final isDark = theme.brightness == Brightness.dark;
-    return Container(
+    return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.grey[850] : Colors.grey[100],
-        borderRadius: BorderRadius.circular(14),
-      ),
+      elevation: 4,
+      color: theme.cardColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
-        leading: Icon(icon, color: theme.primaryColor, size: 28),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: theme.primaryColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: theme.primaryColor, size: 24),
+        ),
         title: Text(
           title,
           style: theme.textTheme.titleMedium?.copyWith(

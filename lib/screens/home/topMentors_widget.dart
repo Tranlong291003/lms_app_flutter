@@ -75,7 +75,9 @@ class _TopMentorsState extends State<TopMentors> {
                 CircleAvatar(
                   radius: 30,
                   backgroundImage: imageProvider,
-                  onBackgroundImageError: (_, __) => const Icon(Icons.person),
+                  onBackgroundImageError:
+                      (_, __) =>
+                          const Icon(Icons.person, color: Colors.transparent),
                 ),
                 const SizedBox(height: 8),
                 SizedBox(
@@ -85,7 +87,13 @@ class _TopMentorsState extends State<TopMentors> {
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12),
+                    style: TextStyle(
+                      color:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ],

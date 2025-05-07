@@ -62,9 +62,9 @@ class LanguageScreen extends StatelessWidget {
   }) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 0,
+      elevation: 4,
       color: theme.cardColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
         title: Text(
           title,
@@ -75,15 +75,15 @@ class LanguageScreen extends StatelessWidget {
         subtitle: Text(
           subtitle,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
           ),
         ),
         trailing: Icon(
           isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
           color:
               isSelected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurface.withOpacity(0.5),
+                  ? theme.primaryColor
+                  : theme.textTheme.bodyMedium?.color?.withOpacity(0.5),
         ),
         onTap: onTap,
       ),

@@ -7,7 +7,6 @@ class HelpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       appBar: CustomAppBar(title: 'Trung tâm trợ giúp'),
       body: ListView(
@@ -15,7 +14,6 @@ class HelpScreen extends StatelessWidget {
         children: [
           _buildSectionTitle('Câu hỏi thường gặp', theme),
           _buildHelpCard(
-            context,
             icon: Icons.help_outline,
             title: 'Làm thế nào để đăng ký tài khoản?',
             content:
@@ -23,7 +21,6 @@ class HelpScreen extends StatelessWidget {
             theme: theme,
           ),
           _buildHelpCard(
-            context,
             icon: Icons.lock_outline,
             title: 'Tôi quên mật khẩu, phải làm sao?',
             content:
@@ -32,7 +29,6 @@ class HelpScreen extends StatelessWidget {
           ),
           _buildSectionTitle('Hướng dẫn sử dụng', theme),
           _buildHelpCard(
-            context,
             icon: Icons.play_circle_outline,
             title: 'Bắt đầu với khoá học',
             content: 'Chọn khoá học bạn muốn và nhấn "Đăng ký" để bắt đầu.',
@@ -40,7 +36,6 @@ class HelpScreen extends StatelessWidget {
           ),
           _buildSectionTitle('Liên hệ hỗ trợ', theme),
           _buildHelpCard(
-            context,
             icon: Icons.email_outlined,
             title: 'Email hỗ trợ',
             content: 'support@lms.com',
@@ -57,29 +52,33 @@ class HelpScreen extends StatelessWidget {
       child: Text(
         title,
         style: theme.textTheme.titleMedium?.copyWith(
-          color: Colors.grey,
+          color: theme.textTheme.titleMedium?.color?.withOpacity(0.7),
           fontWeight: FontWeight.bold,
         ),
       ),
     );
   }
 
-  Widget _buildHelpCard(
-    BuildContext context, {
+  Widget _buildHelpCard({
     required IconData icon,
     required String title,
     required String content,
     required ThemeData theme,
   }) {
-    final isDark = theme.brightness == Brightness.dark;
-    return Container(
+    return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.grey[850] : Colors.grey[100],
-        borderRadius: BorderRadius.circular(14),
-      ),
+      elevation: 4,
+      color: theme.cardColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
-        leading: Icon(icon, color: theme.primaryColor, size: 28),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: theme.primaryColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: theme.primaryColor, size: 24),
+        ),
         title: Text(
           title,
           style: theme.textTheme.titleMedium?.copyWith(

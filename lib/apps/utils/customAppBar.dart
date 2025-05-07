@@ -65,6 +65,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return AppBar(
       elevation: 0,
@@ -79,12 +80,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
               ? Padding(
                 padding: const EdgeInsets.only(left: 12.0),
                 child: IconButton(
-                  icon: Image.asset(
-                    'assets/icons/back.png',
-                    color:
-                        Theme.of(context).brightness == Brightness.light
-                            ? Colors.black
-                            : Colors.white,
+                  icon: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: theme.colorScheme.onSurface,
+                    size: 22,
                   ),
                   onPressed: widget.onBack ?? () => Navigator.maybePop(context),
                 ),
@@ -102,8 +101,15 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 child: Container(
                   height: 40,
                   decoration: BoxDecoration(
-                    color: theme.cardColor,
-                    borderRadius: BorderRadius.circular(8),
+                    color:
+                        isDark
+                            ? theme.colorScheme.surface
+                            : theme.colorScheme.surface.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withOpacity(0.2),
+                      width: 1,
+                    ),
                   ),
                   child: TextField(
                     controller: _controller,
@@ -112,13 +118,18 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     style: theme.textTheme.bodyLarge,
                     decoration: InputDecoration(
                       hintText: 'Tìm kiếm...',
-                      hintStyle: theme.textTheme.bodyMedium,
+                      hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      ),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
+                        horizontal: 16,
                       ),
                       suffixIcon: IconButton(
-                        icon: Icon(Icons.close, color: theme.hintColor),
+                        icon: Icon(
+                          Icons.close_rounded,
+                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        ),
                         onPressed: _toggleSearch,
                       ),
                     ),
@@ -130,8 +141,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 child: Text(
                   widget.title ?? '',
                   style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     fontSize: 20,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -142,12 +154,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
         if (widget.showSearch && !_isSearching)
           IconButton(
             padding: const EdgeInsets.only(right: 12.0),
-            icon: Image.asset(
-              'assets/icons/search.png',
-              color:
-                  Theme.of(context).brightness == Brightness.light
-                      ? Colors.black
-                      : Colors.white,
+            icon: Icon(
+              Icons.search_rounded,
+              color: theme.colorScheme.onSurface,
+              size: 24,
             ),
             onPressed: _toggleSearch,
           ),
@@ -160,25 +170,25 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 widget.menuItems != null
                     // có menuItems → hiển thị PopupMenuButton
                     ? PopupMenuButton<String>(
-                      icon: Image.asset(
-                        'assets/icons/more.png',
-                        color:
-                            Theme.of(context).brightness == Brightness.light
-                                ? Colors.black
-                                : Colors.white,
+                      icon: Icon(
+                        Icons.more_vert_rounded,
+                        color: theme.colorScheme.onSurface,
+                        size: 24,
                       ),
                       onSelected: widget.onMenuSelected,
                       itemBuilder: (_) => widget.menuItems!,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
                     )
                     // không có menuItems → chỉ hiển thị icon, không popup
                     : IconButton(
                       padding: EdgeInsets.zero,
-                      icon: Image.asset(
-                        'assets/icons/more.png',
-                        color:
-                            Theme.of(context).brightness == Brightness.light
-                                ? Colors.black
-                                : Colors.white,
+                      icon: Icon(
+                        Icons.more_vert_rounded,
+                        color: theme.colorScheme.onSurface,
+                        size: 24,
                       ),
                       onPressed: () {},
                     ),
@@ -195,11 +205,17 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: TabBar(
                     tabs: widget.tabs!,
-                    labelStyle: theme.textTheme.titleMedium,
+                    labelStyle: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                     unselectedLabelStyle: theme.textTheme.titleMedium,
-                    labelColor: theme.primaryColor,
-                    unselectedLabelColor: theme.hintColor,
-                    indicatorColor: theme.primaryColor,
+                    labelColor: theme.colorScheme.primary,
+                    unselectedLabelColor: theme.colorScheme.onSurface
+                        .withOpacity(0.6),
+                    indicatorColor: theme.colorScheme.primary,
+                    indicatorWeight: 3,
+                    indicatorSize: TabBarIndicatorSize.label,
+                    dividerColor: Colors.transparent,
                   ),
                 ),
               )

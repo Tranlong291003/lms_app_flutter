@@ -110,7 +110,7 @@ class InviteScreen extends StatelessWidget {
       child: Text(
         title,
         style: theme.textTheme.titleMedium?.copyWith(
-          color: theme.colorScheme.onSurface.withOpacity(0.7),
+          color: theme.textTheme.titleMedium?.color?.withOpacity(0.7),
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -126,9 +126,9 @@ class InviteScreen extends StatelessWidget {
   }) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 0,
+      elevation: 4,
       color: theme.cardColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
@@ -147,13 +147,13 @@ class InviteScreen extends StatelessWidget {
         subtitle: Text(
           subtitle,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
           ),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,
           size: 16,
-          color: theme.colorScheme.onSurface.withOpacity(0.5),
+          color: theme.textTheme.bodyMedium?.color?.withOpacity(0.5),
         ),
         onTap: onTap,
       ),
@@ -168,14 +168,19 @@ class InviteScreen extends StatelessWidget {
       itemBuilder: (context, index) {
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
-          elevation: 0,
+          elevation: 4,
           color: theme.cardColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: theme.primaryColor.withOpacity(0.1),
+            leading: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: theme.primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
               child: Icon(Icons.person, color: theme.primaryColor),
             ),
             title: Text(
@@ -187,19 +192,19 @@ class InviteScreen extends StatelessWidget {
             subtitle: Text(
               'Đã tham gia ${index + 1} ngày trước',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
               ),
             ),
             trailing: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
+                color: theme.primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 '${(index + 1) * 10}%',
                 style: theme.textTheme.labelLarge?.copyWith(
-                  color: Colors.green,
+                  color: theme.primaryColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
