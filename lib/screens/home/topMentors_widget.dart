@@ -8,10 +8,25 @@ import 'package:lms/models/user_model.dart';
 import 'package:lms/routes/app_router.dart'; // import hằng số route
 
 /// Widget hiển thị danh sách mentor ngẫu nhiên (tối đa 10), nhận dữ liệu từ parent
-class TopMentors extends StatelessWidget {
+class TopMentors extends StatefulWidget {
   final List<User> mentors;
 
   const TopMentors({super.key, required this.mentors});
+
+  @override
+  State<TopMentors> createState() => _TopMentorsState();
+}
+
+class _TopMentorsState extends State<TopMentors> {
+  late final List<User> _randomizedMentors;
+
+  @override
+  void initState() {
+    super.initState();
+    // Random và cache danh sách mentors khi widget được khởi tạo
+    final randomList = List<User>.from(widget.mentors)..shuffle(Random());
+    _randomizedMentors = randomList.take(min(10, randomList.length)).toList();
+  }
 
   String getDisplayName(String fullName) {
     final name = fullName.trim();
@@ -29,19 +44,14 @@ class TopMentors extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tạo bản sao và shuffle
-    final randomList = List<User>.from(mentors)..shuffle(Random());
-    // Giới hạn tối đa 10 mentors hoặc ít hơn nếu list ngắn
-    final display = randomList.take(min(10, randomList.length)).toList();
-
     return SizedBox(
       height: 90,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: display.length,
+        itemCount: _randomizedMentors.length,
         separatorBuilder: (_, __) => const SizedBox(width: 16),
         itemBuilder: (context, index) {
-          final mentor = display[index];
+          final mentor = _randomizedMentors[index];
           final displayName = getDisplayName(mentor.name);
           final avatarUrl =
               mentor.avatarUrl.isNotEmpty
@@ -52,9 +62,7 @@ class TopMentors extends StatelessWidget {
           return InkWell(
             borderRadius: BorderRadius.circular(30),
             onTap: () async {
-              // Pre-cache ảnh để chuyển mượt hơn
               await precacheImage(imageProvider, context);
-              // Điều hướng sang màn MentorDetail
               Navigator.pushNamed(
                 context,
                 AppRouter.mentorDetail,

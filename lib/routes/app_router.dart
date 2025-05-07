@@ -2,21 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:lms/screens/bookmark/bookmark_screen.dart';
 import 'package:lms/screens/course_detail/course_detail_screen.dart';
 import 'package:lms/screens/forgotpassword/forgotpassword_screen.dart';
+import 'package:lms/screens/help/help_screen.dart';
+import 'package:lms/screens/invite/invite_screen.dart';
+import 'package:lms/screens/language/language_screen.dart';
 import 'package:lms/screens/listCourse/listCourse_screen.dart';
 import 'package:lms/screens/listMentor/listMentor_screen.dart';
 import 'package:lms/screens/listMentor/mentor_detail_screen.dart';
 import 'package:lms/screens/login/loginWithPassword_screen.dart';
 import 'package:lms/screens/login/login_screen.dart';
 import 'package:lms/screens/notification/notification_screen.dart';
+import 'package:lms/screens/payment/payment_screen.dart';
+import 'package:lms/screens/privacy/privacy_screen.dart';
 import 'package:lms/screens/profile/editprofile_screen.dart';
 import 'package:lms/screens/profile/profile_screen.dart';
 import 'package:lms/screens/quiz/quiz_detail_screen.dart';
 import 'package:lms/screens/quiz/quiz_questions_screen.dart';
 import 'package:lms/screens/quiz/quiz_screen.dart';
+import 'package:lms/screens/security/security_screen.dart';
 import 'package:lms/screens/signup/signup_screen.dart';
 
 import '../apps/utils/bottomNavigationBar.dart';
 import '../screens/Introduction/intro_screen.dart';
+import '../screens/security/change_password_screen.dart';
 
 class AppRouter {
   // Route names
@@ -37,6 +44,13 @@ class AppRouter {
   static const String quizQuestions = '/quiz/questions';
   static const String courseDetail = '/courseDetail';
   static const String mentorDetail = '/mentordetail';
+  static const String payment = '/payment';
+  static const String security = '/security';
+  static const String language = '/language';
+  static const String privacy = '/privacy';
+  static const String help = '/help';
+  static const String invite = '/invite';
+  static const String changePassword = '/change-password';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     Widget page;
@@ -99,6 +113,28 @@ class AppRouter {
             body: Center(child: Text('Không tìm thấy Mentor UID')),
           );
         }
+        break;
+      case payment:
+        page = const PaymentScreen();
+        break;
+      case security:
+        page = const SecurityScreen();
+        break;
+      case language:
+        page = const LanguageScreen();
+        break;
+      case privacy:
+        page = const PrivacyScreen();
+        break;
+      case help:
+        page = const HelpScreen();
+        break;
+      case invite:
+        page = const InviteScreen();
+        break;
+      case changePassword:
+        page = const ChangePasswordScreen();
+        break;
       default:
         page = const Scaffold(
           body: Center(child: Text('Không tìm thấy trang')),
