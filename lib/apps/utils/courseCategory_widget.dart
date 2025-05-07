@@ -5,6 +5,7 @@ import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/cubit/category/category_cubit.dart';
 import 'package:lms/blocs/cubit/category/category_state.dart';
+import 'package:lms/blocs/cubit/courses/course_cubit.dart';
 import 'package:lms/models/category_model.dart';
 
 class CourseCategoryWidget extends StatelessWidget {
@@ -67,6 +68,8 @@ class CourseCategoryWidget extends StatelessWidget {
                     final newSel =
                         (cat.categoryId == allId) ? null : cat.categoryId;
                     context.read<CategoryCubit>().selectCategory(newSel);
+                    // Gọi lại CourseCubit để lọc
+                    context.read<CourseCubit>().loadCourses(categoryId: newSel);
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(

@@ -1,3 +1,4 @@
+// lib/blocs/cubit/courses/course_state.dart
 part of 'course_cubit.dart';
 
 abstract class CourseState extends Equatable {

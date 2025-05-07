@@ -1,3 +1,4 @@
+// lib/blocs/cubit/courses/course_cubit.dart
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
@@ -9,16 +10,28 @@ part 'course_state.dart';
 
 class CourseCubit extends Cubit<CourseState> {
   final CourseRepository _repo;
+  int? _categoryFilter;
+
   CourseCubit()
     : _repo = CourseRepository(Dio(BaseOptions(baseUrl: ApiConfig.baseUrl))),
       super(const CourseInitial()) {
     loadCourses();
   }
 
-  Future<void> loadCourses() async {
+  /// Load courses với filter tùy chọn
+  Future<void> loadCourses({
+    int? categoryId,
+    String? status,
+    String? search,
+  }) async {
     emit(const CourseLoading());
     try {
-      final courses = await _repo.getAllCourses();
+      _categoryFilter = categoryId;
+      final courses = await _repo.getAllCourses(
+        categoryId: categoryId,
+        status: status,
+        search: search,
+      );
       emit(CourseLoaded(courses));
     } catch (e) {
       emit(CourseError(e.toString()));

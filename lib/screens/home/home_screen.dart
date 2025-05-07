@@ -6,6 +6,8 @@ import 'package:lms/apps/utils/listCourses_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/apps/utils/route_observer.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
+import 'package:lms/blocs/cubit/category/category_cubit.dart';
+import 'package:lms/blocs/cubit/category/category_state.dart';
 import 'package:lms/blocs/cubit/courses/course_cubit.dart';
 import 'package:lms/blocs/mentors/mentors_bloc.dart';
 import 'package:lms/blocs/mentors/mentors_event.dart';
@@ -119,23 +121,41 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                         CourseCategoryWidget(),
                         const SizedBox(height: 20),
                         BlocBuilder<CourseCubit, CourseState>(
-                          builder: (context, state) {
-                            if (state is CourseLoading) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else if (state is CourseLoaded) {
-                              // Tạo bản sao, xáo trộn và giữ 10 phần tử đầu
-                              final randomList = List<Course>.from(
-                                state.courses,
-                              )..shuffle();
+                          builder: (context, courseState) {
+                            if (courseState is CourseLoading) {
+                              return LoadingIndicator();
+                            } else if (courseState is CourseLoaded) {
+                              // 1. Lấy danh sách gốc
+                              var list = courseState.courses;
+
+                              // 2. Lọc theo category nếu đã chọn
+                              final categoryState =
+                                  context.watch<CategoryCubit>().state;
+                              if (categoryState is CategoryLoaded &&
+                                  categoryState.selectedId != null) {
+                                list =
+                                    list
+                                        .where(
+                                          (c) =>
+                                              c.categoryId ==
+                                              categoryState.selectedId,
+                                        )
+                                        .toList();
+                              }
+
+                              // 3. Xáo trộn và lấy 10 phần tử
+                              final randomList = List<Course>.from(list)
+                                ..shuffle();
                               final limitedList = randomList.take(10).toList();
+
+                              // 4. Trả về widget
                               return ListCoursesWidget(courses: limitedList);
-                            } else if (state is CourseError) {
+                            } else if (courseState is CourseError) {
                               return Center(
-                                child: Text('Lỗi: ${state.message}'),
+                                child: Text('Không có khoá học nào tổn tại'),
                               );
                             }
+
                             return const SizedBox.shrink();
                           },
                         ),

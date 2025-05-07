@@ -6,8 +6,17 @@ class CourseRepository {
   final CourseService _service;
   CourseRepository(Dio dio) : _service = CourseService(dio);
 
-  Future<List<Course>> getAllCourses() async {
-    final raw = await _service.fetchAllCourses();
+  /// Lấy danh sách khóa học với filter status, category, search
+  Future<List<Course>> getAllCourses({
+    String? status,
+    int? categoryId,
+    String? search,
+  }) async {
+    final raw = await _service.fetchAllCourses(
+      status: status,
+      categoryId: categoryId,
+      search: search,
+    );
     return raw.map((e) => Course.fromJson(e)).toList();
   }
 }
