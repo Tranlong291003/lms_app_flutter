@@ -54,7 +54,7 @@ class _ListMentorScreenState extends State<ListMentorScreen> {
             }
             return RefreshIndicator(
               onRefresh: () async {
-                context.read<MentorsBloc>().add(GetAllMentorsEvent());
+                context.read<MentorsBloc>().add(RefreshMentorsEvent());
               },
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(vertical: 12),

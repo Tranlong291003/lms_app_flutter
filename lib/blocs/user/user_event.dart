@@ -26,3 +26,5 @@ class UpdateUserProfileEvent extends UserEvent {
     this.avatarFile,
   });
 }
+
+class RefreshUserEvent extends UserEvent {}

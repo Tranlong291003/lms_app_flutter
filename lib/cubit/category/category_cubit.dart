@@ -27,4 +27,8 @@ class CategoryCubit extends Cubit<CategoryState> {
       emit(CategoryLoaded(s.categories, selectedId: id));
     }
   }
+
+  void refreshCategories() {
+    loadCategories();
+  }
 }

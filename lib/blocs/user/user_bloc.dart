@@ -9,6 +9,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   UserBloc(this._userRepository) : super(UserLoading()) {
     on<GetUserByUidEvent>(_onGetUserByUid);
     on<UpdateUserProfileEvent>(_onUpdateUserProfile);
+    on<RefreshUserEvent>(_onRefreshUser);
   }
 
   // Lấy thông tin user từ UID
@@ -54,6 +55,17 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(UserUpdateSuccess(user, notification));
     } catch (e) {
       emit(UserUpdateFailure('Cập nhật hồ sơ thất bại: $e'));
+    }
+  }
+
+  Future<void> _onRefreshUser(
+    RefreshUserEvent event,
+    Emitter<UserState> emit,
+  ) async {
+    // Có thể xóa cache nếu có, sau đó reload user hiện tại
+    if (state is UserLoaded) {
+      final uid = (state as UserLoaded).user.uid;
+      add(GetUserByUidEvent(uid));
     }
   }
 }

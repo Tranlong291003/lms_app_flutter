@@ -6,15 +6,14 @@ import 'package:lms/apps/utils/listCourses_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/apps/utils/route_observer.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
-import 'package:lms/cubit/category/category_cubit.dart';
-import 'package:lms/cubit/category/category_state.dart';
-import 'package:lms/cubit/courses/course_cubit.dart';
 import 'package:lms/blocs/mentors/mentors_bloc.dart';
 import 'package:lms/blocs/mentors/mentors_event.dart';
 import 'package:lms/blocs/mentors/mentors_state.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
-import 'package:lms/blocs/user/user_state.dart';
+import 'package:lms/cubit/category/category_cubit.dart';
+import 'package:lms/cubit/category/category_state.dart';
+import 'package:lms/cubit/courses/course_cubit.dart';
 import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/screens/home/appBar_widget.dart';
 import 'package:lms/screens/home/discountSlider_widget.dart';
@@ -28,24 +27,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with RouteAware {
-  final List<Map<String, dynamic>> sampleCourses = List.generate(10, (index) {
-    return {
-      "title": "Khoá học Flutter nâng cao số ${index + 1}",
-      "thumbnail_url":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIviTPCD7epj8fyQGlF5uMqKIE20C_JuULQw&s",
-      "category": ["Lập trình", "Thiết kế", "Marketing"][index % 3],
-      "price": 500000 + (index * 10000),
-      "discount_price": index % 2 == 0 ? 400000 + (index * 8000) : null,
-      "language": index % 2 == 0 ? "Tiếng Việt" : "Tiếng Anh",
-      "level": ["Cơ bản", "Trung cấp", "Nâng cao"][index % 3],
-    };
-  });
-
   @override
   void initState() {
     super.initState();
-    _loadCurrentUser();
     _loadMentor();
+    _loadCurrentUser();
+    context.read<CourseCubit>().loadCourses();
+  }
+
+  void _loadMentor() {
+    context.read<MentorsBloc>().add(GetAllMentorsEvent());
   }
 
   void _loadCurrentUser() {
@@ -53,10 +44,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     if (uid != null) {
       context.read<UserBloc>().add(GetUserByUidEvent(uid));
     }
-  }
-
-  void _loadMentor() {
-    context.read<MentorsBloc>().add(GetAllMentorsEvent());
   }
 
   @override
@@ -72,101 +59,95 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   }
 
   @override
-  void didPopNext() {
-    _loadCurrentUser();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
     return Scaffold(
-      appBar: AppBarHome(context, 'Home'),
-      body: BlocBuilder<UserBloc, UserState>(
-        builder: (context, state) {
-          if (state is UserLoading) {
-          } else if (state is UserError) {
-            return Center(child: Text('Lỗi: ${state.message}'));
-          }
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SearchBarWidget(),
-                  DiscountSlider(),
-                  _buildSection(
-                    title: 'Danh sách giảng viên',
-                    onTap: () => Navigator.pushNamed(context, '/listmentor'),
-                    child: BlocBuilder<MentorsBloc, MentorsState>(
-                      builder: (context, state) {
-                        if (state is MentorsLoading) {
-                          return const LoadingIndicator();
-                        } else if (state is MentorsLoaded) {
-                          return TopMentors(mentors: state.mentors);
-                        } else if (state is MentorsError) {
-                          return Center(child: Text('Lỗi: ${state.message}'));
-                        }
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                  ),
-                  _buildSection(
-                    title: 'Danh sách khoá học',
-                    onTap: () => Navigator.pushNamed(context, '/listcourse'),
-                    child: Column(
-                      children: [
-                        CourseCategoryWidget(),
-                        const SizedBox(height: 20),
-                        BlocBuilder<CourseCubit, CourseState>(
-                          builder: (context, courseState) {
-                            if (courseState is CourseLoading) {
-                              return LoadingIndicator();
-                            } else if (courseState is CourseLoaded) {
-                              // 1. Lấy danh sách gốc
-                              var list = courseState.courses;
-
-                              // 2. Lọc theo category nếu đã chọn
-                              final categoryState =
-                                  context.watch<CategoryCubit>().state;
-                              if (categoryState is CategoryLoaded &&
-                                  categoryState.selectedId != null) {
-                                list =
-                                    list
-                                        .where(
-                                          (c) =>
-                                              c.categoryId ==
-                                              categoryState.selectedId,
-                                        )
-                                        .toList();
-                              }
-
-                              // 3. Xáo trộn và lấy 10 phần tử
-                              final randomList = List<Course>.from(list)
-                                ..shuffle();
-                              final limitedList = randomList.take(10).toList();
-
-                              // 4. Trả về widget
-                              return ListCoursesWidget(courses: limitedList);
-                            } else if (courseState is CourseError) {
-                              return Center(
-                                child: Text('Không có khoá học nào tổn tại'),
-                              );
-                            }
-
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
+      appBar: AppBarHome(context, 'title'),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          context.read<CourseCubit>().refreshCourses();
+          context.read<MentorsBloc>().add(RefreshMentorsEvent());
+          context.read<UserBloc>().add(RefreshUserEvent());
+          context.read<CategoryCubit>().refreshCategories();
         },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SearchBarWidget(),
+                DiscountSlider(),
+                _buildSection(
+                  title: 'Danh sách giảng viên',
+                  onTap: () => Navigator.pushNamed(context, '/listmentor'),
+                  child: BlocBuilder<MentorsBloc, MentorsState>(
+                    builder: (context, state) {
+                      if (state is MentorsLoading) {
+                        return const LoadingIndicator();
+                      } else if (state is MentorsLoaded) {
+                        return TopMentors(mentors: state.mentors);
+                      } else if (state is MentorsError) {
+                        return Center(child: Text('Lỗi: ${state.message}'));
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ),
+                _buildSection(
+                  title: 'Danh sách khoá học',
+                  onTap: () => Navigator.pushNamed(context, '/listcourse'),
+                  child: Column(
+                    children: [
+                      CourseCategoryWidget(),
+                      const SizedBox(height: 20),
+                      BlocBuilder<CourseCubit, CourseState>(
+                        builder: (context, courseState) {
+                          if (courseState is CourseLoading) {
+                            return const SizedBox(
+                              height: 200,
+                              child: Center(child: CircularProgressIndicator()),
+                            );
+                          } else if (courseState is CourseLoaded) {
+                            var list = courseState.courses;
+                            final categoryState =
+                                context.watch<CategoryCubit>().state;
+                            if (categoryState is CategoryLoaded &&
+                                categoryState.selectedId != null) {
+                              list =
+                                  list
+                                      .where(
+                                        (c) =>
+                                            c.categoryId ==
+                                            categoryState.selectedId,
+                                      )
+                                      .toList();
+                            }
+                            final randomList = List<Course>.from(list)
+                              ..shuffle();
+                            final limitedList = randomList.take(10).toList();
+                            return ListCoursesWidget(courses: limitedList);
+                          } else if (courseState is CourseError) {
+                            return const SizedBox(
+                              height: 200,
+                              child: Center(
+                                child: Text('Không có khoá học nào tổn tại'),
+                              ),
+                            );
+                          }
+                          return const SizedBox(height: 200);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

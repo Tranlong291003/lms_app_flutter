@@ -1,23 +1,22 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+/// Service quản lý thông báo cục bộ
 class NotificationService {
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  // Khởi tạo các cài đặt cho thông báo cục bộ
+  /// Khởi tạo cài đặt cho thông báo cục bộ
   Future<void> initialize() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings(
-          'app_icon',
-        ); // Đảm bảo bạn có icon trong drawable
+        AndroidInitializationSettings('app_icon');
 
-    final InitializationSettings initializationSettings =
+    const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
 
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  // Hàm để hiển thị thông báo cục bộ
+  /// Hiển thị thông báo cục bộ
   Future<void> showNotification(
     String title,
     String body,
@@ -25,24 +24,23 @@ class NotificationService {
   ) async {
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-          'your_channel_id', // Channel ID
-          'your_channel_name',
-          channelDescription: 'Your channel description',
+          'default_channel',
+          'Thông báo mặc định',
+          channelDescription: 'Kênh thông báo mặc định cho ứng dụng',
           importance: Importance.high,
           priority: Priority.high,
           showWhen: false,
-          icon: 'app_icon', // Đặt tên icon mà bạn đã thêm vào thư mục drawable
+          icon: 'app_icon',
         );
 
     const NotificationDetails platformDetails = NotificationDetails(
       android: androidDetails,
     );
 
-    // Hiển thị thông báo
-    await flutterLocalNotificationsPlugin.show(
-      notificationId, // ID thông báo
-      title, // Tiêu đề thông báo
-      body, // Nội dung thông báo
+    await _flutterLocalNotificationsPlugin.show(
+      notificationId,
+      title,
+      body,
       platformDetails,
     );
   }

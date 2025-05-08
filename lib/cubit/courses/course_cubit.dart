@@ -40,6 +40,10 @@ class CourseCubit extends Cubit<CourseState> {
       emit(CourseError(e.toString()));
     }
   }
+
+  void refreshCourses() {
+    loadCourses();
+  }
 }
 
 class CourseDetailCubit extends Cubit<CourseDetailState> {
@@ -54,6 +58,13 @@ class CourseDetailCubit extends Cubit<CourseDetailState> {
       emit(CourseDetailLoaded(detail));
     } catch (e) {
       emit(CourseDetailError(e.toString()));
+    }
+  }
+
+  void refreshCourseDetail() {
+    if (state is CourseDetailLoaded) {
+      final courseId = (state as CourseDetailLoaded).detail.courseId;
+      fetchCourseDetail(courseId);
     }
   }
 }

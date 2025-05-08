@@ -10,6 +10,8 @@ class MentorsBloc extends Bloc<MentorsEvent, MentorsState> {
 
   MentorsBloc(this._mentorRepository) : super(MentorsLoading()) {
     on<GetAllMentorsEvent>(_onGetAllMentors);
+    on<GetMentorByUidEvent>(_onGetMentorByUid);
+    on<RefreshMentorsEvent>(_onRefreshMentors);
   }
 
   Future<void> _onGetAllMentors(
@@ -39,5 +41,27 @@ class MentorsBloc extends Bloc<MentorsEvent, MentorsState> {
     } catch (e) {
       emit(MentorsError('Không thể tải danh sách mentor: $e'));
     }
+  }
+
+  Future<void> _onGetMentorByUid(
+    GetMentorByUidEvent event,
+    Emitter<MentorsState> emit,
+  ) async {
+    try {
+      emit(MentorsLoading());
+      final Mentor = await _mentorRepository.getMentorByUid(event.uid);
+      emit(MentorsLoaded([Mentor]));
+    } catch (e) {
+      emit(MentorsError('Không thể tải thông tin người dùng: $e'));
+    }
+  }
+
+  Future<void> _onRefreshMentors(
+    RefreshMentorsEvent event,
+    Emitter<MentorsState> emit,
+  ) async {
+    emit(MentorsLoading());
+    _cachedMentors = null;
+    add(GetAllMentorsEvent());
   }
 }

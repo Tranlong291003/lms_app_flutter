@@ -6,13 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:lms/apps/config/api_config.dart';
-import 'package:lms/cubit/category/category_cubit.dart';
-import 'package:lms/cubit/courses/course_cubit.dart';
-import 'package:lms/cubit/notification/notification_cubit.dart';
+import 'package:lms/blocs/mentors/mentor_detail_bloc.dart';
 import 'package:lms/blocs/mentors/mentors_bloc.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_event.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
+import 'package:lms/cubit/category/category_cubit.dart';
+import 'package:lms/cubit/courses/course_cubit.dart';
+import 'package:lms/cubit/notification/notification_cubit.dart';
 import 'package:lms/repository/category_repository.dart';
 import 'package:lms/repository/course_repository.dart';
 import 'package:lms/repository/mentor_repository.dart';
@@ -32,8 +33,8 @@ Future<void> main() async {
 
   // 1. Tạo Dio + Services
   final dio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl));
-  final userService = UserService(dio);
-  final mentorService = MentorService(dio);
+  final userService = UserService();
+  final mentorService = MentorService();
   final categoryService = CategoryService(dio);
   final notificationService = NotificationService();
 
@@ -48,6 +49,7 @@ Future<void> main() async {
   final authCubit = AuthCubit(FirebaseAuth.instance, dio);
   final userBloc = UserBloc(userRepository);
   final mentorBloc = MentorsBloc(mentorRepository);
+  final mentorDetailBloc = MentorDetailBloc(mentorRepository);
   final notifCubit = NotificationCubit(notificationService);
 
   // 4. Khởi động các service cần await trước khi chạy UI
@@ -60,6 +62,7 @@ Future<void> main() async {
       providers: [
         RepositoryProvider<UserRepository>(create: (_) => userRepository),
         RepositoryProvider<MentorRepository>(create: (_) => mentorRepository),
+
         RepositoryProvider<CategoryRepository>(
           create: (_) => categoryRepository,
         ),
@@ -69,7 +72,6 @@ Future<void> main() async {
                 Dio(BaseOptions(baseUrl: ApiConfig.baseUrl)),
               ),
         ),
-        // ... nếu còn repo khác
       ],
       child: MultiBlocProvider(
         providers: [
@@ -79,6 +81,7 @@ Future<void> main() async {
           BlocProvider<UserBloc>(create: (_) => userBloc),
           BlocProvider<NotificationCubit>(create: (_) => notifCubit),
           BlocProvider<MentorsBloc>(create: (_) => mentorBloc),
+          BlocProvider<MentorDetailBloc>(create: (_) => mentorDetailBloc),
 
           BlocProvider<CategoryCubit>(
             create:

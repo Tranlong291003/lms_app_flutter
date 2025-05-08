@@ -24,9 +24,9 @@ import 'package:lms/screens/quiz/quiz_screen.dart';
 import 'package:lms/screens/security/security_screen.dart';
 import 'package:lms/screens/signup/signup_screen.dart';
 
-import '../utils/bottomNavigationBar.dart';
 import '../../screens/Introduction/intro_screen.dart';
 import '../../screens/security/change_password_screen.dart';
+import '../utils/bottomNavigationBar.dart';
 
 class AppRouter {
   // Route names

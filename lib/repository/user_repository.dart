@@ -1,16 +1,16 @@
 import 'dart:io';
 
 import 'package:lms/models/user_model.dart';
+import 'package:lms/repository/base_repository.dart';
 import 'package:lms/services/user_service.dart';
 
-class UserRepository {
-  final UserService _service; // Đảm bảo dùng tên nhất quán
-  UserRepository(this._service);
+class UserRepository extends BaseRepository<UserService> {
+  UserRepository(super.service);
 
   /* ---------- Lấy thông tin người dùng ---------- */
   Future<User> getUserByUid(String uid) async {
     try {
-      return await _service.getUserByUid(uid);
+      return await service.getUserByUid(uid);
     } catch (e) {
       throw Exception('Không thể lấy thông tin người dùng: $e');
     }
@@ -27,7 +27,7 @@ class UserRepository {
     File? avatarFile,
   }) async {
     // Gọi service để cập nhật hồ sơ người dùng và nhận thông báo
-    final result = await _service.updateProfile(
+    final result = await service.updateProfile(
       uid: uid,
       name: name,
       phone: phone,

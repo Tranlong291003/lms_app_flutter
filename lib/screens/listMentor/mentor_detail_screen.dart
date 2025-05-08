@@ -6,9 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
-import 'package:lms/blocs/user/user_bloc.dart';
-import 'package:lms/blocs/user/user_event.dart';
-import 'package:lms/blocs/user/user_state.dart';
+import 'package:lms/blocs/mentors/mentor_detail_bloc.dart';
+import 'package:lms/blocs/mentors/mentors_event.dart';
+import 'package:lms/blocs/mentors/mentors_state.dart';
 import 'package:shimmer/shimmer.dart';
 
 /// Màn hình chi tiết Mentor, chỉ cần truyền UID
@@ -24,7 +24,7 @@ class _MentorDetailScreenState extends State<MentorDetailScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<UserBloc>().add(GetUserByUidEvent(widget.uid));
+    context.read<MentorDetailBloc>().add(GetMentorByUidEvent(widget.uid));
   }
 
   @override
@@ -37,12 +37,12 @@ class _MentorDetailScreenState extends State<MentorDetailScreen> {
         title: const Text('Chi tiết Giảng viên'),
         centerTitle: true,
       ),
-      body: BlocBuilder<UserBloc, UserState>(
+      body: BlocBuilder<MentorDetailBloc, MentorsState>(
         builder: (context, state) {
-          if (state is UserLoading) {
+          if (state is MentorsLoading) {
             return const Center(child: LoadingIndicator());
-          } else if (state is UserLoaded) {
-            final mentor = state.user;
+          } else if (state is MentorsLoaded) {
+            final mentor = state.mentors.first;
             final avatarUrl =
                 mentor.avatarUrl.isNotEmpty
                     ? '${ApiConfig.baseUrl}${mentor.avatarUrl}'
@@ -188,7 +188,7 @@ class _MentorDetailScreenState extends State<MentorDetailScreen> {
                 ],
               ),
             );
-          } else if (state is UserError) {
+          } else if (state is MentorsError) {
             return Center(child: Text('Lỗi: ${state.message}'));
           }
           return const SizedBox.shrink();
