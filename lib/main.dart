@@ -14,6 +14,7 @@ import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_event.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/repository/category_repository.dart';
+import 'package:lms/repository/course_repository.dart';
 import 'package:lms/repository/mentor_repository.dart';
 import 'package:lms/repository/user_repository.dart';
 import 'package:lms/screens/Introduction/cubit/intro_cubit.dart';
@@ -61,6 +62,12 @@ Future<void> main() async {
         RepositoryProvider<MentorRepository>(create: (_) => mentorRepository),
         RepositoryProvider<CategoryRepository>(
           create: (_) => categoryRepository,
+        ),
+        RepositoryProvider<CourseRepository>(
+          create:
+              (_) => CourseRepository(
+                Dio(BaseOptions(baseUrl: ApiConfig.baseUrl)),
+              ),
         ),
         // ... nếu còn repo khác
       ],

@@ -22,142 +22,152 @@ class ListCoursesWidget extends StatelessWidget {
         final c = courses[i];
         final actualPrice = c.discountPrice > 0 ? c.discountPrice : c.price;
 
-        return Container(
-          height: 140,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: theme.colorScheme.outline.withOpacity(0.1),
+        return InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              '/courseDetail',
+              arguments: c.courseId,
+            );
+          },
+          child: Container(
+            height: 140,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: theme.colorScheme.outline.withOpacity(0.1),
+              ),
             ),
-          ),
-          child: Stack(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      '${ApiConfig.baseUrl}${c.thumbnailUrl}' ?? '',
-                      width: 120,
-                      height: 120,
-                      fit: BoxFit.cover,
-                      errorBuilder:
-                          (_, __, ___) => Container(
-                            width: 120,
-                            height: 120,
-                            color: theme.colorScheme.surfaceContainerHighest,
-                            child: Icon(
-                              Icons.broken_image,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Tags
-                        Row(
-                          children: [
-                            _tag(
-                              context,
-                              c.categoryName,
-                              theme.colorScheme.primaryContainer,
-                              theme.colorScheme.onPrimaryContainer,
-                            ),
-                            const SizedBox(width: 8),
-                            _tag(
-                              context,
-                              c.level,
-                              _getLevelColor(context, c.level),
-                              theme.colorScheme.onPrimary,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-
-                        // Title
-                        Text(
-                          c.title,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.clip,
-                        ),
-                        const SizedBox(height: 6),
-
-                        // Price row
-                        Row(
-                          children: [
-                            Text(
-                              "${priceFmt.format(actualPrice)} VND",
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
+            child: Stack(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        '${ApiConfig.baseUrl}${c.thumbnailUrl}' ?? '',
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (_, __, ___) => Container(
+                              width: 120,
+                              height: 120,
+                              color: theme.colorScheme.surfaceContainerHighest,
+                              child: Icon(
+                                Icons.broken_image,
+                                color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
-                            if (c.discountPrice > 0) ...[
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Tags
+                          Row(
+                            children: [
+                              _tag(
+                                context,
+                                c.categoryName,
+                                theme.colorScheme.primaryContainer,
+                                theme.colorScheme.onPrimaryContainer,
+                              ),
                               const SizedBox(width: 8),
-                              Text(
-                                "${priceFmt.format(c.price)} VND",
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurface
-                                      .withOpacity(0.6),
-                                  decoration: TextDecoration.lineThrough,
-                                ),
+                              _tag(
+                                context,
+                                c.level,
+                                _getLevelColor(context, c.level),
+                                theme.colorScheme.onPrimary,
                               ),
                             ],
-                          ],
-                        ),
-                        const SizedBox(height: 6),
+                          ),
+                          const SizedBox(height: 6),
 
-                        // Rating and Enroll count
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.star,
-                              size: 16,
-                              color: theme.colorScheme.secondary,
+                          // Title
+                          Text(
+                            c.title,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              c.rating.toStringAsFixed(1),
-                              style: theme.textTheme.bodySmall,
-                            ),
-                            const SizedBox(width: 16),
-                            Icon(
-                              Icons.person,
-                              size: 16,
-                              color: theme.colorScheme.onSurface.withOpacity(
-                                0.6,
+                            maxLines: 1,
+                            overflow: TextOverflow.clip,
+                          ),
+                          const SizedBox(height: 6),
+
+                          // Price row
+                          Row(
+                            children: [
+                              Text(
+                                "${priceFmt.format(actualPrice)} VND",
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.primary,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${c.enrollCount} người học',
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          ],
-                        ),
-                      ],
+                              if (c.discountPrice > 0) ...[
+                                const SizedBox(width: 8),
+                                Text(
+                                  "${priceFmt.format(c.price)} VND",
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurface
+                                        .withOpacity(0.6),
+                                    decoration: TextDecoration.lineThrough,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+
+                          // Rating and Enroll count
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.star,
+                                size: 16,
+                                color: theme.colorScheme.secondary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                c.rating.toStringAsFixed(1),
+                                style: theme.textTheme.bodySmall,
+                              ),
+                              const SizedBox(width: 16),
+                              Icon(
+                                Icons.person,
+                                size: 16,
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  0.6,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${c.enrollCount} người học',
+                                style: theme.textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              // Bookmark
-              Positioned(
-                top: 0,
-                right: 0,
-                child: BookmarkButton(initialSaved: false),
-              ),
-            ],
+                  ],
+                ),
+                // Bookmark
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: BookmarkButton(initialSaved: false),
+                ),
+              ],
+            ),
           ),
         );
       },

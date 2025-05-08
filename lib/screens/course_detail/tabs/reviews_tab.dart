@@ -5,6 +5,7 @@ class ReviewsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final reviews = List.generate(
       4,
       (index) => {
@@ -21,68 +22,60 @@ class ReviewsTab extends StatelessWidget {
       itemCount: reviews.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (_, i) {
-        final r = reviews[i];
-        return Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color:
-                Theme.of(context).brightness == Brightness.light
-                    ? Colors.white
-                    : const Color(0xFF2C2C2E),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              if (Theme.of(context).brightness == Brightness.light)
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
+        final review = reviews[i];
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: theme.colorScheme.primary.withOpacity(
+                        0.1,
+                      ),
+                      child: Icon(
+                        Icons.person,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            review['name']! as String,
+                            style: theme.textTheme.titleMedium,
+                          ),
+                          Text(
+                            review['date']! as String,
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: List.generate(
+                        review['rating']! as int,
+                        (_) => Icon(
+                          Icons.star,
+                          color: theme.colorScheme.secondary,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-            ],
-            border: Border.all(color: Colors.grey.withOpacity(0.15)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const CircleAvatar(radius: 18, child: Icon(Icons.person)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          r['name']! as String,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                        Text(
-                          r['date']! as String,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    children: List.generate(
-                      r['rating']! as int,
-                      (_) =>
-                          const Icon(Icons.star, color: Colors.amber, size: 16),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                r['comment']! as String,
-                style: const TextStyle(fontSize: 13.5),
-              ),
-            ],
+                const SizedBox(height: 12),
+                Text(
+                  review['comment']! as String,
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ],
+            ),
           ),
         );
       },

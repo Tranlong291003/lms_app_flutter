@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/models/courses/course_detail_model.dart';
 
 class CourseService {
   final Dio _dio;
@@ -44,6 +45,19 @@ class CourseService {
       }
     }
     // Các trường hợp khác throw exception
-    throw Exception('Failed to load courses (status: \${res.statusCode})');
+    throw Exception('Failed to load courses (status: \\${res.statusCode})');
+  }
+
+  Future<CourseDetail> getCourseDetail(int courseId) async {
+    try {
+      final res = await _dio.get('${ApiConfig.getAllCourses}/$courseId');
+      print('DEBUG getCourseDetail response: \\${res.data}');
+      if (res.statusCode == 200 && res.data['data'] is Map<String, dynamic>) {
+        return CourseDetail.fromJson(res.data['data'] as Map<String, dynamic>);
+      }
+      throw Exception('Không thể tải chi tiết khoá học');
+    } catch (e) {
+      throw Exception('Lỗi khi tải chi tiết khoá học: \\${e.toString()}');
+    }
   }
 }

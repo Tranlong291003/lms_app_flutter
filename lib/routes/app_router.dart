@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/blocs/cubit/courses/course_cubit.dart';
+import 'package:lms/repository/course_repository.dart';
 import 'package:lms/screens/bookmark/bookmark_screen.dart';
 import 'package:lms/screens/course_detail/course_detail_screen.dart';
 import 'package:lms/screens/forgotpassword/forgotpassword_screen.dart';
@@ -102,7 +105,20 @@ class AppRouter {
         page = const QuizQuestionsScreen();
         break;
       case courseDetail:
-        page = const CourseDetailScreen();
+        final args = settings.arguments;
+        if (args is int) {
+          page = BlocProvider(
+            create:
+                (context) =>
+                    CourseDetailCubit(context.read<CourseRepository>())
+                      ..fetchCourseDetail(args),
+            child: CourseDetailScreen(courseId: args),
+          );
+        } else {
+          page = const Scaffold(
+            body: Center(child: Text('Không tìm thấy Course ID')),
+          );
+        }
         break;
       case mentorDetail:
         final args = settings.arguments;

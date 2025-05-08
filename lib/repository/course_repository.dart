@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:lms/models/courses/course_detail_model.dart';
 import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/services/course_service.dart';
 
@@ -18,5 +19,9 @@ class CourseRepository {
       search: search,
     );
     return raw.map((e) => Course.fromJson(e)).toList();
+  }
+
+  Future<CourseDetail> getCourseDetail(int courseId) async {
+    return await _service.getCourseDetail(courseId);
   }
 }

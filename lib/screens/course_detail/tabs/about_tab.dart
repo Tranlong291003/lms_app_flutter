@@ -1,55 +1,99 @@
 import 'package:flutter/material.dart';
-
-import '../shared/expandable_description.dart';
+import 'package:lms/apps/config/api_config.dart';
 
 class AboutTab extends StatelessWidget {
-  const AboutTab({super.key});
+  final String description;
+  final String instructorName;
+  final String? instructorAvatarUrl;
+  final String? instructorBio;
+  const AboutTab({
+    super.key,
+    required this.description,
+    required this.instructorName,
+    this.instructorAvatarUrl,
+    this.instructorBio,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.only(right: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'Giảng viên',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 12),
           Row(
             children: [
-              const CircleAvatar(
-                radius: 24,
-                backgroundImage: AssetImage('assets/images/mentor.png'),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: theme.colorScheme.primary,
+                    width: 2,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: CircleAvatar(
+                  radius: 24,
+                  backgroundImage:
+                      (instructorAvatarUrl != null &&
+                              instructorAvatarUrl!.isNotEmpty)
+                          ? NetworkImage(
+                            '${ApiConfig.baseUrl}$instructorAvatarUrl',
+                          )
+                          : const AssetImage('assets/images/mentor.png')
+                              as ImageProvider,
+                ),
               ),
               const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    'Jonathan Williams',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text('Chuyên gia thiết kế tại Google'),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      instructorName,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (instructorBio != null && instructorBio!.isNotEmpty)
+                      Text(
+                        instructorBio!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                  ],
+                ),
               ),
               const Spacer(),
-              const Icon(Icons.chat_bubble_outline, color: Colors.blue),
+              Icon(Icons.chat_bubble_outline, color: theme.colorScheme.primary),
             ],
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Giới thiệu khoá học',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 12),
-          const ExpandableDescription(),
+          Text(description, style: theme.textTheme.bodyMedium),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Công cụ sử dụng',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 12),
           Row(
@@ -59,7 +103,7 @@ class AboutTab extends StatelessWidget {
                 width: 20,
               ),
               const SizedBox(width: 8),
-              const Text('Figma'),
+              Text('Figma', style: theme.textTheme.bodyMedium),
             ],
           ),
         ],

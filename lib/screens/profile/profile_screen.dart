@@ -260,6 +260,7 @@ class ProfileScreen extends StatelessWidget {
                   titleColor: Colors.red,
                   iconColor: Colors.red,
                   onTap: () async {
+                    final parentContext = context;
                     final confirm = await showModalBottomSheet<bool>(
                       context: context,
                       shape: const RoundedRectangleBorder(
@@ -346,7 +347,9 @@ class ProfileScreen extends StatelessWidget {
 
                     if (confirm == true) {
                       await FirebaseAuth.instance.signOut();
-                      Navigator.pushReplacementNamed(context, '/login');
+                      if (parentContext.mounted) {
+                        Navigator.pushReplacementNamed(parentContext, '/login');
+                      }
                     }
                   },
                 ),
