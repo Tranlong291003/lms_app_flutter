@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:lms/blocs/theme/theme_state.dart';
 
 // Hàm tạo ElevatedButton với text tùy chỉnh và hành động onPressed tùy chỉnh
 ElevatedButton botton({
-  required ThemeState themeState, // Thêm đối số ThemeState
-  required String text, // Thêm đối số text
-  required VoidCallback onPressed, // Thêm đối số onPressed tùy chỉnh
+  required BuildContext context,
+  required String text,
+  required VoidCallback onPressed,
+  double? width,
+  double height = 50,
 }) {
+  final theme = Theme.of(context);
+
   return ElevatedButton(
-    onPressed: onPressed, // Sử dụng hàm onPressed truyền vào
+    onPressed: onPressed,
     style: ElevatedButton.styleFrom(
-      minimumSize: const Size(double.infinity, 50),
+      minimumSize: Size(width ?? double.infinity, height),
+      backgroundColor: theme.colorScheme.primary,
+      foregroundColor: theme.colorScheme.onPrimary,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      elevation: 2,
+      textStyle: theme.textTheme.labelLarge?.copyWith(
+        fontWeight: FontWeight.bold,
+      ),
     ),
-    child: Text(text), // Text được truyền vào
+    child: Text(text),
   );
 }

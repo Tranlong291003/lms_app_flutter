@@ -33,16 +33,52 @@ class _MyCourseScreenState extends State<MyCourseScreen> {
           menuItems: [
             PopupMenuItem(
               value: 'linear',
-              child: Icon(
-                Icons.linear_scale,
-                color: !showCircular ? Colors.blue : Colors.black54,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.linear_scale,
+                    color:
+                        !showCircular
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('Dạng thanh tiến trình'),
+                  const Spacer(),
+                  if (!showCircular)
+                    Icon(
+                      Icons.check_rounded,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 18,
+                    ),
+                ],
               ),
             ),
             PopupMenuItem(
               value: 'circle',
-              child: Icon(
-                Icons.donut_large,
-                color: showCircular ? Colors.blue : Colors.black54,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.donut_large,
+                    color:
+                        showCircular
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('Dạng vòng tròn'),
+                  const Spacer(),
+                  if (showCircular)
+                    Icon(
+                      Icons.check_rounded,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 18,
+                    ),
+                ],
               ),
             ),
           ],

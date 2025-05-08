@@ -1,37 +1,127 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/listCourses_widget.dart';
+import 'package:lms/models/courses/courses_model.dart';
 
 class BookmarkScreen extends StatelessWidget {
   const BookmarkScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> sampleCourses = List.generate(5, (index) {
-      return {
-        "title": "Khoá học Flutter nâng cao số ${index + 1}",
-        "thumbnail_url":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIviTPCD7epj8fyQGlF5uMqKIE20C_JuULQw&s",
-        "category": ["Lập trình", "Thiết kế", "Marketing"][index % 3],
-        "price": 500000 + (index * 10000),
-        "discount_price": index % 2 == 0 ? 400000 + (index * 8000) : null,
-        "language": index % 2 == 0 ? "Tiếng Việt" : "Tiếng Anh",
-        "level": ["Cơ bản", "Trung cấp", "Nâng cao"][index % 3],
-        "isSaved": true, // ✅ Mặc định đã lưu
-      };
-    });
+    // TODO: Replace with actual bookmarked courses from state management
+    final List<Course> bookmarkedCourses = [
+      Course(
+        courseId: 1,
+        instructorUid: 'instructor1',
+        categoryId: 1,
+        title: 'Lập trình Flutter cơ bản đến nâng cao',
+        price: 1000000,
+        discountPrice: 800000,
+        thumbnailUrl: '/images/courses/flutter.jpg',
+        categoryName: 'Mobile',
+        level: 'Cơ bản',
+        rating: 4.5,
+        enrollCount: 1000,
+        status: 'active',
+        updatedAt: DateTime.now(),
+        instructorName: 'Nguyễn Văn A',
+      ),
+      Course(
+        courseId: 2,
+        instructorUid: 'instructor2',
+        categoryId: 2,
+        title: 'Lập trình Backend với Node.js',
+        price: 1200000,
+        discountPrice: 900000,
+        thumbnailUrl: '/images/courses/nodejs.jpg',
+        categoryName: 'Backend',
+        level: 'Trung cấp',
+        rating: 4.8,
+        enrollCount: 800,
+        status: 'active',
+        updatedAt: DateTime.now(),
+        instructorName: 'Trần Văn B',
+      ),
+    ];
 
     return Scaffold(
       appBar: CustomAppBar(
+        title: 'Khóa học đã lưu',
         showBack: true,
+        showSearch: true,
         showMenu: true,
-        title: 'DS khoá học yêu thích',
+        menuItems: [
+          PopupMenuItem(
+            value: 'sort',
+            child: Row(
+              children: [
+                Icon(
+                  Icons.sort_rounded,
+                  color: Theme.of(context).colorScheme.onSurface,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                const Text('Sắp xếp'),
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            value: 'filter',
+            child: Row(
+              children: [
+                Icon(
+                  Icons.filter_list_rounded,
+                  color: Theme.of(context).colorScheme.onSurface,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                const Text('Lọc'),
+              ],
+            ),
+          ),
+        ],
+        onMenuSelected: (value) {
+          // TODO: Handle menu selection
+        },
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: ListCoursesWidget(courses: []),
-        ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child:
+            bookmarkedCourses.isEmpty
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.bookmark_border_rounded,
+                        size: 64,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.5),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Chưa có khóa học nào được lưu',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleMedium?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      FilledButton.icon(
+                        onPressed: () {
+                          // TODO: Navigate to course list
+                        },
+                        icon: const Icon(Icons.search_rounded),
+                        label: const Text('Tìm khóa học'),
+                      ),
+                    ],
+                  ),
+                )
+                : ListCoursesWidget(courses: bookmarkedCourses),
       ),
     );
   }

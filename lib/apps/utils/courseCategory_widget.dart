@@ -13,6 +13,8 @@ class CourseCategoryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return BlocBuilder<CategoryCubit, CategoryState>(
       builder: (context, state) {
         if (state is CategoryLoading) {
@@ -21,7 +23,14 @@ class CourseCategoryWidget extends StatelessWidget {
         if (state is CategoryError) {
           return SizedBox(
             height: 40,
-            child: Center(child: Text('Lỗi: ${state.message}')),
+            child: Center(
+              child: Text(
+                'Lỗi: ${state.message}',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
+            ),
           );
         }
         if (state is CategoryLoaded) {
@@ -79,11 +88,11 @@ class CourseCategoryWidget extends StatelessWidget {
                     decoration: BoxDecoration(
                       color:
                           isSelected
-                              ? const Color(0xFF2F56DD)
+                              ? theme.colorScheme.primary
                               : Colors.transparent,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: const Color(0xFF2F56DD),
+                        color: theme.colorScheme.primary,
                         width: 1.5,
                       ),
                     ),
@@ -94,14 +103,12 @@ class CourseCategoryWidget extends StatelessWidget {
                         if (iconWidget is! SizedBox) const SizedBox(width: 4),
                         Text(
                           cat.name,
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 14,
+                          style: theme.textTheme.labelLarge?.copyWith(
                             fontWeight: FontWeight.w500,
                             color:
                                 isSelected
-                                    ? Colors.white
-                                    : const Color(0xFF2F56DD),
+                                    ? theme.colorScheme.onPrimary
+                                    : theme.colorScheme.primary,
                           ),
                         ),
                       ],
@@ -113,9 +120,16 @@ class CourseCategoryWidget extends StatelessWidget {
           );
         }
         // initial / fallback
-        return const SizedBox(
+        return SizedBox(
           height: 40,
-          child: Center(child: Text('Không có danh mục nào')),
+          child: Center(
+            child: Text(
+              'Không có danh mục nào',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
+              ),
+            ),
+          ),
         );
       },
     );

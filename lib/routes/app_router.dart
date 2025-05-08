@@ -144,7 +144,7 @@ class AppRouter {
     return _buildAnimatedRoute(page, settings);
   }
 
-  /// Helper để tạo PageRoute với hiệu ứng slide + fade.
+  /// Helper để tạo PageRoute với hiệu ứng slide + fade hiện đại, mượt mà.
   static PageRouteBuilder _buildAnimatedRoute(
     Widget page,
     RouteSettings settings,
@@ -152,16 +152,21 @@ class AppRouter {
     return PageRouteBuilder(
       settings: settings,
       pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 500),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        // Slide từ phải sang trái, biên độ lớn hơn, curve mượt
         final slideAnim = Tween<Offset>(
-          begin: const Offset(1, 0),
+          begin: const Offset(1.0, 0),
           end: Offset.zero,
-        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut));
+        ).animate(
+          CurvedAnimation(parent: animation, curve: Curves.easeInOutQuart),
+        );
+
+        // Fade in đồng thời
         final fadeAnim = Tween<double>(
           begin: 0.0,
           end: 1.0,
-        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeIn));
+        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
 
         return SlideTransition(
           position: slideAnim,

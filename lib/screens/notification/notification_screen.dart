@@ -7,191 +7,252 @@ class NotificationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, List<NotificationItemModel>> notifications = {
-      'Hôm nay': [
-        NotificationItemModel(
-          type: 'payment',
-          title: 'Thanh toán thành công!',
-          message: 'Bạn đã thanh toán khóa học thành công.',
-          time: DateTime.now().subtract(const Duration(minutes: 15)),
-        ),
-        NotificationItemModel(
-          type: 'promotion',
-          title: 'Ưu đãi đặc biệt hôm nay',
-          message: 'Bạn nhận được khuyến mãi đặc biệt!',
-          time: DateTime.now().subtract(const Duration(hours: 1)),
-        ),
-      ],
-      'Hôm qua': [
-        NotificationItemModel(
-          type: 'new_course',
-          title: 'Khoá học mới được thêm!',
-          message: 'Khoá học thiết kế 3D đã sẵn sàng.',
-          time: DateTime.now().subtract(const Duration(hours: 20)),
-        ),
-        NotificationItemModel(
-          type: 'bank',
-          title: 'Đã kết nối thẻ ngân hàng',
-          message: 'Thẻ của bạn đã được liên kết.',
-          time: DateTime.now().subtract(const Duration(hours: 30)),
-        ),
-      ],
-      '22/12/2024': [
-        NotificationItemModel(
-          type: 'account',
-          title: 'Tạo tài khoản thành công',
-          message: 'Tài khoản của bạn đã được tạo.',
-          time: DateTime(2024, 12, 22, 8, 0),
-        ),
-      ],
-    };
+    // TODO: Replace with actual notifications from state management
+    final List<Map<String, dynamic>> notifications = [
+      {
+        'id': 1,
+        'title': 'Khóa học mới',
+        'message': 'Khóa học Flutter nâng cao đã được thêm vào danh sách',
+        'type': 'course',
+        'isRead': false,
+        'createdAt': DateTime.now().subtract(const Duration(minutes: 5)),
+      },
+      {
+        'id': 2,
+        'title': 'Giảm giá',
+        'message': 'Giảm giá 50% cho tất cả khóa học trong tháng này',
+        'type': 'promotion',
+        'isRead': true,
+        'createdAt': DateTime.now().subtract(const Duration(hours: 2)),
+      },
+      {
+        'id': 3,
+        'title': 'Cập nhật khóa học',
+        'message': 'Khóa học Node.js đã được cập nhật thêm bài học mới',
+        'type': 'update',
+        'isRead': false,
+        'createdAt': DateTime.now().subtract(const Duration(days: 1)),
+      },
+    ];
 
     return Scaffold(
-      appBar: CustomAppBar(showBack: true, title: 'Thông báo', showMenu: true),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        children:
-            notifications.entries.map((entry) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    entry.key,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ...entry.value.map((item) => NotificationTile(item: item)),
-                  const SizedBox(height: 28),
-                ],
-              );
-            }).toList(),
-      ),
-    );
-  }
-}
-
-class NotificationItemModel {
-  final String type;
-  final String title;
-  final String message;
-  final DateTime time;
-
-  NotificationItemModel({
-    required this.type,
-    required this.title,
-    required this.message,
-    required this.time,
-  });
-
-  IconData get icon =>
-      {
-        'payment': Icons.payment,
-        'promotion': Icons.card_giftcard,
-        'new_course': Icons.school,
-        'bank': Icons.credit_card,
-        'account': Icons.check_circle,
-      }[type] ??
-      Icons.notifications;
-
-  Color get color =>
-      {
-        'payment': Colors.blue,
-        'promotion': Colors.orange,
-        'new_course': Colors.redAccent,
-        'bank': Colors.indigo,
-        'account': Colors.green,
-      }[type] ??
-      Colors.grey;
-
-  String getFormattedTime() {
-    final now = DateTime.now();
-    final diff = now.difference(time);
-
-    if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
-    if (diff.inHours < 24) return '${diff.inHours} giờ trước';
-    if (diff.inDays == 1) return 'Hôm qua ${DateFormat('HH:mm').format(time)}';
-    return DateFormat('dd/MM/yyyy HH:mm').format(time);
-  }
-}
-
-class NotificationTile extends StatelessWidget {
-  final NotificationItemModel item;
-
-  const NotificationTile({super.key, required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1F1F1F) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          if (!isDark)
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            height: 52,
-            width: 52,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [
-                  item.color.withOpacity(0.2),
-                  item.color.withOpacity(0.1),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Icon(item.icon, color: item.color, size: 28),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      appBar: CustomAppBar(
+        title: 'Thông báo',
+        showBack: true,
+        showMenu: true,
+        menuItems: [
+          PopupMenuItem(
+            value: 'mark_all_read',
+            child: Row(
               children: [
-                Text(
-                  item.title,
-                  style: const TextStyle(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w600,
-                  ),
+                Icon(
+                  Icons.done_all_rounded,
+                  color: Theme.of(context).colorScheme.onSurface,
+                  size: 20,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  item.message,
-                  style: TextStyle(
-                    fontSize: 13.5,
-                    color: isDark ? Colors.grey[300] : Colors.grey[700],
-                  ),
+                const SizedBox(width: 8),
+                const Text('Đánh dấu đã đọc tất cả'),
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            value: 'clear_all',
+            child: Row(
+              children: [
+                Icon(
+                  Icons.delete_outline_rounded,
+                  color: Theme.of(context).colorScheme.error,
+                  size: 20,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(width: 8),
                 Text(
-                  item.getFormattedTime(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isDark ? Colors.grey[500] : Colors.grey[500],
-                  ),
+                  'Xóa tất cả',
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ],
             ),
           ),
         ],
+        onMenuSelected: (value) {
+          // TODO: Handle menu selection
+        },
+      ),
+      body:
+          notifications.isEmpty
+              ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.notifications_none_rounded,
+                      size: 64,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.5),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Chưa có thông báo nào',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+              : ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: notifications.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final notification = notifications[index];
+                  return _NotificationCard(notification: notification);
+                },
+              ),
+    );
+  }
+}
+
+class _NotificationCard extends StatelessWidget {
+  final Map<String, dynamic> notification;
+
+  const _NotificationCard({required this.notification});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: theme.colorScheme.outline.withOpacity(0.1)),
+      ),
+      child: InkWell(
+        onTap: () {
+          // TODO: Handle notification tap
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Icon
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: _getIconColor(
+                    theme,
+                    notification['type'],
+                  ).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  _getIcon(notification['type']),
+                  color: _getIconColor(theme, notification['type']),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            notification['title'],
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color:
+                                  notification['isRead']
+                                      ? theme.colorScheme.onSurface.withOpacity(
+                                        0.7,
+                                      )
+                                      : theme.colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                        if (!notification['isRead'])
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      notification['message'],
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _formatTime(notification['createdAt']),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  IconData _getIcon(String type) {
+    switch (type) {
+      case 'course':
+        return Icons.school_rounded;
+      case 'promotion':
+        return Icons.local_offer_rounded;
+      case 'update':
+        return Icons.update_rounded;
+      default:
+        return Icons.notifications_rounded;
+    }
+  }
+
+  Color _getIconColor(ThemeData theme, String type) {
+    switch (type) {
+      case 'course':
+        return theme.colorScheme.primary;
+      case 'promotion':
+        return theme.colorScheme.tertiary;
+      case 'update':
+        return theme.colorScheme.secondary;
+      default:
+        return theme.colorScheme.primary;
+    }
+  }
+
+  String _formatTime(DateTime time) {
+    final now = DateTime.now();
+    final difference = now.difference(time);
+
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} phút trước';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours} giờ trước';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} ngày trước';
+    } else {
+      return DateFormat('dd/MM/yyyy').format(time);
+    }
   }
 }

@@ -10,27 +10,20 @@ ElevatedButton SocialLoginButton({
   Color?
   finalIconColor, // Thêm tham số cho màu sắc của icon (nếu muốn thay đổi)
 }) {
-  // Nếu không truyền finalIconColor, thì màu của icon sẽ không thay đổi, giữ nguyên như lúc đầu
-  Color iconColor =
-      finalIconColor ??
-      (Theme.of(context).brightness == Brightness.light
-          ? Colors
-              .black // Màu icon cho theme sáng
-          : Colors.white); // Màu icon cho theme tối
+  final theme = Theme.of(context);
+
+  Color iconColor = finalIconColor ?? theme.colorScheme.onSurface;
 
   return ElevatedButton(
     onPressed: onPressed, // Gọi hàm callback khi nhấn nút
     style: ElevatedButton.styleFrom(
       minimumSize: Size(width, height), // Tuỳ chỉnh kích thước button
-      backgroundColor:
-          Theme.of(context).brightness == Brightness.light
-              ? Colors
-                  .white // Màu nền cho theme sáng
-              : Color(0xFF1F222A), // Màu nền cho theme tối
+      backgroundColor: theme.colorScheme.surface,
+      foregroundColor: theme.colorScheme.onSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
         side: BorderSide(
-          color: Colors.grey.withOpacity(0.2), // Màu viền mờ
+          color: theme.colorScheme.outline.withOpacity(0.2),
           width: 1, // Độ dày viền
         ),
       ),
@@ -50,12 +43,8 @@ ElevatedButton SocialLoginButton({
           const SizedBox(width: 10), // Khoảng cách giữa icon và text
           Text(
             text, // Sử dụng text tùy chỉnh
-            style: TextStyle(
-              color:
-                  Theme.of(context).brightness == Brightness.light
-                      ? Colors
-                          .black // Màu chữ cho theme sáng
-                      : Colors.white, // Màu chữ cho theme tối
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurface,
             ),
           ),
         ],

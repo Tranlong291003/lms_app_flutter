@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/ElevatedButtonsocial.dart';
 import 'package:lms/apps/utils/botton.dart';
 import 'package:lms/apps/utils/customTextField.dart';
-import 'package:lms/blocs/theme/theme_bloc.dart';
-import 'package:lms/blocs/theme/theme_state.dart';
 import 'package:lms/screens/login/loginWithPassword_screen.dart';
 import 'package:lms/screens/signup/cubit/sign_up_cubit.dart';
 import 'package:page_transition/page_transition.dart';
@@ -87,22 +85,18 @@ class SignUpScreen extends StatelessWidget {
                       prefixAsset: 'assets/icons/telephone.png',
                     ),
                     const SizedBox(height: 25),
-                    BlocBuilder<ThemeBloc, ThemeState>(
-                      builder: (context, themeState) {
-                        return botton(
-                          themeState: themeState,
-                          text: 'Đăng ký',
-                          onPressed: () {
-                            // Gọi hàm signUp từ SignUpCubit
-                            context.read<SignUpCubit>().signUp(
-                              context: context,
-                              name: _nameController.text,
-                              email: _emailController.text,
-                              password: _passwordController.text,
-                              confirmPassword: _confirmPasswordController.text,
-                              phone: _phoneController.text,
-                            );
-                          },
+                    botton(
+                      context: context,
+                      text: 'Đăng ký',
+                      onPressed: () {
+                        // Gọi hàm signUp từ SignUpCubit
+                        context.read<SignUpCubit>().signUp(
+                          context: context,
+                          name: _nameController.text,
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                          confirmPassword: _confirmPasswordController.text,
+                          phone: _phoneController.text,
                         );
                       },
                     ),

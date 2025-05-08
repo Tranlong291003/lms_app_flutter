@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_state.dart';
 import 'package:lms/screens/dashboard/dashboard_screen.dart';
@@ -23,8 +22,7 @@ class _BottomNavigationBarExampleState
 
   @override
   Widget build(BuildContext context) {
-    // 1) Check brightness: nếu Dark Mode thì dùng trắng, ngược lại dùng xanh
-    final activeColor = const Color(0xFF335EF7);
+    final theme = Theme.of(context);
 
     // 2) Lấy role từ UserBloc, chỉ rebuild khi role thay đổi
     final isAdminOrMentor = context.select<UserBloc, bool>((bloc) {
@@ -44,29 +42,56 @@ class _BottomNavigationBarExampleState
 
     final items = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
-        icon: Image.asset('assets/icons/home.png', color: Colors.grey),
-        activeIcon: Image.asset('assets/icons/home.png', color: activeColor),
+        icon: Image.asset(
+          'assets/icons/home.png',
+          color: theme.colorScheme.onSurface.withOpacity(0.6),
+        ),
+        activeIcon: Image.asset(
+          'assets/icons/home.png',
+          color: theme.colorScheme.primary,
+        ),
         label: 'Trang chủ',
       ),
       BottomNavigationBarItem(
-        icon: Image.asset('assets/icons/course.png', color: Colors.grey),
-        activeIcon: Image.asset('assets/icons/course.png', color: activeColor),
+        icon: Image.asset(
+          'assets/icons/course.png',
+          color: theme.colorScheme.onSurface.withOpacity(0.6),
+        ),
+        activeIcon: Image.asset(
+          'assets/icons/course.png',
+          color: theme.colorScheme.primary,
+        ),
         label: 'Khoá học',
       ),
       BottomNavigationBarItem(
-        icon: Image.asset('assets/icons/quiz.png', color: Colors.grey),
-        activeIcon: Image.asset('assets/icons/quiz.png', color: activeColor),
+        icon: Image.asset(
+          'assets/icons/quiz.png',
+          color: theme.colorScheme.onSurface.withOpacity(0.6),
+        ),
+        activeIcon: Image.asset(
+          'assets/icons/quiz.png',
+          color: theme.colorScheme.primary,
+        ),
         label: 'Quiz',
       ),
       if (isAdminOrMentor)
         BottomNavigationBarItem(
-          icon: const Icon(Icons.dashboard, color: Colors.grey),
-          activeIcon: Icon(Icons.dashboard, color: activeColor),
+          icon: Icon(
+            Icons.dashboard,
+            color: theme.colorScheme.onSurface.withOpacity(0.6),
+          ),
+          activeIcon: Icon(Icons.dashboard, color: theme.colorScheme.primary),
           label: 'Dashboard',
         ),
       BottomNavigationBarItem(
-        icon: Image.asset('assets/icons/profile.png', color: Colors.grey),
-        activeIcon: Image.asset('assets/icons/profile.png', color: activeColor),
+        icon: Image.asset(
+          'assets/icons/profile.png',
+          color: theme.colorScheme.onSurface.withOpacity(0.6),
+        ),
+        activeIcon: Image.asset(
+          'assets/icons/profile.png',
+          color: theme.colorScheme.primary,
+        ),
         label: 'Cá nhân',
       ),
     ];
@@ -80,12 +105,18 @@ class _BottomNavigationBarExampleState
         type: BottomNavigationBarType.fixed,
         currentIndex: safeIndex,
         onTap: (idx) => setState(() => _selectedIndex = idx),
-        selectedItemColor: activeColor,
-        unselectedItemColor: Colors.grey[600],
+        selectedItemColor: theme.colorScheme.primary,
+        unselectedItemColor: theme.colorScheme.onSurface.withOpacity(0.6),
         selectedFontSize: 14,
         unselectedFontSize: 12,
-        selectedLabelStyle: GoogleFonts.roboto(fontWeight: FontWeight.w500),
-        unselectedLabelStyle: GoogleFonts.roboto(fontWeight: FontWeight.w400),
+        selectedLabelStyle: theme.textTheme.labelLarge?.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
+        unselectedLabelStyle: theme.textTheme.labelMedium?.copyWith(
+          fontWeight: FontWeight.w400,
+        ),
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 8,
         items: items,
       ),
     );

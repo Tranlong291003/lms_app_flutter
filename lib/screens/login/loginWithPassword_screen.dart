@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/ElevatedButtonsocial.dart';
 import 'package:lms/apps/utils/botton.dart';
 import 'package:lms/apps/utils/customTextField.dart';
-import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart'; // Import the loading animation package
 
@@ -74,7 +73,7 @@ class LoginWithPasswordScreen extends StatelessWidget {
                   else
                     // Login button
                     botton(
-                      themeState: context.read<ThemeBloc>().state,
+                      context: context,
                       text: 'Đăng nhập',
                       onPressed: () {
                         // Trigger the login Cubit with email and password

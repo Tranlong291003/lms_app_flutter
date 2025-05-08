@@ -85,7 +85,7 @@ class LoginScreen extends StatelessWidget {
                 const SizedBox(height: 20),
                 // Sign in with password
                 botton(
-                  themeState: themeState,
+                  context: context,
                   text: 'Đăng nhập với mật khẩu',
                   onPressed: () {
                     Navigator.pushNamed(context, '/loginwithpassword');

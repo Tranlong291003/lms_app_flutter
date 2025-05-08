@@ -110,7 +110,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
             return SingleChildScrollView(
               padding:
-                  MediaQuery.of(context).viewInsets + const EdgeInsets.all(20),
+                  MediaQuery.of(context).viewInsets +
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -123,9 +124,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           alignment: Alignment.bottomRight,
                           children: [
                             CircleAvatar(
-                              radius: 70,
-                              backgroundColor:
-                                  theme.colorScheme.secondaryContainer,
+                              radius: 60,
+                              backgroundColor: theme.colorScheme.surface,
                               backgroundImage:
                                   _imageFile != null
                                       ? FileImage(_imageFile!)
@@ -135,29 +135,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                           as ImageProvider?,
                               child:
                                   user.avatarUrl.isEmpty && _imageFile == null
-                                      ? const Icon(Icons.person, size: 70)
+                                      ? Icon(
+                                        Icons.person,
+                                        size: 60,
+                                        color: theme.colorScheme.onSurface
+                                            .withOpacity(0.4),
+                                      )
                                       : null,
                             ),
                             CircleAvatar(
-                              radius: 20,
-                              backgroundColor: theme.scaffoldBackgroundColor,
-                              child: Icon(
+                              radius: 18,
+                              backgroundColor: theme.colorScheme.primary,
+                              child: const Icon(
                                 Icons.camera_alt,
-                                color: theme.colorScheme.primary,
+                                color: Colors.white,
+                                size: 18,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
                     Text(
                       'Thông tin cơ bản',
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     // Họ và tên
                     _buildField(
                       'Họ và tên',
@@ -182,7 +189,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
                         Expanded(
@@ -191,10 +198,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             decoration: InputDecoration(
                               labelText: 'Giới tính',
                               filled: true,
-                              fillColor: theme.colorScheme.surfaceContainer,
+                              fillColor: theme.colorScheme.surface,
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 12,
                               ),
                             ),
                             items:
@@ -214,7 +225,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         : null,
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: InkWell(
                             onTap: _pickDate,
@@ -222,24 +233,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               decoration: InputDecoration(
                                 labelText: 'Ngày sinh',
                                 filled: true,
-                                fillColor: theme.colorScheme.surfaceContainer,
+                                fillColor: theme.colorScheme.surface,
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide.none,
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 12,
                                 ),
                               ),
                               child: Text(
                                 _birthdate != null
                                     ? dateFmt.format(_birthdate!)
                                     : 'Chọn ngày sinh',
-                                style: theme.textTheme.bodyLarge,
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  color:
+                                      _birthdate != null
+                                          ? theme.colorScheme.onSurface
+                                          : theme.colorScheme.onSurface
+                                              .withOpacity(0.5),
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
                     _buildField(
                       'Tiểu sử',
                       _bio,
@@ -247,7 +268,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       theme,
                       maxLines: 3,
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
@@ -265,12 +286,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         textStyle: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 16,
                         ),
                       ),
@@ -300,7 +321,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         v == null || v.trim().isEmpty ? 'Không được để trống' : null;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 18),
+      padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
         initialValue: init,
         maxLines: maxLines,
@@ -309,10 +330,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         decoration: InputDecoration(
           labelText: label,
           filled: true,
-          fillColor: theme.colorScheme.surfaceContainer,
+          fillColor: theme.colorScheme.surface,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 12,
           ),
         ),
       ),

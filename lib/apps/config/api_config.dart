@@ -10,4 +10,5 @@ class ApiConfig {
   static String get getAllMentor => "$baseUrl/api/users/listmentor";
   static String get getAllCategory => "$baseUrl/api/course-categories";
   static String get getAllCourses => "$baseUrl/api/courses";
+  static String get getMentorDetail => "$baseUrl/api/users";
 }
