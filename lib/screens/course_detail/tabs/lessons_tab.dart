@@ -16,16 +16,17 @@ class LessonsTab extends StatelessWidget {
     );
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       itemCount: lessons.length,
       itemBuilder: (context, index) {
         final lesson = lessons[index];
         final isCompleted = lesson['completed'] as bool;
 
         return Card(
-          margin: const EdgeInsets.only(bottom: 12),
+          margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+          color: theme.colorScheme.surface,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             child: Row(
               children: [
                 Icon(

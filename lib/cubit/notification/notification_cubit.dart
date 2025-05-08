@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:lms/blocs/cubit/notification/notification_state.dart';
+import 'package:lms/cubit/notification/notification_state.dart';
 import 'package:lms/services/notification_service.dart';
 
 class NotificationCubit extends Cubit<NotificationState> {

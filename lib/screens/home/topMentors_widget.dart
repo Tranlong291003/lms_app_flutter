@@ -5,7 +5,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/models/user_model.dart';
-import 'package:lms/routes/app_router.dart'; // import hằng số route
+import 'package:lms/apps/config/app_router.dart'; // import hằng số route
 
 /// Widget hiển thị danh sách mentor ngẫu nhiên (tối đa 10), nhận dữ liệu từ parent
 class TopMentors extends StatefulWidget {

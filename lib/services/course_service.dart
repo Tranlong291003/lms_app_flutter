@@ -14,11 +14,13 @@ class CourseService {
   }) async {
     // Chuẩn bị query parameters
     final params = <String, dynamic>{};
-    if (status != null && status.trim().isNotEmpty)
+    if (status != null && status.trim().isNotEmpty) {
       params['status'] = status.trim();
+    }
     if (categoryId != null) params['category'] = categoryId;
-    if (search != null && search.trim().isNotEmpty)
+    if (search != null && search.trim().isNotEmpty) {
       params['search'] = search.trim();
+    }
 
     // Gọi API với params nếu có
     final res = await _dio.get(

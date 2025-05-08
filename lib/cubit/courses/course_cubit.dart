@@ -1,9 +1,15 @@
 // lib/blocs/cubit/courses/course_cubit.dart
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
+import 'package:equatable/equatable.dart';
 import 'package:lms/apps/config/api_config.dart';
-import 'package:lms/cubit/courses/course_cubit.dart';
+import 'package:lms/models/courses/course_detail_model.dart';
+import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/repository/course_repository.dart';
+import 'package:meta/meta.dart';
+
+part 'course_detail_state.dart';
+part 'course_state.dart';
 
 class CourseCubit extends Cubit<CourseState> {
   final CourseRepository _repo;

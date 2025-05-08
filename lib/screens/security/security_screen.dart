@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
-import 'package:lms/routes/app_router.dart';
+import 'package:lms/apps/config/app_router.dart';
 
 class SecurityScreen extends StatelessWidget {
   const SecurityScreen({super.key});

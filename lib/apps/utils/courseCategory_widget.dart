@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
-import 'package:lms/blocs/cubit/category/category_cubit.dart';
-import 'package:lms/blocs/cubit/category/category_state.dart';
-import 'package:lms/blocs/cubit/courses/course_cubit.dart';
+import 'package:lms/cubit/category/category_cubit.dart';
+import 'package:lms/cubit/category/category_state.dart';
+import 'package:lms/cubit/courses/course_cubit.dart';
 import 'package:lms/models/category_model.dart';
 
 class CourseCategoryWidget extends StatelessWidget {

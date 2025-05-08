@@ -18,12 +18,17 @@ class ReviewsTab extends StatelessWidget {
     );
 
     return ListView.separated(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       itemCount: reviews.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, __) => const SizedBox(height: 16),
       itemBuilder: (_, i) {
         final review = reviews[i];
         return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -48,11 +53,18 @@ class ReviewsTab extends StatelessWidget {
                         children: [
                           Text(
                             review['name']! as String,
-                            style: theme.textTheme.titleMedium,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
+                          const SizedBox(height: 4),
                           Text(
                             review['date']! as String,
-                            style: theme.textTheme.bodySmall,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurface.withOpacity(
+                                0.6,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -60,19 +72,22 @@ class ReviewsTab extends StatelessWidget {
                     Row(
                       children: List.generate(
                         review['rating']! as int,
-                        (_) => Icon(
-                          Icons.star,
-                          color: theme.colorScheme.secondary,
-                          size: 18,
+                        (_) => Padding(
+                          padding: const EdgeInsets.only(left: 2),
+                          child: Icon(
+                            Icons.star,
+                            color: theme.colorScheme.secondary,
+                            size: 18,
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Text(
                   review['comment']! as String,
-                  style: theme.textTheme.bodyMedium,
+                  style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
                 ),
               ],
             ),

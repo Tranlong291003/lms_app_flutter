@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../routes/app_router.dart';
+import '../../apps/config/app_router.dart';
 
 class QuizScreen extends StatelessWidget {
   const QuizScreen({super.key});

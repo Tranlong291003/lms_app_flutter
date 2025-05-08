@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/courseCategory_widget.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/listCourses_widget.dart';
-import 'package:lms/blocs/cubit/courses/course_cubit.dart';
+import 'package:lms/cubit/courses/course_cubit.dart';
 
 class ListCoursescreen extends StatelessWidget {
   const ListCoursescreen({super.key});

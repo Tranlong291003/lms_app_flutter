@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
-import 'package:lms/blocs/cubit/courses/course_cubit.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
+import 'package:lms/cubit/courses/course_cubit.dart';
 import 'package:lms/models/courses/course_detail_model.dart';
 import 'package:lms/screens/course_detail/course_stats_section.dart';
 import 'package:lms/screens/course_detail/course_tab_view.dart';
@@ -14,18 +15,19 @@ class CourseDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return BlocBuilder<CourseDetailCubit, CourseDetailState>(
       builder: (context, state) {
         if (state is CourseDetailLoading) {
           return Scaffold(
-            backgroundColor: Theme.of(context).colorScheme.surface,
-            body: const Center(child: CircularProgressIndicator()),
+            backgroundColor: theme.scaffoldBackgroundColor,
+            body: const Center(child: LoadingIndicator()),
           );
         }
         if (state is CourseDetailLoaded) {
           final detail = state.detail;
           return Scaffold(
-            backgroundColor: Theme.of(context).colorScheme.surface,
+            backgroundColor: theme.scaffoldBackgroundColor,
             body: CustomScrollView(
               slivers: [
                 CourseAppBarDynamic(
@@ -36,7 +38,7 @@ class CourseDetailScreen extends StatelessWidget {
             ),
             bottomNavigationBar: Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
+                color: theme.scaffoldBackgroundColor,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
@@ -54,7 +56,7 @@ class CourseDetailScreen extends StatelessWidget {
         }
         if (state is CourseDetailError) {
           return Scaffold(
-            backgroundColor: Theme.of(context).colorScheme.surface,
+            backgroundColor: theme.scaffoldBackgroundColor,
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -62,12 +64,12 @@ class CourseDetailScreen extends StatelessWidget {
                   Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: Theme.of(context).colorScheme.error,
+                    color: theme.colorScheme.error,
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'Lỗi: ${state.message}',
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: theme.textTheme.titleMedium,
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -87,15 +89,16 @@ class CourseAppBarDynamic extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SliverAppBar(
       pinned: true,
       expandedHeight: 240,
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       leading: IconButton(
         icon: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
+            color: theme.scaffoldBackgroundColor.withOpacity(0.8),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.arrow_back_ios_new, size: 16),
@@ -112,21 +115,21 @@ class CourseAppBarDynamic extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder:
                     (_, __, ___) => Container(
-                      color: Theme.of(context).colorScheme.surface,
+                      color: theme.scaffoldBackgroundColor,
                       child: Icon(
                         Icons.broken_image,
                         size: 60,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
               )
             else
               Container(
-                color: Theme.of(context).colorScheme.surface,
+                color: theme.scaffoldBackgroundColor,
                 child: Icon(
                   Icons.image,
                   size: 60,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: theme.colorScheme.primary,
                 ),
               ),
             Container(
@@ -156,7 +159,7 @@ class _CourseBody extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
+            color: theme.scaffoldBackgroundColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.only(

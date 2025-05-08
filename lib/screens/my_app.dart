@@ -6,7 +6,7 @@ import 'package:lms/apps/config/app_theme.dart'; // Import AppTheme to use theme
 import 'package:lms/apps/utils/route_observer.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_state.dart';
-import 'package:lms/routes/app_router.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/screens/Introduction/cubit/intro_cubit.dart';
 import 'package:lms/services/notification_service.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart'; // Import LoadingAnimationWidget
