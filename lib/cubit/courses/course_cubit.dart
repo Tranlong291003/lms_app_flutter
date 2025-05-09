@@ -2,11 +2,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/models/courses/course_detail_model.dart';
 import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/repository/course_repository.dart';
-import 'package:meta/meta.dart';
 
 part 'course_detail_state.dart';
 part 'course_state.dart';
@@ -32,10 +32,11 @@ class CourseCubit extends Cubit<CourseState> {
       _categoryFilter = categoryId;
       final courses = await _repo.getAllCourses(
         categoryId: categoryId,
-        status: status,
+        status: 'true',
         search: search,
       );
-      emit(CourseLoaded(courses));
+      final randomCourses = List<Course>.from(courses)..shuffle();
+      emit(CourseLoaded(courses, randomCourses));
     } catch (e) {
       emit(CourseError(e.toString()));
     }
@@ -43,6 +44,14 @@ class CourseCubit extends Cubit<CourseState> {
 
   void refreshCourses() {
     loadCourses();
+  }
+
+  void refreshRandomCourses() {
+    if (state is CourseLoaded) {
+      final loaded = state as CourseLoaded;
+      final newRandom = List<Course>.from(loaded.courses)..shuffle();
+      emit(CourseLoaded(loaded.courses, newRandom));
+    }
   }
 }
 

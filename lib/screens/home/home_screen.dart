@@ -14,7 +14,6 @@ import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/cubit/category/category_cubit.dart';
 import 'package:lms/cubit/category/category_state.dart';
 import 'package:lms/cubit/courses/course_cubit.dart';
-import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/screens/home/appBar_widget.dart';
 import 'package:lms/screens/home/discountSlider_widget.dart';
 import 'package:lms/screens/home/topMentors_widget.dart';
@@ -32,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     super.initState();
     _loadMentor();
     _loadCurrentUser();
-    context.read<CourseCubit>().loadCourses();
+    context.read<CourseCubit>().loadCourses(status: 'true');
   }
 
   void _loadMentor() {
@@ -108,11 +107,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                         builder: (context, courseState) {
                           if (courseState is CourseLoading) {
                             return const SizedBox(
-                              height: 200,
-                              child: Center(child: CircularProgressIndicator()),
+                              child: Center(child: LoadingIndicator()),
                             );
                           } else if (courseState is CourseLoaded) {
-                            var list = courseState.courses;
+                            var list = courseState.randomCourses;
                             final categoryState =
                                 context.watch<CategoryCubit>().state;
                             if (categoryState is CategoryLoaded &&
@@ -126,13 +124,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                       )
                                       .toList();
                             }
-                            final randomList = List<Course>.from(list)
-                              ..shuffle();
-                            final limitedList = randomList.take(10).toList();
+                            final limitedList = list.take(10).toList();
                             return ListCoursesWidget(courses: limitedList);
                           } else if (courseState is CourseError) {
                             return const SizedBox(
-                              height: 200,
                               child: Center(
                                 child: Text('Không có khoá học nào tổn tại'),
                               ),

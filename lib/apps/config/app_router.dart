@@ -1,11 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/cubit/courses/course_cubit.dart';
 import 'package:lms/repository/course_repository.dart';
+import 'package:lms/screens/Introduction/intro_screen.dart';
+import 'package:lms/screens/app_entry_gate.dart';
 import 'package:lms/screens/bookmark/bookmark_screen.dart';
 import 'package:lms/screens/course_detail/course_detail_screen.dart';
 import 'package:lms/screens/forgotpassword/forgotpassword_screen.dart';
 import 'package:lms/screens/help/help_screen.dart';
+import 'package:lms/screens/home/home_screen.dart';
 import 'package:lms/screens/invite/invite_screen.dart';
 import 'package:lms/screens/language/language_screen.dart';
 import 'package:lms/screens/listCourse/listCourse_screen.dart';
@@ -21,11 +25,10 @@ import 'package:lms/screens/profile/profile_screen.dart';
 import 'package:lms/screens/quiz/quiz_detail_screen.dart';
 import 'package:lms/screens/quiz/quiz_questions_screen.dart';
 import 'package:lms/screens/quiz/quiz_screen.dart';
+import 'package:lms/screens/security/change_password_screen.dart';
 import 'package:lms/screens/security/security_screen.dart';
 import 'package:lms/screens/signup/signup_screen.dart';
 
-import '../../screens/Introduction/intro_screen.dart';
-import '../../screens/security/change_password_screen.dart';
 import '../utils/bottomNavigationBar.dart';
 
 class AppRouter {
@@ -59,6 +62,8 @@ class AppRouter {
     Widget page;
 
     switch (settings.name) {
+      case '/':
+        return MaterialPageRoute(builder: (_) => const AppEntryGate());
       case home:
         page = BottomNavigationBarExample();
         break;

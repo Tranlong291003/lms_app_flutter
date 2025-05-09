@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:lms/screens/Introduction/cubit/intro_cubit.dart';
 import 'package:lms/screens/login/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
@@ -55,6 +56,12 @@ class _IntroScreenState extends State<IntroScreen> {
       pageColor: Colors.transparent,
       contentMargin: const EdgeInsets.symmetric(horizontal: 16),
     );
+  }
+
+  Future<void> setIntroViewedAndNavigate(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isIntroViewed', true);
+    Navigator.pushReplacementNamed(context, '/');
   }
 
   @override
@@ -129,10 +136,7 @@ class _IntroScreenState extends State<IntroScreen> {
               context
                   .read<IntroCubit>()
                   .markIntroAsViewed(); // Đánh dấu intro đã xem
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-              );
+              setIntroViewedAndNavigate(context);
             },
             dotsDecorator: DotsDecorator(
               size: const Size.square(10.0),

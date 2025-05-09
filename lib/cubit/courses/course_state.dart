@@ -17,9 +17,10 @@ class CourseLoading extends CourseState {
 
 class CourseLoaded extends CourseState {
   final List<Course> courses;
-  const CourseLoaded(this.courses);
+  final List<Course> randomCourses;
+  const CourseLoaded(this.courses, this.randomCourses);
   @override
-  List<Object?> get props => [courses];
+  List<Object?> get props => [courses, randomCourses];
 }
 
 class CourseError extends CourseState {
