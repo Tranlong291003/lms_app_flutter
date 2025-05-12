@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
@@ -8,6 +9,7 @@ import 'package:lms/screens/course_detail/course_stats_section.dart';
 import 'package:lms/screens/course_detail/course_tab_view.dart';
 import 'package:lms/screens/course_detail/course_title.dart';
 import 'package:lms/screens/course_detail/enroll_button.dart';
+import 'package:lms/services/course_service.dart';
 
 class CourseDetailScreen extends StatelessWidget {
   final int courseId;
@@ -26,6 +28,8 @@ class CourseDetailScreen extends StatelessWidget {
         }
         if (state is CourseDetailLoaded) {
           final detail = state.detail;
+          final user = FirebaseAuth.instance.currentUser;
+          final userUid = user?.uid ?? '';
           return Scaffold(
             backgroundColor: theme.scaffoldBackgroundColor,
             body: CustomScrollView(
@@ -36,21 +40,41 @@ class CourseDetailScreen extends StatelessWidget {
                 SliverToBoxAdapter(child: _CourseBody(detail: detail)),
               ],
             ),
-            bottomNavigationBar: Container(
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, -5),
+            bottomNavigationBar: FutureBuilder<bool>(
+              future: CourseService().checkEnrollment(
+                userUid: userUid,
+                courseId: detail.courseId,
+              ),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // Có thể show loading hoặc để trống
+                  return const SizedBox.shrink();
+                }
+                if (snapshot.hasData && snapshot.data == true) {
+                  // Đã đăng ký, ẩn hoàn toàn
+                  return const SizedBox.shrink();
+                }
+                // Chưa đăng ký, hiển thị nút
+                return Container(
+                  decoration: BoxDecoration(
+                    color: theme.scaffoldBackgroundColor,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, -5),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: const SafeArea(
-                minimum: EdgeInsets.all(20),
-                child: EnrollButton(),
-              ),
+                  child: SafeArea(
+                    minimum: const EdgeInsets.all(20),
+                    child: EnrollButton(
+                      userUid: userUid,
+                      courseId: detail.courseId,
+                    ),
+                  ),
+                );
+              },
             ),
           );
         }
@@ -182,6 +206,7 @@ class _CourseBody extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               CourseTabView(
+                courseId: detail.courseId,
                 description: detail.description,
                 instructorName: detail.instructorName,
                 instructorAvatarUrl: detail.instructorAvatarUrl,

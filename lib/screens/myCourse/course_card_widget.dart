@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/api_config.dart';
 
 class CourseCard extends StatelessWidget {
   final String thumbnail;
@@ -8,6 +9,7 @@ class CourseCard extends StatelessWidget {
   final Color progressColor;
   final String progressText;
   final bool showCircular;
+  final VoidCallback? onTap;
 
   const CourseCard({
     super.key,
@@ -18,6 +20,7 @@ class CourseCard extends StatelessWidget {
     required this.progressColor,
     required this.progressText,
     required this.showCircular,
+    this.onTap,
   });
 
   @override
@@ -28,7 +31,7 @@ class CourseCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
-        onTap: () {}, // TODO: handle tap if needed
+        onTap: onTap,
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
@@ -59,7 +62,7 @@ class CourseCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.network(
-                  thumbnail,
+                  '${ApiConfig.baseUrl}$thumbnail',
                   height: 64,
                   width: 64,
                   fit: BoxFit.cover,

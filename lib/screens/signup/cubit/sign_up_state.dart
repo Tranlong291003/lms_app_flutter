@@ -10,3 +10,5 @@ class SignUpFailure extends SignUpState {
   final String message;
   SignUpFailure({required this.message});
 }
+
+class SignUpLoading extends SignUpState {}

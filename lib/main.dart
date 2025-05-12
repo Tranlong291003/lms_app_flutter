@@ -2,6 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -13,6 +14,7 @@ import 'package:lms/blocs/theme/theme_event.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/cubit/category/category_cubit.dart';
 import 'package:lms/cubit/courses/course_cubit.dart';
+import 'package:lms/cubit/lessons/lesson_detail_cubit.dart';
 import 'package:lms/cubit/notification/notification_cubit.dart';
 import 'package:lms/repository/category_repository.dart';
 import 'package:lms/repository/course_repository.dart';
@@ -25,11 +27,28 @@ import 'package:lms/services/category_service.dart';
 import 'package:lms/services/mentor_service.dart';
 import 'package:lms/services/notification_service.dart';
 import 'package:lms/services/user_service.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+Future<void> requestPermissions() async {
+  // Xin quyền thông báo (Android 13+)
+  await Permission.notification.request();
+  // Xin quyền truy cập bộ nhớ
+  await Permission.storage.request();
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Ẩn log của AndroidInAppWebView
+  if (!kDebugMode) {
+    debugPrint = (String? message, {int? wrapWidth}) {};
+  }
+
   await Firebase.initializeApp();
   await initializeDateFormatting('vi', null);
+
+  // Yêu cầu quyền ngay khi vào app
+  await requestPermissions();
 
   // 1. Tạo Dio + Services
   final dio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl));
@@ -90,6 +109,9 @@ Future<void> main() async {
                       ..loadCategories(),
           ),
           BlocProvider(create: (_) => CourseCubit()),
+          BlocProvider<LessonDetailCubit>(
+            create: (context) => LessonDetailCubit(),
+          ),
         ],
         child: MyApp(notificationService: notificationService),
       ),

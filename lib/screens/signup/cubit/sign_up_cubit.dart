@@ -55,6 +55,8 @@ class SignUpCubit extends Cubit<SignUpState> {
     final dio = Dio();
 
     try {
+      emit(SignUpLoading());
+
       final response = await dio.post(
         ApiConfig.signUp,
         data: {

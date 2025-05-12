@@ -5,13 +5,17 @@
       "name": "Real Device SM G950U1",
       "request": "launch",
       "type": "dart",
-      "deviceId": "9887bc36344d493254"
+      "deviceId": "9887bc36344d493254",
+      "hotReload": true,
+      "hotRestart": true
     },
     {
       "name": "Emulator sdk gphone64 x86_64",
       "request": "launch",
       "type": "dart",
-      "deviceId": "emulator-5554"
+      "deviceId": "emulator-5554",
+      "hotReload": true,
+      "hotRestart": true
     }
   ],
   "compounds": [

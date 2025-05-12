@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/listCourses_widget.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubit/courses/course_cubit.dart';
 
 class ListCoursescreen extends StatelessWidget {
@@ -17,22 +18,18 @@ class ListCoursescreen extends StatelessWidget {
         title: 'Danh sách khoá học',
         onSearchChanged: (value) {
           // Gọi API tìm kiếm ở đây
-          context.read<CourseCubit>().loadCourses(
-            search: value,
-            status: 'false',
-          );
+          context.read<CourseCubit>().loadCourses(search: value);
         },
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(24),
           child: Column(
             children: [
-              // const CourseCategoryWidget(),
               BlocBuilder<CourseCubit, CourseState>(
                 builder: (context, state) {
                   if (state is CourseLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return Center(child: LoadingIndicator());
                   }
                   if (state is CourseError) {
                     return Center(

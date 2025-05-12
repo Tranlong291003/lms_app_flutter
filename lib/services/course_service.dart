@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/models/courses/course_detail_model.dart';
 import 'package:lms/services/base_service.dart';
@@ -62,6 +63,68 @@ class CourseService extends BaseService {
       throw Exception('Không thể tải chi tiết khóa học');
     } catch (e) {
       throw Exception('Lỗi khi tải chi tiết khóa học: $e');
+    }
+  }
+
+  /// Kiểm tra người dùng đã đăng ký khoá học chưa
+  Future<bool> checkEnrollment({
+    required String userUid,
+    required int courseId,
+  }) async {
+    try {
+      final response = await get(ApiConfig.checkEnrollment(userUid, courseId));
+      print(
+        '[CourseService] Response status: [35m${response.statusCode}[0m, data: [33m${response.data}[0m',
+      );
+      if (response.statusCode == 200) {
+        final data = response.data;
+        print('[CourseService] Parsed data: [36m$data[0m');
+        if (data is bool) return data;
+        if (data is Map<String, dynamic> && data.containsKey('enrolled')) {
+          print(
+            '[CourseService] Trả về enrolled = [32m${data['enrolled']}[0m',
+          );
+          return data['enrolled'] == true;
+        }
+        print('[CourseService] Không có trường enrolled, trả về false');
+        return false;
+      }
+      print('[CourseService] Status khác 200, trả về false');
+      return false;
+    } catch (e) {
+      print('[CourseService] Lỗi khi kiểm tra đăng ký: [31m$e[0m');
+      return false;
+    }
+  }
+
+  Future<dynamic> registerEnrollment({
+    required String userUid,
+    required int courseId,
+  }) async {
+    print(
+      '[CourseService] Gọi đăng ký khoá học: userUid=$userUid, courseId=$courseId',
+    );
+    try {
+      final data = {'userUid': userUid, 'courseId': courseId};
+      print('[CourseService] Dữ liệu gửi lên: $data');
+      final response = await post(ApiConfig.registerEnrollment, data: data);
+      print(
+        '[CourseService] Response: status=${response.statusCode}, data=${response.data}',
+      );
+      if (response.data is Map && response.data['notification'] != null) {
+        print('[CourseService] Trả về Map có notification');
+        return response.data;
+      }
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      if (e is DioException && e.response != null) {
+        print(
+          '[CourseService] Lỗi đăng ký khoá học: status=${e.response?.statusCode}, data=${e.response?.data}',
+        );
+      } else {
+        print('[CourseService] Lỗi đăng ký khoá học: $e');
+      }
+      throw Exception('Đăng ký khoá học thất bại: $e');
     }
   }
 }

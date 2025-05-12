@@ -1,15 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/cubit/courses/course_cubit.dart';
+import 'package:lms/cubit/lessons/lessons_cubit.dart';
 import 'package:lms/repository/course_repository.dart';
 import 'package:lms/screens/Introduction/intro_screen.dart';
 import 'package:lms/screens/app_entry_gate.dart';
 import 'package:lms/screens/bookmark/bookmark_screen.dart';
 import 'package:lms/screens/course_detail/course_detail_screen.dart';
+import 'package:lms/screens/course_detail/lesson_detail_screen.dart';
 import 'package:lms/screens/forgotpassword/forgotpassword_screen.dart';
 import 'package:lms/screens/help/help_screen.dart';
-import 'package:lms/screens/home/home_screen.dart';
 import 'package:lms/screens/invite/invite_screen.dart';
 import 'package:lms/screens/language/language_screen.dart';
 import 'package:lms/screens/listCourse/listCourse_screen.dart';
@@ -57,6 +57,7 @@ class AppRouter {
   static const String help = '/help';
   static const String invite = '/invite';
   static const String changePassword = '/change-password';
+  static const String lessonDetail = '/lesson-detail';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     Widget page;
@@ -122,6 +123,19 @@ class AppRouter {
         } else {
           page = const Scaffold(
             body: Center(child: Text('Không tìm thấy Course ID')),
+          );
+        }
+        break;
+      case lessonDetail:
+        final args = settings.arguments;
+        if (args is int) {
+          page = BlocProvider(
+            create: (context) => LessonsCubit()..loadLessonDetail(args),
+            child: LessonDetailScreen(lessonId: args, courseId: args),
+          );
+        } else {
+          page = const Scaffold(
+            body: Center(child: Text('Không tìm thấy Lesson ID')),
           );
         }
         break;

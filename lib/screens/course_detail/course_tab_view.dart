@@ -8,10 +8,13 @@ class CourseTabView extends StatelessWidget {
   final String instructorName;
   final String? instructorAvatarUrl;
   final String? instructorBio;
+  final int courseId;
+
   const CourseTabView({
     super.key,
     required this.description,
     required this.instructorName,
+    required this.courseId,
     this.instructorAvatarUrl,
     this.instructorBio,
   });
@@ -91,8 +94,8 @@ class CourseTabView extends StatelessWidget {
                   instructorAvatarUrl: instructorAvatarUrl,
                   instructorBio: instructorBio,
                 ),
-                const LessonsTab(),
-                const ReviewsTab(),
+                LessonsTab(courseId: courseId),
+                ReviewsTab(courseId: courseId),
               ],
             ),
           ),

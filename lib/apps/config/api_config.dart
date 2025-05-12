@@ -11,4 +11,22 @@ class ApiConfig {
   static String get getAllCategory => "$baseUrl/api/course-categories";
   static String get getAllCourses => "$baseUrl/api/courses";
   static String get getMentorDetail => "$baseUrl/api/users";
+
+  //lesson
+  static String get getAllLessons => "$baseUrl/api/lessons";
+  static String getLessonsByCourseAndUser(int courseId, String userUid) =>
+      "$baseUrl/api/lessons/courses/$courseId/$userUid";
+  static String getLessonDetail(int lessonId) =>
+      "$baseUrl/api/lessons/detail/$lessonId";
+
+  static String get completeLesson => "$baseUrl/api/lessons/complete";
+
+  static String checkEnrollment(String userUid, int courseId) =>
+      "$baseUrl/api/enrollments/check/$userUid/$courseId";
+
+  static String get registerEnrollment => "$baseUrl/api/enrollments/register";
+
+  // enrolled courses
+  static String getEnrolledCoursesByUser(String userUid) =>
+      "$baseUrl/api/enrollments/user/$userUid";
 }

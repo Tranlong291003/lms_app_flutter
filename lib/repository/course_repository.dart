@@ -24,4 +24,28 @@ class CourseRepository extends BaseRepository<CourseService> {
   Future<CourseDetail> getCourseDetail(int courseId) async {
     return await service.getCourseDetail(courseId);
   }
+
+  Future<dynamic> registerEnrollment({
+    required String userUid,
+    required int courseId,
+  }) async {
+    print(
+      '[CourseRepository] Gọi đăng ký khoá học: userUid=$userUid, courseId=$courseId',
+    );
+    try {
+      final result = await service.registerEnrollment(
+        userUid: userUid,
+        courseId: courseId,
+      );
+      print('[CourseRepository] Kết quả trả về từ service: $result');
+      if (result is Map) {
+        print('[CourseRepository] Trả về Map (có notification)');
+        return result;
+      }
+      return result == true;
+    } catch (e) {
+      print('[CourseRepository] Lỗi khi đăng ký khoá học: $e');
+      rethrow;
+    }
+  }
 }
