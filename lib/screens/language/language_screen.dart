@@ -1,91 +1,122 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/utils/FeInDevMessaage.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 
-class LanguageScreen extends StatelessWidget {
+class LanguageScreen extends StatefulWidget {
   const LanguageScreen({super.key});
+
+  @override
+  State<LanguageScreen> createState() => _LanguageScreenState();
+}
+
+class _LanguageScreenState extends State<LanguageScreen> {
+  final String _selectedLanguage = 'vi';
+
+  final List<Map<String, dynamic>> _languages = [
+    {'code': 'vi', 'name': 'Tiếng Việt', 'flag': '🇻🇳'},
+    {'code': 'en', 'name': 'English', 'flag': '🇬🇧'},
+    {'code': 'zh', 'name': '中文', 'flag': '🇨🇳'},
+    {'code': 'ja', 'name': '日本語', 'flag': '🇯🇵'},
+    {'code': 'ko', 'name': '한국어', 'flag': '🇰🇷'},
+  ];
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      appBar: CustomAppBar(showBack: true, title: 'Ngôn ngữ'),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      appBar: CustomAppBar(title: 'Ngôn ngữ', showBack: true),
+      body: Column(
         children: [
-          _buildLanguageOption(
-            title: 'Tiếng Việt',
-            subtitle: 'Vietnamese',
-            isSelected: true,
-            onTap: () {
-              // Handle Vietnamese selection
-            },
-            theme: theme,
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _languages.length,
+              itemBuilder: (context, index) {
+                final language = _languages[index];
+                final isSelected = language['code'] == _selectedLanguage;
+
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      if (!isSelected) {
+                        showFeatureInDevelopmentMessage(
+                          context,
+                          'Đổi ngôn ngữ',
+                        );
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Text(
+                            language['flag'],
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              language['name'],
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          if (isSelected)
+                            Icon(
+                              Icons.check_circle,
+                              color: colorScheme.primary,
+                              size: 24,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
-          _buildLanguageOption(
-            title: 'English (US)',
-            subtitle: 'American English',
-            isSelected: false,
-            onTap: () {
-              // Handle English selection
-            },
-            theme: theme,
-          ),
-          _buildLanguageOption(
-            title: '中文',
-            subtitle: 'Chinese',
-            isSelected: false,
-            onTap: () {
-              // Handle Chinese selection
-            },
-            theme: theme,
-          ),
-          _buildLanguageOption(
-            title: '日本語',
-            subtitle: 'Japanese',
-            isSelected: false,
-            onTap: () {
-              // Handle Japanese selection
-            },
-            theme: theme,
+
+          // Nút áp dụng
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.scaffoldBackgroundColor,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -5),
+                ),
+              ],
+            ),
+            child: ElevatedButton(
+              onPressed: () {
+                showFeatureInDevelopmentMessage(context, 'Áp dụng ngôn ngữ');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Áp dụng',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildLanguageOption({
-    required String title,
-    required String subtitle,
-    required bool isSelected,
-    required VoidCallback onTap,
-    required ThemeData theme,
-  }) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 4,
-      color: theme.cardColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: ListTile(
-        title: Text(
-          title,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
-          ),
-        ),
-        trailing: Icon(
-          isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-          color:
-              isSelected
-                  ? theme.primaryColor
-                  : theme.textTheme.bodyMedium?.color?.withOpacity(0.5),
-        ),
-        onTap: onTap,
       ),
     );
   }

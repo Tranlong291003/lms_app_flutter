@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/customTextField.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -121,7 +122,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: CustomAppBar(title: 'Đổi mật khẩu'),
+      appBar: CustomAppBar(title: 'Đổi mật khẩu', showBack: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -220,10 +221,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         ? SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: theme.colorScheme.onPrimary,
-                          ),
+                          child: LoadingIndicator(),
                         )
                         : const Text('Đổi mật khẩu'),
               ),

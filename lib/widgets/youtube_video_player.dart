@@ -7,6 +7,7 @@ class YoutubeVideoPlayer extends StatefulWidget {
   final VoidCallback? onEnterFullScreen;
   final VoidCallback? onExitFullScreen;
   final YoutubePlayerController? controller;
+  final bool hideRelatedVideos;
 
   const YoutubeVideoPlayer({
     super.key,
@@ -15,6 +16,7 @@ class YoutubeVideoPlayer extends StatefulWidget {
     this.onEnterFullScreen,
     this.onExitFullScreen,
     this.controller,
+    this.hideRelatedVideos = true,
   });
 
   @override
@@ -40,14 +42,20 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
     } else {
       _controller = YoutubePlayerController(
         initialVideoId: widget.videoId,
-        flags: const YoutubePlayerFlags(
-          autoPlay: false,
+        flags: YoutubePlayerFlags(
+          autoPlay: widget.autoPlay,
           mute: false,
           enableCaption: false,
           forceHD: true,
           controlsVisibleAtStart: true,
           showLiveFullscreenButton: true,
           useHybridComposition: true,
+          hideControls: false,
+          disableDragSeek: false,
+          hideThumbnail: false,
+          // Ẩn video gợi ý khi video kết thúc
+          loop: false,
+          isLive: false,
         ),
       );
     }
@@ -61,6 +69,16 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
     }
     if (_controller.value.isPlaying != _isPlaying) {
       setState(() => _isPlaying = _controller.value.isPlaying);
+    }
+
+    // Khi video kết thúc và cần ẩn gợi ý video
+    if (widget.hideRelatedVideos &&
+        _controller.value.playerState == PlayerState.ended) {
+      // Xử lý khi video kết thúc - tự động phát lại video để tránh hiển thị gợi ý
+      Future.delayed(const Duration(milliseconds: 300), () {
+        _controller.seekTo(const Duration(seconds: 0));
+        _controller.pause();
+      });
     }
   }
 
@@ -100,6 +118,16 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
           backgroundColor: Colors.grey[300]!,
           bufferedColor: Theme.of(context).colorScheme.primary.withOpacity(0.4),
         ),
+        onEnded: (data) {
+          if (widget.hideRelatedVideos) {
+            // Khi video kết thúc, chúng ta sẽ tự động quay về frame cuối cùng
+            // và tạm dừng để tránh hiển thị video gợi ý
+            _controller.seekTo(
+              Duration(seconds: _controller.metadata.duration.inSeconds - 1),
+            );
+            _controller.pause();
+          }
+        },
         bottomActions: [
           CurrentPosition(),
           ProgressBar(isExpanded: true),
@@ -107,7 +135,8 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
           const PlaybackSpeedButton(),
           FullScreenButton(),
         ],
-        // topActions: []  // Không còn nút cài đặt chất lượng
+        // Ẩn các nút không cần thiết ở phía trên
+        topActions: widget.hideRelatedVideos ? [] : null,
       ),
       builder:
           (context, player) => AspectRatio(

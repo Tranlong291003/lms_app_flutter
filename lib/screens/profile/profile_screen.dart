@@ -2,13 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_event.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/blocs/user/user_state.dart';
-import 'package:lms/apps/config/app_router.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -52,7 +52,9 @@ class ProfileScreen extends StatelessWidget {
                                 backgroundImage:
                                     state.user.avatarUrl.isNotEmpty
                                         ? NetworkImage(
-                                          '${ApiConfig.baseUrl}${state.user.avatarUrl}',
+                                          ApiConfig.getImageUrl(
+                                            state.user.avatarUrl,
+                                          ),
                                         )
                                         : const NetworkImage(defaultAvatar),
                               ),
@@ -61,25 +63,39 @@ class ProfileScreen extends StatelessWidget {
                           Positioned(
                             bottom: 0,
                             right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: theme.scaffoldBackgroundColor,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: theme.colorScheme.shadow.withOpacity(
-                                      0.1,
+                            child: GestureDetector(
+                              onTap: () {
+                                final currentUser =
+                                    FirebaseAuth.instance.currentUser;
+                                if (currentUser != null) {
+                                  context.read<UserBloc>().add(
+                                    GetUserByUidEvent(currentUser.uid),
+                                  );
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRouter.editProfile,
+                                  );
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: theme.scaffoldBackgroundColor,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: theme.colorScheme.shadow
+                                          .withOpacity(0.1),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
                                     ),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                Icons.edit,
-                                size: 16,
-                                color: theme.primaryColor,
+                                  ],
+                                ),
+                                child: Icon(
+                                  Icons.edit,
+                                  size: 16,
+                                  color: theme.primaryColor,
+                                ),
                               ),
                             ),
                           ),
@@ -199,21 +215,25 @@ class ProfileScreen extends StatelessWidget {
                   iconPath: "assets/icons/notification.png",
                   title: "Thông báo",
                   context: context,
-                  onTap:
-                      () =>
-                          Navigator.pushNamed(context, AppRouter.notification),
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRouter.notificationSetting);
+                  },
                 ),
                 _buildMenuItem(
                   iconPath: "assets/icons/payment.png",
                   title: "Thanh toán",
                   context: context,
-                  onTap: () => Navigator.pushNamed(context, AppRouter.payment),
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRouter.payment);
+                  },
                 ),
                 _buildMenuItem(
                   iconPath: "assets/icons/security.png",
                   title: "Bảo mật",
                   context: context,
-                  onTap: () => Navigator.pushNamed(context, AppRouter.security),
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRouter.security);
+                  },
                 ),
                 const SizedBox(height: 24),
                 _buildSectionTitle('Cài đặt', theme),
@@ -222,7 +242,9 @@ class ProfileScreen extends StatelessWidget {
                   title: "Ngôn ngữ",
                   trailing: const Text("Tiếng Việt"),
                   context: context,
-                  onTap: () => Navigator.pushNamed(context, AppRouter.language),
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRouter.language);
+                  },
                 ),
                 _buildMenuItem(
                   iconPath:
@@ -242,7 +264,9 @@ class ProfileScreen extends StatelessWidget {
                   iconPath: "assets/icons/privacy.png",
                   title: "Chính sách bảo mật",
                   context: context,
-                  onTap: () => Navigator.pushNamed(context, AppRouter.privacy),
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRouter.privacy);
+                  },
                 ),
                 const SizedBox(height: 24),
                 _buildSectionTitle('Hỗ trợ', theme),
@@ -250,7 +274,9 @@ class ProfileScreen extends StatelessWidget {
                   iconPath: "assets/icons/helpcenter.png",
                   title: "Trung tâm trợ giúp",
                   context: context,
-                  onTap: () => Navigator.pushNamed(context, AppRouter.help),
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRouter.help);
+                  },
                 ),
                 _buildMenuItem(
                   iconPath: "assets/icons/logout.png",
@@ -347,7 +373,10 @@ class ProfileScreen extends StatelessWidget {
                     if (confirm == true) {
                       await FirebaseAuth.instance.signOut();
                       if (parentContext.mounted) {
-                        Navigator.pushReplacementNamed(parentContext, '/login');
+                        Navigator.pushReplacementNamed(
+                          parentContext,
+                          AppRouter.login,
+                        );
                       }
                     }
                   },

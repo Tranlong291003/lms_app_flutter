@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/utils/FeInDevMessaage.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 
 class PrivacyScreen extends StatelessWidget {
@@ -7,54 +8,189 @@ class PrivacyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: CustomAppBar(title: 'Chính sách bảo mật'),
+      appBar: CustomAppBar(title: 'Chính sách bảo mật', showBack: true),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _buildSectionTitle('Thông tin cá nhân', theme),
-          _buildPrivacyCard(
+          // Thông tin về chính sách
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color:
+                  isDark
+                      ? colorScheme.surfaceContainerHighest.withOpacity(0.3)
+                      : colorScheme.surfaceContainerHighest.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, color: colorScheme.primary, size: 24),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    'Chính sách bảo mật này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ thông tin của bạn.',
+                    style: theme.textTheme.bodyLarge,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+          _buildSectionTitle('Các chính sách', theme),
+
+          // Danh sách các chính sách
+          _buildPrivacyItem(
+            context: context,
             icon: Icons.person_outline,
             title: 'Thông tin cá nhân',
-            content:
-                'Chúng tôi thu thập thông tin cá nhân của bạn khi bạn đăng ký tài khoản, sử dụng dịch vụ hoặc liên hệ với chúng tôi.',
-            theme: theme,
+            onTap: () {
+              showFeatureInDevelopmentMessage(
+                context,
+                'Chính sách thông tin cá nhân',
+              );
+            },
           ),
-          _buildPrivacyCard(
-            icon: Icons.devices_other,
-            title: 'Thông tin thiết bị',
-            content:
-                'Chúng tôi thu thập thông tin về thiết bị của bạn để cải thiện trải nghiệm người dùng và bảo mật.',
-            theme: theme,
+
+          _buildPrivacyItem(
+            context: context,
+            icon: Icons.cookie_outlined,
+            title: 'Cookie và dữ liệu',
+            onTap: () {
+              showFeatureInDevelopmentMessage(
+                context,
+                'Chính sách cookie và dữ liệu',
+              );
+            },
           ),
-          _buildSectionTitle('Sử dụng thông tin', theme),
-          _buildPrivacyCard(
-            icon: Icons.settings,
-            title: 'Cung cấp dịch vụ',
-            content:
-                'Thông tin của bạn được sử dụng để cung cấp, duy trì và cải thiện dịch vụ của chúng tôi.',
-            theme: theme,
+
+          _buildPrivacyItem(
+            context: context,
+            icon: Icons.security_outlined,
+            title: 'Bảo mật dữ liệu',
+            onTap: () {
+              showFeatureInDevelopmentMessage(
+                context,
+                'Chính sách bảo mật dữ liệu',
+              );
+            },
           ),
-          _buildPrivacyCard(
-            icon: Icons.security,
-            title: 'Bảo mật',
-            content:
-                'Chúng tôi sử dụng thông tin để bảo vệ tài khoản của bạn và ngăn chặn các hoạt động trái phép.',
-            theme: theme,
-          ),
-          _buildPrivacyCard(
-            icon: Icons.share,
+
+          _buildPrivacyItem(
+            context: context,
+            icon: Icons.share_outlined,
             title: 'Chia sẻ thông tin',
-            content:
-                'Chúng tôi không chia sẻ thông tin cá nhân của bạn với bên thứ ba trừ khi có sự đồng ý của bạn hoặc theo quy định pháp luật.',
-            theme: theme,
+            onTap: () {
+              showFeatureInDevelopmentMessage(
+                context,
+                'Chính sách chia sẻ thông tin',
+              );
+            },
           ),
-          _buildPrivacyCard(
-            icon: Icons.verified_user,
-            title: 'Quyền của bạn',
-            content:
-                'Bạn có quyền truy cập, chỉnh sửa hoặc xóa thông tin cá nhân của mình bất cứ lúc nào.',
-            theme: theme,
+
+          _buildPrivacyItem(
+            context: context,
+            icon: Icons.child_care_outlined,
+            title: 'Bảo vệ trẻ em',
+            onTap: () {
+              showFeatureInDevelopmentMessage(
+                context,
+                'Chính sách bảo vệ trẻ em',
+              );
+            },
+          ),
+
+          const SizedBox(height: 24),
+          _buildSectionTitle('Yêu cầu và liên hệ', theme),
+
+          // Các tùy chọn liên hệ
+          Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Bạn có thắc mắc về chính sách bảo mật?',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            showFeatureInDevelopmentMessage(
+                              context,
+                              'Gửi phản hồi',
+                            );
+                          },
+                          icon: const Icon(Icons.feedback_outlined),
+                          label: const Text('Gửi phản hồi'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            showFeatureInDevelopmentMessage(
+                              context,
+                              'Liên hệ hỗ trợ',
+                            );
+                          },
+                          icon: const Icon(Icons.support_agent),
+                          label: const Text('Liên hệ hỗ trợ'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Phiên bản và cập nhật
+          Container(
+            margin: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.all(16),
+            child: Center(
+              child: Text(
+                'Phiên bản chính sách: 1.0.0\nCập nhật lần cuối: 01/06/2024',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.5),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
         ],
       ),
@@ -63,44 +199,61 @@ class PrivacyScreen extends StatelessWidget {
 
   Widget _buildSectionTitle(String title, ThemeData theme) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Text(
         title,
         style: theme.textTheme.titleMedium?.copyWith(
-          color: theme.textTheme.titleMedium?.color?.withOpacity(0.7),
           fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
         ),
       ),
     );
   }
 
-  Widget _buildPrivacyCard({
+  Widget _buildPrivacyItem({
+    required BuildContext context,
     required IconData icon,
     required String title,
-    required String content,
-    required ThemeData theme,
+    required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 4,
-      color: theme.cardColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: theme.primaryColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: theme.colorScheme.primary),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: theme.colorScheme.onSurface.withOpacity(0.5),
+              ),
+            ],
           ),
-          child: Icon(icon, color: theme.primaryColor, size: 24),
         ),
-        title: Text(
-          title,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Text(content, style: theme.textTheme.bodyMedium),
       ),
     );
   }

@@ -3,9 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
-import 'package:lms/cubit/courses/course_cubit.dart';
-import 'package:lms/cubit/enrolled_courses/enrolled_course_cubit.dart';
-import 'package:lms/cubit/enrolled_courses/enrolled_course_state.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
+import 'package:lms/cubits/courses/course_cubit.dart';
+import 'package:lms/cubits/enrolled_courses/enrolled_course_cubit.dart';
+import 'package:lms/cubits/enrolled_courses/enrolled_course_state.dart';
 import 'package:lms/repository/course_repository.dart';
 import 'package:lms/screens/course_detail/course_detail_screen.dart';
 import 'package:lms/screens/myCourse/course_card_widget.dart';
@@ -77,7 +78,7 @@ class _MyOngoingCoursesScreenState extends State<MyOngoingCoursesScreen> {
       child: BlocBuilder<EnrolledCourseCubit, EnrolledCourseState>(
         builder: (context, state) {
           if (state is EnrolledCourseLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LoadingIndicator());
           } else if (state is EnrolledCourseError) {
             return Center(
               child: Column(

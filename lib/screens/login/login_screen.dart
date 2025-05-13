@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/ElevatedButtonsocial.dart';
 import 'package:lms/apps/utils/botton.dart';
@@ -137,7 +138,10 @@ class LoginScreen extends StatelessWidget {
                         context: context,
                         text: 'Đăng nhập với mật khẩu',
                         onPressed: () {
-                          Navigator.pushNamed(context, '/loginwithpassword');
+                          Navigator.pushNamed(
+                            context,
+                            AppRouter.loginWithPassword,
+                          );
                         },
                       ),
                       const SizedBox(height: 24),

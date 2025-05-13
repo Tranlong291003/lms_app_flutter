@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/utils/FeInDevMessaage.dart';
+import 'package:lms/apps/utils/customAppBar.dart';
 
 class SecurityScreen extends StatelessWidget {
   const SecurityScreen({super.key});
@@ -8,50 +9,97 @@ class SecurityScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: CustomAppBar(title: 'Bảo mật'),
+      appBar: CustomAppBar(title: 'Bảo mật', showBack: true),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _buildSectionTitle('Tài khoản', theme),
-          _buildSecurityItem(
+          _buildSectionTitle('Bảo mật tài khoản', theme),
+
+          // Đổi mật khẩu
+          _buildSecurityOption(
             context: context,
             icon: Icons.lock_outline,
             title: 'Đổi mật khẩu',
             subtitle: 'Cập nhật mật khẩu của bạn',
             onTap: () => Navigator.pushNamed(context, AppRouter.changePassword),
           ),
-          _buildSecurityItem(
+
+          // Xác thực hai yếu tố
+          _buildSecurityOption(
             context: context,
-            icon: Icons.phone_android_outlined,
-            title: 'Xác thực 2 yếu tố',
-            subtitle: 'Bảo vệ tài khoản của bạn bằng xác thực 2 yếu tố',
-            trailing: Switch(
-              value: false,
-              onChanged: (value) {
-                // TODO: Implement 2FA
-              },
-            ),
-          ),
-          const SizedBox(height: 24),
-          _buildSectionTitle('Đăng nhập', theme),
-          _buildSecurityItem(
-            context: context,
-            icon: Icons.devices_outlined,
-            title: 'Thiết bị đã đăng nhập',
-            subtitle: 'Quản lý các thiết bị đã đăng nhập vào tài khoản của bạn',
+            icon: Icons.security,
+            title: 'Xác thực hai yếu tố',
+            subtitle: 'Bảo mật tài khoản với xác thực 2 lớp',
             onTap: () {
-              // TODO: Implement device management
+              showFeatureInDevelopmentMessage(context, 'Xác thực hai yếu tố');
             },
           ),
-          _buildSecurityItem(
+
+          // Câu hỏi bảo mật
+          _buildSecurityOption(
             context: context,
-            icon: Icons.history_outlined,
-            title: 'Lịch sử đăng nhập',
-            subtitle: 'Xem lịch sử đăng nhập của bạn',
+            icon: Icons.help_outline,
+            title: 'Câu hỏi bảo mật',
+            subtitle: 'Thiết lập câu hỏi bảo mật để khôi phục tài khoản',
             onTap: () {
-              // TODO: Implement login history
+              showFeatureInDevelopmentMessage(context, 'Câu hỏi bảo mật');
+            },
+          ),
+
+          const SizedBox(height: 24),
+          _buildSectionTitle('Quản lý phiên đăng nhập', theme),
+
+          // Thiết bị đã đăng nhập
+          _buildSecurityOption(
+            context: context,
+            icon: Icons.devices_other,
+            title: 'Thiết bị đã đăng nhập',
+            subtitle: 'Xem và quản lý các thiết bị đã đăng nhập',
+            onTap: () {
+              showFeatureInDevelopmentMessage(context, 'Thiết bị đã đăng nhập');
+            },
+          ),
+
+          // Lịch sử đăng nhập
+          _buildSecurityOption(
+            context: context,
+            icon: Icons.history,
+            title: 'Lịch sử đăng nhập',
+            subtitle: 'Xem lịch sử đăng nhập gần đây',
+            onTap: () {
+              showFeatureInDevelopmentMessage(context, 'Lịch sử đăng nhập');
+            },
+          ),
+
+          const SizedBox(height: 24),
+          _buildSectionTitle('Quyền riêng tư', theme),
+
+          // Quyền truy cập dữ liệu
+          _buildSecurityOption(
+            context: context,
+            icon: Icons.visibility_outlined,
+            title: 'Quyền truy cập dữ liệu',
+            subtitle: 'Kiểm soát quyền truy cập vào dữ liệu của bạn',
+            onTap: () {
+              showFeatureInDevelopmentMessage(
+                context,
+                'Quyền truy cập dữ liệu',
+              );
+            },
+          ),
+
+          // Xóa tài khoản
+          _buildSecurityOption(
+            context: context,
+            icon: Icons.delete_outline,
+            title: 'Xóa tài khoản',
+            subtitle: 'Xóa vĩnh viễn tài khoản và dữ liệu của bạn',
+            isDestructive: true,
+            onTap: () {
+              showFeatureInDevelopmentMessage(context, 'Xóa tài khoản');
             },
           ),
         ],
@@ -61,61 +109,90 @@ class SecurityScreen extends StatelessWidget {
 
   Widget _buildSectionTitle(String title, ThemeData theme) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Text(
         title,
         style: theme.textTheme.titleMedium?.copyWith(
-          color: theme.colorScheme.onSurface.withOpacity(0.7),
           fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
         ),
       ),
     );
   }
 
-  Widget _buildSecurityItem({
+  Widget _buildSecurityOption({
     required BuildContext context,
     required IconData icon,
     required String title,
     required String subtitle,
-    Widget? trailing,
-    VoidCallback? onTap,
+    required VoidCallback onTap,
+    bool isDestructive = false,
   }) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
-      color: theme.cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: theme.primaryColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, size: 24, color: theme.primaryColor),
-        ),
-        title: Text(
-          title,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
-          ),
-        ),
-        trailing:
-            trailing ??
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
-            ),
+      child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color:
+                      isDestructive
+                          ? colorScheme.error.withOpacity(0.1)
+                          : colorScheme.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  color:
+                      isDestructive ? colorScheme.error : colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: isDestructive ? colorScheme.error : null,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color:
+                            isDestructive
+                                ? colorScheme.error.withOpacity(0.8)
+                                : colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color:
+                    isDestructive
+                        ? colorScheme.error.withOpacity(0.5)
+                        : colorScheme.onSurface.withOpacity(0.5),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

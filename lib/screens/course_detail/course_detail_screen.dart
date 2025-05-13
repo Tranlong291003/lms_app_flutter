@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
-import 'package:lms/cubit/courses/course_cubit.dart';
+import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/models/courses/course_detail_model.dart';
 import 'package:lms/screens/course_detail/course_stats_section.dart';
 import 'package:lms/screens/course_detail/course_tab_view.dart';
@@ -35,7 +35,7 @@ class CourseDetailScreen extends StatelessWidget {
             body: CustomScrollView(
               slivers: [
                 CourseAppBarDynamic(
-                  imageUrl: '${ApiConfig.baseUrl}${detail.thumbnailUrl}',
+                  imageUrl: ApiConfig.getImageUrl(detail.thumbnailUrl),
                 ),
                 SliverToBoxAdapter(child: _CourseBody(detail: detail)),
               ],

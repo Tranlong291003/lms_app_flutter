@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 
 class CourseCard extends StatelessWidget {
   final String thumbnail;
@@ -62,7 +63,7 @@ class CourseCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.network(
-                  '${ApiConfig.baseUrl}$thumbnail',
+                  ApiConfig.getImageUrl(thumbnail),
                   height: 64,
                   width: 64,
                   fit: BoxFit.cover,
@@ -134,12 +135,7 @@ class CourseCard extends StatelessWidget {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        CircularProgressIndicator(
-                          value: progressValue,
-                          strokeWidth: 6,
-                          color: progressColor,
-                          backgroundColor: theme.dividerColor.withOpacity(0.12),
-                        ),
+                        LoadingIndicator(),
                         Text(
                           "${(progressValue * 100).round()}%",
                           style: theme.textTheme.bodySmall?.copyWith(

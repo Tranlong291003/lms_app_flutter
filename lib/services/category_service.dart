@@ -46,15 +46,15 @@ class CategoryService {
         'kiểu trả về: ${res.data.runtimeType})',
       );
     } on DioException catch (e) {
-      print(
-        '❌ [CategoryService] DioError type=${e.type}, message=${e.message}',
-      );
+      // print(
+      //   '❌ [CategoryService] DioError type=${e.type}, message=${e.message}',
+      // );
       if (e.response != null) {
-        print('❌ [CategoryService] response data: ${e.response?.data}');
+        // print('❌ [CategoryService] response data: ${e.response?.data}');
       }
       throw Exception('Lỗi Dio khi tải category: ${e.message}');
     } catch (e) {
-      print('❌ [CategoryService] Unknown error: $e');
+      // print('❌ [CategoryService] Unknown error: $e');
       throw Exception('Lỗi không xác định khi tải category: $e');
     }
   }

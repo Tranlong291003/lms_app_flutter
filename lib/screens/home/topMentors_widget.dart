@@ -53,10 +53,7 @@ class _TopMentorsState extends State<TopMentors> {
         itemBuilder: (context, index) {
           final mentor = _randomizedMentors[index];
           final displayName = getDisplayName(mentor.name);
-          final avatarUrl =
-              mentor.avatarUrl.isNotEmpty
-                  ? '${ApiConfig.baseUrl}${mentor.avatarUrl}'
-                  : 'https://www.gravatar.com/avatar/?d=mp';
+          final avatarUrl = ApiConfig.getImageUrl(mentor.avatarUrl);
           final imageProvider = NetworkImage(avatarUrl);
 
           return InkWell(

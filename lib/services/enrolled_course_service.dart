@@ -13,13 +13,13 @@ class EnrolledCourseService extends BaseService {
     String userUid,
   ) async {
     try {
-      print(
-        '[EnrolledCourseService] Đang gọi API: ${ApiConfig.getEnrolledCoursesByUser(userUid)}',
-      );
+      // print(
+      //   '[EnrolledCourseService] Đang gọi API: ${ApiConfig.getEnrolledCoursesByUser(userUid)}',
+      // );
       final response = await get(ApiConfig.getEnrolledCoursesByUser(userUid));
 
-      print('[EnrolledCourseService] Kết quả trả về: ${response.statusCode}');
-      _debugPrintResponse(response.data);
+      // print('[EnrolledCourseService] Kết quả trả về: ${response.statusCode}');
+      // _debugPrintResponse(response.data);
 
       // Khởi tạo kết quả mặc định
       final result = {
@@ -30,7 +30,7 @@ class EnrolledCourseService extends BaseService {
       if (response.statusCode == 200) {
         // Kiểm tra xem response.data có phải là Map hay không
         if (response.data is Map<String, dynamic>) {
-          print('[EnrolledCourseService] Dữ liệu trả về là Map');
+          // print('[EnrolledCourseService] Dữ liệu trả về là Map');
 
           // Kiểm tra xem có trường 'data' trong Map không
           if (response.data.containsKey('data')) {

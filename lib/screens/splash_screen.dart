@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/screens/app_entry_gate.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -33,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
               height: 160,
             ),
             SizedBox(height: 32),
-            CircularProgressIndicator(),
+            LoadingIndicator(),
           ],
         ),
       ),

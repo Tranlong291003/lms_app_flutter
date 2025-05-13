@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
-import 'package:lms/cubit/lessons/lessons_cubit.dart';
+import 'package:lms/cubits/lessons/lessons_cubit.dart';
 import 'package:lms/models/lesson_model.dart';
 import 'package:lms/services/course_service.dart';
 

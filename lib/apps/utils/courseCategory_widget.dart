@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
-import 'package:lms/cubit/category/category_cubit.dart';
-import 'package:lms/cubit/category/category_state.dart';
-import 'package:lms/cubit/courses/course_cubit.dart';
+import 'package:lms/cubits/category/category_cubit.dart';
+import 'package:lms/cubits/category/category_state.dart';
+import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/models/category_model.dart';
 
 class CourseCategoryWidget extends StatelessWidget {
@@ -57,10 +57,7 @@ class CourseCategoryWidget extends StatelessWidget {
 
                 Widget iconWidget = const SizedBox.shrink();
                 if (cat.icon?.isNotEmpty == true) {
-                  final fullUrl =
-                      (cat.icon != null && cat.icon!.startsWith('http'))
-                          ? cat.icon
-                          : '${ApiConfig.baseUrl}${cat.icon}';
+                  final fullUrl = ApiConfig.getImageUrl(cat.icon);
                   iconWidget = Image.network(
                     fullUrl ?? '',
                     width: 16,

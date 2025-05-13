@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/models/courses/courses_model.dart';
 
 class ListCoursesWidget extends StatelessWidget {
@@ -27,7 +28,7 @@ class ListCoursesWidget extends StatelessWidget {
           onTap: () {
             Navigator.pushNamed(
               context,
-              '/courseDetail',
+              AppRouter.courseDetail,
               arguments: c.courseId,
             );
           },
@@ -49,7 +50,7 @@ class ListCoursesWidget extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
-                        '${ApiConfig.baseUrl}${c.thumbnailUrl}' ?? '',
+                        ApiConfig.getImageUrl(c.thumbnailUrl) ?? '',
                         width: 120,
                         height: 120,
                         fit: BoxFit.cover,

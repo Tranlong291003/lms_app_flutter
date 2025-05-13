@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_state.dart';
 
@@ -37,16 +38,16 @@ AppBar AppBarHome(BuildContext context, String title) {
                 final role = (state is UserLoaded) ? state.user.role : null;
                 final avatarUrl =
                     (state is UserLoaded && state.user.avatarUrl.isNotEmpty)
-                        ? '${ApiConfig.baseUrl}${state.user.avatarUrl}'
+                        ? ApiConfig.getImageUrl(state.user.avatarUrl)
                         : defaultAvatar;
 
                 return InkWell(
                   borderRadius: BorderRadius.circular(20),
                   onTap: () {
                     if (role == 'admin' || role == 'mentor') {
-                      Navigator.pushNamed(context, '/dashBoard');
+                      // Navigator.pushNamed(context, AppRouter.dashBoard);
                     } else {
-                      Navigator.pushNamed(context, '/profile');
+                      Navigator.pushNamed(context, AppRouter.profile);
                     }
                   },
                   child: CircleAvatar(
@@ -107,14 +108,18 @@ AppBar AppBarHome(BuildContext context, String title) {
                 'assets/icons/bookmark.png',
                 color: Theme.of(context).iconTheme.color,
               ),
-              onPressed: () => Navigator.pushNamed(context, '/bookmark'),
+              onPressed: () => Navigator.pushNamed(context, AppRouter.bookmark),
             ),
             IconButton(
               icon: Image.asset(
                 'assets/icons/notification.png',
                 color: Theme.of(context).iconTheme.color,
               ),
-              onPressed: () => Navigator.pushNamed(context, '/notification'),
+              onPressed:
+                  () => Navigator.pushNamed(
+                    context,
+                    AppRouter.notificationSetting,
+                  ),
             ),
           ],
         ),

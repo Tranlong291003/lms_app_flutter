@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
-import 'package:lms/cubit/reviews/review_cubit.dart';
-import 'package:lms/cubit/reviews/review_state.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
+import 'package:lms/cubits/reviews/review_cubit.dart';
+import 'package:lms/cubits/reviews/review_state.dart';
 import 'package:lms/models/reivew_model.dart';
 
 class ReviewsTab extends StatelessWidget {
@@ -17,7 +18,7 @@ class ReviewsTab extends StatelessWidget {
       child: BlocBuilder<ReviewCubit, ReviewState>(
         builder: (context, state) {
           if (state is ReviewLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LoadingIndicator());
           }
           if (state is ReviewError) {
             return Center(
@@ -108,7 +109,7 @@ class _ReviewCard extends StatelessWidget {
         (review.userAvatarUrl.isNotEmpty)
             ? (review.userAvatarUrl.startsWith('http')
                 ? review.userAvatarUrl
-                : '${ApiConfig.baseUrl}${review.userAvatarUrl}')
+                : ApiConfig.getImageUrl(review.userAvatarUrl))
             : defaultAvatarNet;
     return Card(
       margin: EdgeInsets.zero,

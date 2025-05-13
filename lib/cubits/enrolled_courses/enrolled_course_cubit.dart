@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:lms/cubit/enrolled_courses/enrolled_course_state.dart';
+import 'package:lms/cubits/enrolled_courses/enrolled_course_state.dart';
 import 'package:lms/models/enrolledCourse_model.dart';
 import 'package:lms/repository/enrolled_course_repository.dart';
 

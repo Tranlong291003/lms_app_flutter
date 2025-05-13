@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/courseCategory_widget.dart';
 import 'package:lms/apps/utils/listCourses_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
@@ -11,9 +12,9 @@ import 'package:lms/blocs/mentors/mentors_event.dart';
 import 'package:lms/blocs/mentors/mentors_state.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
-import 'package:lms/cubit/category/category_cubit.dart';
-import 'package:lms/cubit/category/category_state.dart';
-import 'package:lms/cubit/courses/course_cubit.dart';
+import 'package:lms/cubits/category/category_cubit.dart';
+import 'package:lms/cubits/category/category_state.dart';
+import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/screens/home/appBar_widget.dart';
 import 'package:lms/screens/home/discountSlider_widget.dart';
 import 'package:lms/screens/home/topMentors_widget.dart';
@@ -82,7 +83,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                 DiscountSlider(),
                 _buildSection(
                   title: 'Danh sách giảng viên',
-                  onTap: () => Navigator.pushNamed(context, '/listmentor'),
+                  onTap:
+                      () => Navigator.pushNamed(context, AppRouter.listMentor),
                   child: BlocBuilder<MentorsBloc, MentorsState>(
                     builder: (context, state) {
                       if (state is MentorsLoading) {
@@ -98,7 +100,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                 ),
                 _buildSection(
                   title: 'Danh sách khoá học',
-                  onTap: () => Navigator.pushNamed(context, '/listcourse'),
+                  onTap:
+                      () => Navigator.pushNamed(context, AppRouter.listCourse),
                   child: Column(
                     children: [
                       CourseCategoryWidget(),

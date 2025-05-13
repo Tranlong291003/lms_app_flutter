@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lms/cubit/courses/course_cubit.dart';
-import 'package:lms/cubit/lessons/lessons_cubit.dart';
+import 'package:lms/cubits/courses/course_cubit.dart';
+import 'package:lms/cubits/lessons/lessons_cubit.dart';
 import 'package:lms/repository/course_repository.dart';
 import 'package:lms/screens/Introduction/intro_screen.dart';
 import 'package:lms/screens/app_entry_gate.dart';
@@ -17,7 +17,7 @@ import 'package:lms/screens/listMentor/listMentor_screen.dart';
 import 'package:lms/screens/listMentor/mentor_detail_screen.dart';
 import 'package:lms/screens/login/loginWithPassword_screen.dart';
 import 'package:lms/screens/login/login_screen.dart';
-import 'package:lms/screens/notification/notification_screen.dart';
+import 'package:lms/screens/notification/notification_setting_screen.dart';
 import 'package:lms/screens/payment/payment_screen.dart';
 import 'package:lms/screens/privacy/privacy_screen.dart';
 import 'package:lms/screens/profile/editprofile_screen.dart';
@@ -41,7 +41,7 @@ class AppRouter {
   static const String forgotPassword = '/forgotpassword';
   static const String listMentor = '/listmentor';
   static const String listCourse = '/listcourse';
-  static const String notification = '/notification';
+  static const String notificationSetting = '/notificationSetting';
   static const String bookmark = '/bookmark';
   static const String profile = '/profile';
   static const String editProfile = '/editprofile';
@@ -89,8 +89,8 @@ class AppRouter {
       case listCourse:
         page = ListCoursescreen();
         break;
-      case notification:
-        page = NotificationScreen();
+      case notificationSetting:
+        page = NotificationSettingScreen();
         break;
       case bookmark:
         page = BookmarkScreen();

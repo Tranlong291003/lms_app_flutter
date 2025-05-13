@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/mentors/mentors_bloc.dart';
@@ -82,7 +83,7 @@ class _MentorListItem extends StatelessWidget {
     final primary = theme.colorScheme.primary;
     final avatarUrl =
         mentor.avatarUrl.isNotEmpty
-            ? '${ApiConfig.baseUrl}${mentor.avatarUrl}'
+            ? ApiConfig.getImageUrl(mentor.avatarUrl)
             : null;
 
     final imageProvider =
@@ -103,7 +104,11 @@ class _MentorListItem extends StatelessWidget {
           if (avatarUrl != null) {
             await precacheImage(imageProvider, context);
           }
-          Navigator.pushNamed(context, '/mentordetail', arguments: mentor.uid);
+          Navigator.pushNamed(
+            context,
+            AppRouter.mentorDetail,
+            arguments: mentor.uid,
+          );
         },
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -170,7 +175,7 @@ class _MentorListItem extends StatelessWidget {
                   }
                   Navigator.pushNamed(
                     context,
-                    '/mentordetail',
+                    AppRouter.mentorDetail,
                     arguments: mentor.uid,
                   );
                 },

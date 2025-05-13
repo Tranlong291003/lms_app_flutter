@@ -46,7 +46,7 @@ class AboutTab extends StatelessWidget {
                       (instructorAvatarUrl != null &&
                               instructorAvatarUrl!.isNotEmpty)
                           ? NetworkImage(
-                            '${ApiConfig.baseUrl}$instructorAvatarUrl',
+                            ApiConfig.getImageUrl(instructorAvatarUrl),
                           )
                           : const AssetImage('assets/images/mentor.png')
                               as ImageProvider,

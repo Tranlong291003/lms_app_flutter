@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
-import 'package:lms/cubit/enrolled_courses/enrolled_course_cubit.dart';
+import 'package:lms/cubits/enrolled_courses/enrolled_course_cubit.dart';
 import 'package:lms/screens/myCourse/my_completed_courses.dart';
 import 'package:lms/screens/myCourse/my_ongoing_courses.dart';
 

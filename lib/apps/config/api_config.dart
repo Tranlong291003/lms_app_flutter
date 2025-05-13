@@ -29,4 +29,23 @@ class ApiConfig {
   // enrolled courses
   static String getEnrolledCoursesByUser(String userUid) =>
       "$baseUrl/api/enrollments/user/$userUid";
+
+  // Helper method để nối URL với đường dẫn ảnh
+  static String getImageUrl(String? imagePath) {
+    if (imagePath == null || imagePath.isEmpty) {
+      return baseUrl;
+    }
+
+    // Đảm bảo imagePath không bắt đầu bằng / nếu baseUrl đã kết thúc bằng /
+    if (imagePath.startsWith('/') && baseUrl.endsWith('/')) {
+      return baseUrl + imagePath.substring(1);
+    }
+
+    // Đảm bảo có dấu / giữa baseUrl và imagePath
+    if (!imagePath.startsWith('/') && !baseUrl.endsWith('/')) {
+      return "$baseUrl/$imagePath";
+    }
+
+    return baseUrl + imagePath;
+  }
 }

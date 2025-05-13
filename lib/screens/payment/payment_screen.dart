@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/utils/FeInDevMessaage.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 
 class PaymentScreen extends StatelessWidget {
@@ -7,56 +8,149 @@ class PaymentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: CustomAppBar(showBack: true, title: 'Thanh toán'),
+      appBar: CustomAppBar(title: 'Thanh toán', showBack: true),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           _buildSectionTitle('Phương thức thanh toán', theme),
+
+          // Danh sách phương thức thanh toán
           _buildPaymentMethod(
+            context: context,
+            title: 'Thẻ tín dụng/Ghi nợ',
             icon: Icons.credit_card,
-            title: 'Thẻ tín dụng',
-            subtitle: 'Thanh toán bằng thẻ Visa/Mastercard',
             onTap: () {
-              // Handle credit card payment
+              showFeatureInDevelopmentMessage(context, 'Thanh toán bằng thẻ');
             },
-            theme: theme,
           ),
+
           _buildPaymentMethod(
-            icon: Icons.account_balance,
-            title: 'Chuyển khoản ngân hàng',
-            subtitle: 'Chuyển khoản trực tiếp',
-            onTap: () {
-              // Handle bank transfer
-            },
-            theme: theme,
-          ),
-          _buildPaymentMethod(
-            icon: Icons.payment,
+            context: context,
             title: 'Ví điện tử',
-            subtitle: 'Momo, ZaloPay, VNPay',
+            icon: Icons.account_balance_wallet,
             onTap: () {
-              // Handle e-wallet
+              showFeatureInDevelopmentMessage(
+                context,
+                'Thanh toán bằng ví điện tử',
+              );
             },
-            theme: theme,
           ),
+
+          _buildPaymentMethod(
+            context: context,
+            title: 'Chuyển khoản ngân hàng',
+            icon: Icons.account_balance,
+            onTap: () {
+              showFeatureInDevelopmentMessage(
+                context,
+                'Chuyển khoản ngân hàng',
+              );
+            },
+          ),
+
           const SizedBox(height: 24),
           _buildSectionTitle('Lịch sử giao dịch', theme),
-          _buildTransactionItem(
-            title: 'Khóa học Flutter',
-            date: '20/03/2024',
-            amount: '1,500,000đ',
-            status: 'Thành công',
-            isSuccess: true,
-            theme: theme,
+
+          // Lịch sử giao dịch trống
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color:
+                  isDark
+                      ? colorScheme.surfaceContainerHighest.withOpacity(0.3)
+                      : colorScheme.surfaceContainerHighest.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                width: 1,
+              ),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.receipt_long_outlined,
+                  size: 64,
+                  color: colorScheme.onSurface.withOpacity(0.3),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Chưa có giao dịch nào',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Lịch sử giao dịch của bạn sẽ xuất hiện ở đây',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withOpacity(0.5),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
-          _buildTransactionItem(
-            title: 'Khóa học React Native',
-            date: '15/03/2024',
-            amount: '2,000,000đ',
-            status: 'Đang xử lý',
-            isSuccess: false,
-            theme: theme,
+
+          const SizedBox(height: 24),
+          _buildSectionTitle('Mã giảm giá', theme),
+
+          // Form nhập mã giảm giá
+          Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Nhập mã giảm giá', style: theme.textTheme.titleSmall),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Nhập mã giảm giá',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton(
+                        onPressed: () {
+                          showFeatureInDevelopmentMessage(
+                            context,
+                            'Áp dụng mã giảm giá',
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text('Áp dụng'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -65,130 +159,60 @@ class PaymentScreen extends StatelessWidget {
 
   Widget _buildSectionTitle(String title, ThemeData theme) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Text(
         title,
         style: theme.textTheme.titleMedium?.copyWith(
-          color: theme.textTheme.titleMedium?.color?.withOpacity(0.7),
           fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
         ),
       ),
     );
   }
 
   Widget _buildPaymentMethod({
+    required BuildContext context,
+    required String title,
     required IconData icon,
-    required String title,
-    required String subtitle,
     required VoidCallback onTap,
-    required ThemeData theme,
   }) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 4,
-      color: theme.cardColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: theme.primaryColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, size: 24, color: theme.primaryColor),
-        ),
-        title: Text(
-          title,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
-          ),
-        ),
-        trailing: Text(
-          'Connected',
-          style: theme.textTheme.labelLarge?.copyWith(
-            color: theme.primaryColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        onTap: onTap,
-      ),
-    );
-  }
+    final theme = Theme.of(context);
 
-  Widget _buildTransactionItem({
-    required String title,
-    required String date,
-    required String amount,
-    required String status,
-    required bool isSuccess,
-    required ThemeData theme,
-  }) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 4,
-      color: theme.cardColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: theme.colorScheme.primary),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
                   title,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                Text(
-                  amount,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  date,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color:
-                        isSuccess
-                            ? theme.primaryColor.withOpacity(0.1)
-                            : Colors.orange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    status,
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      color: isSuccess ? theme.primaryColor : Colors.orange,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: theme.colorScheme.onSurface.withOpacity(0.5),
+              ),
+            ],
+          ),
         ),
       ),
     );

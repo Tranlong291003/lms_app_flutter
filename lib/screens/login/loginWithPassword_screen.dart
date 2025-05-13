@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/ElevatedButtonsocial.dart';
 import 'package:lms/apps/utils/botton.dart';
@@ -169,7 +170,10 @@ class LoginWithPasswordScreen extends StatelessWidget {
                         children: [
                           TextButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, '/forgotpassword');
+                              Navigator.pushNamed(
+                                context,
+                                AppRouter.forgotPassword,
+                              );
                             },
                             child: Text(
                               "Quên mật khẩu",
@@ -229,7 +233,7 @@ class LoginWithPasswordScreen extends StatelessWidget {
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, '/signup');
+                              Navigator.pushNamed(context, AppRouter.signup);
                             },
                             child: Text(
                               "Đăng ký",

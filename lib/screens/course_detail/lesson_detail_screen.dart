@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:lms/cubit/lessons/lesson_detail_cubit.dart';
-import 'package:lms/cubit/lessons/lesson_detail_state.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
+import 'package:lms/cubits/lessons/lesson_detail_cubit.dart';
+import 'package:lms/cubits/lessons/lesson_detail_state.dart';
 import 'package:lms/widgets/youtube_video_player.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -207,7 +208,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(color: colorScheme.primary),
+                    LoadingIndicator(),
                     const SizedBox(height: 16),
                     Text(
                       'Đang tải bài học...',
