@@ -93,7 +93,7 @@ class AppRouter {
         page = NotificationSettingScreen();
         break;
       case bookmark:
-        page = BookmarkScreen();
+        page = BookmarkScreen(userUid: settings.arguments as String);
         break;
       case profile:
         page = ProfileScreen();

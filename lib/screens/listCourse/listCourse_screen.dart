@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
@@ -42,7 +43,10 @@ class ListCoursescreen extends StatelessWidget {
                     );
                   }
                   if (state is CourseLoaded) {
-                    return ListCoursesWidget(courses: state.courses);
+                    return ListCoursesWidget(
+                      courses: state.courses,
+                      userUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+                    );
                   }
                   return const SizedBox.shrink();
                 },

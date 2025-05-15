@@ -2,6 +2,7 @@
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
@@ -108,7 +109,23 @@ AppBar AppBarHome(BuildContext context, String title) {
                 'assets/icons/bookmark.png',
                 color: Theme.of(context).iconTheme.color,
               ),
-              onPressed: () => Navigator.pushNamed(context, AppRouter.bookmark),
+              onPressed: () {
+                final currentUser = FirebaseAuth.instance.currentUser;
+                if (currentUser != null) {
+                  Navigator.pushNamed(
+                    context,
+                    AppRouter.bookmark,
+                    arguments: currentUser.uid,
+                  );
+                } else {
+                  // Hiển thị thông báo yêu cầu đăng nhập nếu chưa đăng nhập
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Vui lòng đăng nhập để xem bookmark'),
+                    ),
+                  );
+                }
+              },
             ),
             IconButton(
               icon: Image.asset(

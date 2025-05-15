@@ -30,6 +30,25 @@ class ApiConfig {
   static String getEnrolledCoursesByUser(String userUid) =>
       "$baseUrl/api/enrollments/user/$userUid";
 
+  // bookmarks
+  static String getBookmarksByUser(String userUid) {
+    final url = "$baseUrl/api/bookmarks/$userUid";
+    print('URL getBookmarksByUser: $url');
+    return url;
+  }
+
+  static String get createBookmark {
+    final url = "$baseUrl/api/bookmarks/create";
+    print('URL createBookmark: $url');
+    return url;
+  }
+
+  static String get deleteBookmark {
+    final url = "$baseUrl/api/bookmarks/delete";
+    print('URL deleteBookmark: $url');
+    return url;
+  }
+
   // Helper method để nối URL với đường dẫn ảnh
   static String getImageUrl(String? imagePath) {
     if (imagePath == null || imagePath.isEmpty) {

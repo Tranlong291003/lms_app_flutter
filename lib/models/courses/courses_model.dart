@@ -14,6 +14,7 @@ class Course {
   final String categoryName;
   final double rating; // Trung bình đánh giá
   final int enrollCount; // Số người đăng ký
+  bool isBookmarked; // Trạng thái bookmark
 
   Course({
     required this.courseId,
@@ -30,6 +31,7 @@ class Course {
     required this.categoryName,
     required this.rating,
     required this.enrollCount,
+    this.isBookmarked = false,
   });
 
   factory Course.fromJson(Map<String, dynamic> json) {
@@ -48,6 +50,7 @@ class Course {
       categoryName: json['category_name'] as String,
       rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
       enrollCount: json['enroll_count'] as int? ?? 0,
+      isBookmarked: json['is_bookmarked'] as bool? ?? false,
     );
   }
 
@@ -66,5 +69,27 @@ class Course {
     'category_name': categoryName,
     'rating': rating,
     'enroll_count': enrollCount,
+    'is_bookmarked': isBookmarked,
   };
+
+  // Tạo bản sao với trạng thái bookmark mới
+  Course copyWith({bool? isBookmarked}) {
+    return Course(
+      courseId: courseId,
+      title: title,
+      instructorUid: instructorUid,
+      categoryId: categoryId,
+      price: price,
+      level: level,
+      discountPrice: discountPrice,
+      thumbnailUrl: thumbnailUrl,
+      status: status,
+      updatedAt: updatedAt,
+      instructorName: instructorName,
+      categoryName: categoryName,
+      rating: rating,
+      enrollCount: enrollCount,
+      isBookmarked: isBookmarked ?? this.isBookmarked,
+    );
+  }
 }

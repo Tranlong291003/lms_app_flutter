@@ -53,6 +53,35 @@ class CourseCubit extends Cubit<CourseState> {
       emit(CourseLoaded(loaded.courses, newRandom));
     }
   }
+
+  // Cập nhật trạng thái bookmark cho courses
+  void updateBookmarkStatus(List<int> courseIds, bool isBookmarked) {
+    if (state is CourseLoaded) {
+      final loaded = state as CourseLoaded;
+      final updatedCourses =
+          loaded.courses.map((course) {
+            if (courseIds.contains(course.courseId)) {
+              return course.copyWith(isBookmarked: isBookmarked);
+            }
+            return course;
+          }).toList();
+
+      final updatedRandomCourses =
+          loaded.randomCourses.map((course) {
+            if (courseIds.contains(course.courseId)) {
+              return course.copyWith(isBookmarked: isBookmarked);
+            }
+            return course;
+          }).toList();
+
+      emit(CourseLoaded(updatedCourses, updatedRandomCourses));
+    }
+  }
+
+  // Cập nhật trạng thái bookmark cho một course
+  void updateCourseBookmarkStatus(int courseId, bool isBookmarked) {
+    updateBookmarkStatus([courseId], isBookmarked);
+  }
 }
 
 class CourseDetailCubit extends Cubit<CourseDetailState> {

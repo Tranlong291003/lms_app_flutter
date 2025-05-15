@@ -195,7 +195,7 @@ class _CourseBody extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CourseTitle(title: detail.title),
+              CourseTitle(title: detail.title, courseId: detail.courseId),
               const SizedBox(height: 16),
               CourseStatsSection(
                 category: detail.categoryName,

@@ -128,7 +128,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                       .toList();
                             }
                             final limitedList = list.take(10).toList();
-                            return ListCoursesWidget(courses: limitedList);
+                            return ListCoursesWidget(
+                              courses: limitedList,
+                              userUid:
+                                  FirebaseAuth.instance.currentUser?.uid ?? '',
+                            );
                           } else if (courseState is CourseError) {
                             return const SizedBox(
                               child: Center(
