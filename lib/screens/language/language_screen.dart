@@ -18,7 +18,43 @@ class _LanguageScreenState extends State<LanguageScreen> {
     {'code': 'zh', 'name': '中文', 'flag': '🇨🇳'},
     {'code': 'ja', 'name': '日本語', 'flag': '🇯🇵'},
     {'code': 'ko', 'name': '한국어', 'flag': '🇰🇷'},
+    {'code': 'fr', 'name': 'Français', 'flag': '🇫🇷'},
+    {'code': 'de', 'name': 'Deutsch', 'flag': '🇩🇪'},
+    {'code': 'es', 'name': 'Español', 'flag': '🇪🇸'},
+    {'code': 'it', 'name': 'Italiano', 'flag': '🇮🇹'},
+    {'code': 'ru', 'name': 'Русский', 'flag': '🇷🇺'},
+    {'code': 'ar', 'name': 'العربية', 'flag': '🇸🇦'},
+    {'code': 'pt', 'name': 'Português', 'flag': '🇵🇹'},
+    {'code': 'hi', 'name': 'हिन्दी', 'flag': '🇮🇳'},
+    {'code': 'th', 'name': 'ไทย', 'flag': '🇹🇭'},
+    {'code': 'id', 'name': 'Bahasa Indonesia', 'flag': '🇮🇩'},
+    {'code': 'ms', 'name': 'Bahasa Melayu', 'flag': '🇲🇾'},
+    {'code': 'tr', 'name': 'Türkçe', 'flag': '🇹🇷'},
+    {'code': 'pl', 'name': 'Polski', 'flag': '🇵🇱'},
+    {'code': 'nl', 'name': 'Nederlands', 'flag': '🇳🇱'},
+    {'code': 'sv', 'name': 'Svenska', 'flag': '🇸🇪'},
+    {'code': 'no', 'name': 'Norsk', 'flag': '🇳🇴'},
+    {'code': 'fi', 'name': 'Suomi', 'flag': '🇫🇮'},
+    {'code': 'da', 'name': 'Dansk', 'flag': '🇩🇰'},
+    {'code': 'cs', 'name': 'Čeština', 'flag': '🇨🇿'},
+    {'code': 'ro', 'name': 'Română', 'flag': '🇷🇴'},
+    {'code': 'hu', 'name': 'Magyar', 'flag': '🇭🇺'},
+    {'code': 'el', 'name': 'Ελληνικά', 'flag': '🇬🇷'},
+    {'code': 'he', 'name': 'עברית', 'flag': '🇮🇱'},
+    {'code': 'ur', 'name': 'اردو', 'flag': '🇵🇰'},
+    {'code': 'bn', 'name': 'বাংলা', 'flag': '🇧🇩'},
+    {'code': 'ta', 'name': 'தமிழ்', 'flag': '🇮🇳'},
   ];
+
+  void _onLanguageSelected(String code) {
+    if (code != _selectedLanguage) {
+      showFeatureInDevelopmentMessage(context, 'Đổi ngôn ngữ');
+      // Nếu muốn update ngay khi chọn:
+      // setState(() {
+      //   _selectedLanguage = code;
+      // });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,96 +63,81 @@ class _LanguageScreenState extends State<LanguageScreen> {
 
     return Scaffold(
       appBar: CustomAppBar(title: 'Ngôn ngữ', showBack: true),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: ListView.separated(
+              padding: EdgeInsets.zero,
               itemCount: _languages.length,
-              itemBuilder: (context, index) {
-                final language = _languages[index];
-                final isSelected = language['code'] == _selectedLanguage;
-
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              separatorBuilder:
+                  (_, __) => Divider(
+                    height: 1,
+                    color: Colors.grey.shade300,
+                    indent: 16,
+                    endIndent: 16,
                   ),
-                  child: InkWell(
-                    onTap: () {
-                      if (!isSelected) {
-                        showFeatureInDevelopmentMessage(
-                          context,
-                          'Đổi ngôn ngữ',
-                        );
-                      }
-                    },
-                    borderRadius: BorderRadius.circular(12),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Text(
-                            language['flag'],
-                            style: const TextStyle(fontSize: 24),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              language['name'],
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          if (isSelected)
-                            Icon(
-                              Icons.check_circle,
-                              color: colorScheme.primary,
-                              size: 24,
-                            ),
-                        ],
+              itemBuilder: (context, index) {
+                final lang = _languages[index];
+                final isSelected = lang['code'] == _selectedLanguage;
+
+                return RadioListTile<String>(
+                  value: lang['code'],
+                  groupValue: _selectedLanguage,
+                  onChanged: (value) {
+                    if (value != null) _onLanguageSelected(value);
+                  },
+                  title: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Text(
+                      lang['name'],
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
+                  secondary: Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Text(
+                      lang['flag'],
+                      style: const TextStyle(fontSize: 28),
+                    ),
+                  ),
+                  activeColor: colorScheme.primary,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                  toggleable: false,
                 );
               },
             ),
           ),
-
-          // Nút áp dụng
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: theme.scaffoldBackgroundColor,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -5),
-                ),
-              ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        color: theme.scaffoldBackgroundColor,
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+        child: ElevatedButton(
+          onPressed: () {
+            showFeatureInDevelopmentMessage(context, 'Áp dụng ngôn ngữ');
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
             ),
-            child: ElevatedButton(
-              onPressed: () {
-                showFeatureInDevelopmentMessage(context, 'Áp dụng ngôn ngữ');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                'Áp dụng',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-            ),
+            elevation: 4,
           ),
-        ],
+          child: const Text(
+            'Áp dụng',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+        ),
       ),
     );
   }

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_state.dart';
-import 'package:lms/screens/dashboard/dashboard_screen.dart';
+import 'package:lms/screens/dashboard/admin/admin_dashboard_screen.dart';
+import 'package:lms/screens/dashboard/mentor/mentor_dashboard_screen.dart';
 import 'package:lms/screens/home/home_screen.dart';
 import 'package:lms/screens/myCourse/my_course_screen.dart';
 import 'package:lms/screens/profile/profile_screen.dart';
@@ -24,22 +25,38 @@ class _BottomNavigationBarExampleState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // 2) Lấy role từ UserBloc, chỉ rebuild khi role thay đổi
-    final isAdminOrMentor = context.select<UserBloc, bool>((bloc) {
-      final s = bloc.state;
-      return s is UserLoaded &&
-          (s.user.role == 'admin' || s.user.role == 'mentor');
-    });
+    // Lấy role và tên user
+    final userRole = context.select<UserBloc, String>(
+      (bloc) =>
+          (bloc.state is UserLoaded)
+              ? (bloc.state as UserLoaded).user.role
+              : '',
+    );
+    final userName = context.select<UserBloc, String>(
+      (bloc) =>
+          (bloc.state is UserLoaded)
+              ? (bloc.state as UserLoaded).user.name
+              : '',
+    );
 
-    // 3) Build danh sách màn hình và items động theo role
+    // Xác định dashboardScreen phù hợp
+    Widget? dashboardScreen;
+    if (userRole == 'admin') {
+      dashboardScreen = AdminDashboardScreen(userName: userName);
+    } else if (userRole == 'mentor') {
+      dashboardScreen = MentorDashboardScreen(userName: userName);
+    }
+
+    // Build danh sách màn hình
     final screens = <Widget>[
       const HomeScreen(),
       const MyCourseScreen(),
       const QuizListScreen(),
-      if (isAdminOrMentor) const DashboardScreen(),
+      if (dashboardScreen != null) dashboardScreen,
       const ProfileScreen(),
     ];
 
+    // Build danh sách item
     final items = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         icon: Image.asset(
@@ -74,7 +91,7 @@ class _BottomNavigationBarExampleState
         ),
         label: 'Quiz',
       ),
-      if (isAdminOrMentor)
+      if (dashboardScreen != null)
         BottomNavigationBarItem(
           icon: Icon(
             Icons.dashboard,
@@ -96,7 +113,7 @@ class _BottomNavigationBarExampleState
       ),
     ];
 
-    // 4) Clamp index để tránh out-of-bounds khi số tab thay đổi
+    // Clamp index để tránh out-of-bounds khi số tab thay đổi
     final safeIndex = _selectedIndex.clamp(0, screens.length - 1);
 
     return Scaffold(
