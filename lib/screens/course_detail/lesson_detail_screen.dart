@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/lessons/lesson_detail_cubit.dart';
 import 'package:lms/cubits/lessons/lesson_detail_state.dart';
 import 'package:lms/widgets/youtube_video_player.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class LessonDetailScreen extends StatefulWidget {
@@ -517,13 +519,15 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                                       if (lesson.pdfUrl != null)
                                         _buildAttachmentItem(context, {
                                           'name': 'Tài liệu PDF',
-                                          'url': lesson.pdfUrl,
+                                          'url':
+                                              '${ApiConfig.baseUrl}${lesson.pdfUrl}',
                                           'type': 'pdf',
                                         }),
                                       if (lesson.slideUrl != null)
                                         _buildAttachmentItem(context, {
                                           'name': 'Slide bài giảng',
-                                          'url': lesson.slideUrl,
+                                          'url':
+                                              '${ApiConfig.baseUrl}${lesson.slideUrl}',
                                           'type': 'ppt',
                                         }),
                                     ],
@@ -702,8 +706,42 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
             ),
           ),
           IconButton(
-            onPressed: () {
-              // TODO: Xử lý tải xuống tài liệu
+            onPressed: () async {
+              if (fileUrl.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Không tìm thấy đường dẫn tải xuống'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
+              try {
+                final Uri url = Uri.parse(fileUrl);
+                if (!await launchUrl(
+                  url,
+                  mode: LaunchMode.externalApplication,
+                )) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Không thể mở đường dẫn tải xuống'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Lỗi khi tải xuống: ${e.toString()}'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
             },
             icon: const Icon(Icons.download),
             color: colorScheme.primary,

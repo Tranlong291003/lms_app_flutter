@@ -120,9 +120,7 @@ class _MyOngoingCoursesScreenState extends State<MyOngoingCoursesScreen> {
                       course.completedLessons / course.totalLessons;
 
                   return CourseCard(
-                    thumbnail:
-                        course.thumbnailUrl ??
-                        "https://via.placeholder.com/80x80.png?text=Course",
+                    thumbnail: course.thumbnailUrl ?? "",
                     title: course.title,
                     duration: course.totalDuration,
                     progressValue: percent,

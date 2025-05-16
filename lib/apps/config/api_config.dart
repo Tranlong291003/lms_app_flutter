@@ -49,10 +49,33 @@ class ApiConfig {
     return url;
   }
 
+  // Quizzes
+  static String getQuizzesByUser(String userUid) {
+    final url = "$baseUrl/api/quizzes/getquizuser/$userUid";
+    print('URL getQuizzesByUser: $url');
+    return url;
+  }
+
+  // Questions
+  static String getQuestionsByQuizId(int quizId) {
+    final url = "$baseUrl/api/questions/$quizId";
+    print('URL getQuestionsByQuizId: $url');
+    return url;
+  }
+
   // Helper method để nối URL với đường dẫn ảnh
   static String getImageUrl(String? imagePath) {
     if (imagePath == null || imagePath.isEmpty) {
-      return baseUrl;
+      return "";
+    }
+
+    // Nếu đã là URL đầy đủ, trả về nguyên bản
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      // Không đi qua server proxy nếu là placeholder.com
+      if (imagePath.contains('placeholder.com')) {
+        return "";
+      }
+      return imagePath;
     }
 
     // Đảm bảo imagePath không bắt đầu bằng / nếu baseUrl đã kết thúc bằng /
@@ -67,4 +90,7 @@ class ApiConfig {
 
     return baseUrl + imagePath;
   }
+
+  static String getQuizResultDetails(int resultId) =>
+      '/api/quiz-results/$resultId';
 }

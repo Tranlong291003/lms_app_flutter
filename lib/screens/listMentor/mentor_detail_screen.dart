@@ -327,12 +327,8 @@ class _MentorDetailScreenState extends State<MentorDetailScreen> {
                       margin: const EdgeInsets.fromLTRB(16, 24, 16, 8),
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color:
-                            isDark
-                                ? colorScheme.surfaceContainerHighest
-                                    .withOpacity(0.3)
-                                : colorScheme.surfaceContainerHighest
-                                    .withOpacity(0.2),
+                        color: isDark ? colorScheme.surface : Colors.white,
+
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color:
@@ -401,7 +397,7 @@ class _MentorDetailScreenState extends State<MentorDetailScreen> {
                               isDark
                                   ? Colors.black12
                                   : Colors.black.withOpacity(0.05),
-                          blurRadius: 15,
+                          blurRadius: 3,
                           spreadRadius: 0,
                           offset: const Offset(0, 5),
                         ),

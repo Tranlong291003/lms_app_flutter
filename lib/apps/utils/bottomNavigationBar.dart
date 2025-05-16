@@ -6,7 +6,7 @@ import 'package:lms/screens/dashboard/dashboard_screen.dart';
 import 'package:lms/screens/home/home_screen.dart';
 import 'package:lms/screens/myCourse/my_course_screen.dart';
 import 'package:lms/screens/profile/profile_screen.dart';
-import 'package:lms/screens/quiz/quiz_screen.dart';
+import 'package:lms/screens/quiz/quiz_list_screen.dart';
 
 class BottomNavigationBarExample extends StatefulWidget {
   const BottomNavigationBarExample({super.key});
@@ -35,7 +35,7 @@ class _BottomNavigationBarExampleState
     final screens = <Widget>[
       const HomeScreen(),
       const MyCourseScreen(),
-      const QuizScreen(),
+      const QuizListScreen(),
       if (isAdminOrMentor) const DashboardScreen(),
       const ProfileScreen(),
     ];

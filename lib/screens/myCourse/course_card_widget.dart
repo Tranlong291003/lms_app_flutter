@@ -62,24 +62,18 @@ class CourseCard extends StatelessWidget {
               // PHẦN ẢNH
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  ApiConfig.getImageUrl(thumbnail),
-                  height: 64,
-                  width: 64,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      height: 64,
-                      width: 64,
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      child: Icon(
-                        Icons.image,
-                        color: theme.colorScheme.onSurface.withOpacity(0.25),
-                        size: 32,
-                      ),
-                    );
-                  },
-                ),
+                child:
+                    thumbnail.isNotEmpty
+                        ? Image.network(
+                          ApiConfig.getImageUrl(thumbnail),
+                          height: 64,
+                          width: 64,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return _buildPlaceholderImage(context, theme);
+                          },
+                        )
+                        : _buildPlaceholderImage(context, theme),
               ),
               const SizedBox(width: 14),
               // PHẦN TEXT
@@ -150,6 +144,19 @@ class CourseCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderImage(BuildContext context, ThemeData theme) {
+    return Container(
+      height: 64,
+      width: 64,
+      color: theme.colorScheme.surfaceContainerHighest,
+      child: Icon(
+        Icons.image,
+        color: theme.colorScheme.onSurface.withOpacity(0.25),
+        size: 32,
       ),
     );
   }

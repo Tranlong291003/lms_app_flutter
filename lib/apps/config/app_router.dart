@@ -23,7 +23,9 @@ import 'package:lms/screens/privacy/privacy_screen.dart';
 import 'package:lms/screens/profile/editprofile_screen.dart';
 import 'package:lms/screens/profile/profile_screen.dart';
 import 'package:lms/screens/quiz/quiz_detail_screen.dart';
+import 'package:lms/screens/quiz/quiz_list_screen.dart';
 import 'package:lms/screens/quiz/quiz_questions_screen.dart';
+import 'package:lms/screens/quiz/quiz_result_detail_screen.dart';
 import 'package:lms/screens/quiz/quiz_screen.dart';
 import 'package:lms/screens/security/change_password_screen.dart';
 import 'package:lms/screens/security/security_screen.dart';
@@ -46,6 +48,7 @@ class AppRouter {
   static const String profile = '/profile';
   static const String editProfile = '/editprofile';
   static const String quiz = '/quiz';
+  static const String quizList = '/quiz-list';
   static const String quizDetail = '/quizdetail';
   static const String quizQuestions = '/quiz/questions';
   static const String courseDetail = '/courseDetail';
@@ -58,6 +61,7 @@ class AppRouter {
   static const String invite = '/invite';
   static const String changePassword = '/change-password';
   static const String lessonDetail = '/lesson-detail';
+  static const String quizResultDetail = '/quiz-result-detail';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     Widget page;
@@ -104,11 +108,26 @@ class AppRouter {
       case quiz:
         page = const QuizScreen();
         break;
+      case quizList:
+        page = const QuizListScreen();
+        break;
       case quizDetail:
         page = const QuizDetailScreen();
         break;
       case quizQuestions:
-        page = const QuizQuestionsScreen();
+        final args = settings.arguments;
+        if (args is int) {
+          page = QuizQuestionsScreen(quizId: args);
+        } else if (args is Map<String, dynamic>) {
+          page = QuizQuestionsScreen(
+            quizId: args['quizId'],
+            quizInfo: args['quizInfo'],
+          );
+        } else {
+          page = const Scaffold(
+            body: Center(child: Text('Không tìm thấy Quiz ID')),
+          );
+        }
         break;
       case courseDetail:
         final args = settings.arguments;
@@ -169,6 +188,9 @@ class AppRouter {
         break;
       case changePassword:
         page = const ChangePasswordScreen();
+        break;
+      case quizResultDetail:
+        page = const QuizResultDetailScreen();
         break;
       default:
         page = const Scaffold(

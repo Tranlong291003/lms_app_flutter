@@ -120,9 +120,7 @@ class _MyCompletedCoursesScreenState extends State<MyCompletedCoursesScreen> {
                   final double percent = 1.0; // Đã hoàn thành 100%
 
                   return CourseCard(
-                    thumbnail:
-                        course.thumbnailUrl ??
-                        "https://via.placeholder.com/80x80.png?text=Course",
+                    thumbnail: course.thumbnailUrl ?? "",
                     title: course.title,
                     duration: course.totalDuration,
                     progressValue: percent,

@@ -279,28 +279,19 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          ApiConfig.getImageUrl(course.thumbnailUrl) ?? '',
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                          errorBuilder:
-                              (_, __, ___) => Container(
-                                width: 120,
-                                height: 120,
-                                color:
-                                    Theme.of(
-                                      context,
-                                    ).colorScheme.surfaceContainerHighest,
-                                child: Icon(
-                                  Icons.broken_image,
-                                  color:
-                                      Theme.of(
-                                        context,
-                                      ).colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                        ),
+                        child:
+                            course.thumbnailUrl != null &&
+                                    course.thumbnailUrl!.isNotEmpty
+                                ? Image.network(
+                                  ApiConfig.getImageUrl(course.thumbnailUrl),
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (_, __, ___) =>
+                                          _buildPlaceholderImage(context),
+                                )
+                                : _buildPlaceholderImage(context),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -527,5 +518,18 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
       default:
         return theme.colorScheme.surfaceContainerHighest;
     }
+  }
+
+  Widget _buildPlaceholderImage(BuildContext context) {
+    return Container(
+      width: 120,
+      height: 120,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      child: Icon(
+        Icons.broken_image,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+        size: 48,
+      ),
+    );
   }
 }
