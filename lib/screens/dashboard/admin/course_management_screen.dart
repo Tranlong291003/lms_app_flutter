@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
 
 class CourseManagementScreen extends StatefulWidget {
@@ -24,6 +25,10 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
     _tabController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _navigateToCourseDetail(BuildContext context, int courseId) {
+    Navigator.pushNamed(context, AppRouter.courseDetail, arguments: courseId);
   }
 
   @override
@@ -114,7 +119,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
           return isApproved
               ? ApprovedCourseCard(
                 course: course,
-                onViewDetail: () => _showCourseDetails(context, course),
+                onViewDetail: () => _navigateToCourseDetail(context, course.id),
               )
               : PendingCourseCard(
                 course: course,

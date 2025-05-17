@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
-import 'package:lms/screens/dashboard/admin/category_management_screen.dart';
-import 'package:lms/screens/dashboard/admin/course_management_screen.dart';
-import 'package:lms/screens/dashboard/admin/user_management_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   final String userName;
   const AdminDashboardScreen({super.key, required this.userName});
+
+  void _navigateToUserManagement(BuildContext context) {
+    Navigator.pushNamed(context, AppRouter.adminUsers);
+  }
+
+  void _navigateToCourseManagement(BuildContext context) {
+    Navigator.pushNamed(context, AppRouter.adminCourses);
+  }
+
+  void _navigateToCategoryManagement(BuildContext context) {
+    Navigator.pushNamed(context, AppRouter.adminCategories);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,24 +76,28 @@ class AdminDashboardScreen extends StatelessWidget {
 class _QuickActionsList extends StatelessWidget {
   const _QuickActionsList();
 
+  void _navigateToUserManagement(BuildContext context) {
+    Navigator.pushNamed(context, AppRouter.adminUsers);
+  }
+
+  void _navigateToCourseManagement(BuildContext context) {
+    Navigator.pushNamed(context, AppRouter.adminCourses);
+  }
+
+  void _navigateToCategoryManagement(BuildContext context) {
+    Navigator.pushNamed(context, AppRouter.adminCategories);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Column(
       children: [
         _QuickActionCard(
-          icon: Icons.person_2,
+          icon: Icons.people,
           title: 'Quản lý người dùng',
           subtitle: 'Quản lý học viên, giảng viên và quản trị viên',
           color: Colors.indigo,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const UserManagementScreen()),
-            );
-          },
+          onTap: () => _navigateToUserManagement(context),
         ),
         const SizedBox(height: 12),
         _QuickActionCard(
@@ -91,12 +105,7 @@ class _QuickActionsList extends StatelessWidget {
           title: 'Quản lý khóa học',
           subtitle: 'Phê duyệt, từ chối và quản lý tất cả khóa học',
           color: Colors.teal,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const CourseManagementScreen()),
-            );
-          },
+          onTap: () => _navigateToCourseManagement(context),
         ),
         const SizedBox(height: 12),
         _QuickActionCard(
@@ -104,14 +113,7 @@ class _QuickActionsList extends StatelessWidget {
           title: 'Quản lý danh mục',
           subtitle: 'Thêm, sửa, xóa danh mục và bộ lọc',
           color: Colors.amber.shade700,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const CategoryManagementScreen(),
-              ),
-            );
-          },
+          onTap: () => _navigateToCategoryManagement(context),
         ),
         const SizedBox(height: 12),
         _QuickActionCard(

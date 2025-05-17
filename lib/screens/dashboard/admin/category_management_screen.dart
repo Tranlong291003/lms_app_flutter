@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
 
 class CategoryManagementScreen extends StatefulWidget {
@@ -19,6 +20,14 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _navigateToCourseList(BuildContext context, String categoryId) {
+    Navigator.pushNamed(
+      context,
+      AppRouter.listCourse,
+      arguments: {'categoryId': categoryId},
+    );
   }
 
   @override

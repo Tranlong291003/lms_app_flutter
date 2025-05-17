@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/blocs/mentors/mentor_detail_bloc.dart';
 import 'package:lms/blocs/mentors/mentors_event.dart';
 import 'package:lms/cubits/admin/admin_user_cubit.dart';
 import 'package:lms/models/role_model.dart';
 import 'package:lms/models/user_model.dart';
-import 'package:lms/screens/user_detail_screen.dart';
 import 'package:shimmer/shimmer.dart';
 
 class UserManagementScreen extends StatefulWidget {
@@ -419,139 +419,149 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     final avatarUrl = _getAvatarUrl(user.avatarUrl);
     final role = Role.getRoleById(user.role);
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      color: colorScheme.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Avatar with border and status dot
-            Stack(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: role.color.withOpacity(0.5),
-                      width: 3,
-                    ),
-                  ),
-                  child: CircleAvatar(
-                    radius: 32,
-                    backgroundImage: NetworkImage(avatarUrl),
-                  ),
-                ),
-                Positioned(
-                  right: 2,
-                  bottom: 2,
-                  child: Container(
-                    width: 16,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: isActive ? Colors.green : Colors.red,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: colorScheme.surface, width: 2),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 18),
-            // Info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: () => _navigateToUserDetail(user),
+      borderRadius: BorderRadius.circular(20),
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 16),
+        elevation: 2,
+        color: colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Avatar with border and status dot
+              Stack(
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          user.name,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurface,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: role.color.withOpacity(0.5),
+                        width: 3,
                       ),
-                    ],
-                  ),
-                  if (user.bio.trim().isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      user.bio,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        fontStyle: FontStyle.italic,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ],
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color:
-                              isActive
-                                  ? Colors.green.withOpacity(0.12)
-                                  : Colors.red.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.check_circle,
-                              size: 16,
-                              color: isActive ? Colors.green : Colors.red,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              isActive ? 'Đang hoạt động' : 'Bị khóa',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: isActive ? Colors.green : Colors.red,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
+                    child: CircleAvatar(
+                      radius: 32,
+                      backgroundImage: NetworkImage(avatarUrl),
+                    ),
+                  ),
+                  Positioned(
+                    right: 2,
+                    bottom: 2,
+                    child: Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: isActive ? Colors.green : Colors.red,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: colorScheme.surface,
+                          width: 2,
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
-            ),
-            // Action buttons
-            const SizedBox(width: 12),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () => _showRoleUpdateDialog(user),
-                  icon: Icon(role.icon, size: 22),
-                  color: role.color,
-                  tooltip: 'Thay đổi vai trò',
+              const SizedBox(width: 18),
+              // Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            user.name,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (user.bio.trim().isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        user.bio,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                isActive
+                                    ? Colors.green.withOpacity(0.12)
+                                    : Colors.red.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.check_circle,
+                                size: 16,
+                                color: isActive ? Colors.green : Colors.red,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                isActive ? 'Đang hoạt động' : 'Bị khóa',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: isActive ? Colors.green : Colors.red,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                IconButton(
-                  onPressed: () => _toggleUserStatus(user),
-                  icon: Icon(isActive ? Icons.lock : Icons.lock_open, size: 22),
-                  color: isActive ? Colors.red : Colors.green,
-                  tooltip: isActive ? 'Vô hiệu hóa' : 'Kích hoạt',
-                ),
-              ],
-            ),
-          ],
+              ),
+              // Action buttons
+              const SizedBox(width: 12),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () => _showRoleUpdateDialog(user),
+                    icon: Icon(role.icon, size: 22),
+                    color: role.color,
+                    tooltip: 'Thay đổi vai trò',
+                  ),
+                  const SizedBox(height: 8),
+                  IconButton(
+                    onPressed: () => _toggleUserStatus(user),
+                    icon: Icon(
+                      isActive ? Icons.lock : Icons.lock_open,
+                      size: 22,
+                    ),
+                    color: isActive ? Colors.red : Colors.green,
+                    tooltip: isActive ? 'Vô hiệu hóa' : 'Kích hoạt',
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -593,9 +603,10 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   void _navigateToUserDetail(User user) {
     context.read<MentorDetailBloc>().add(GetMentorByUidEvent(user.uid));
-    Navigator.push(
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(builder: (context) => UserDetailScreen(uid: user.uid)),
+      AppRouter.adminUserDetail,
+      arguments: user.uid,
     );
   }
 

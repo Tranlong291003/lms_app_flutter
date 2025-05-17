@@ -8,6 +8,9 @@ import 'package:lms/screens/app_entry_gate.dart';
 import 'package:lms/screens/bookmark/bookmark_screen.dart';
 import 'package:lms/screens/course_detail/course_detail_screen.dart';
 import 'package:lms/screens/course_detail/lesson_detail_screen.dart';
+import 'package:lms/screens/dashboard/admin/admin_dashboard_screen.dart';
+import 'package:lms/screens/dashboard/admin/category_management_screen.dart';
+import 'package:lms/screens/dashboard/admin/course_management_screen.dart';
 import 'package:lms/screens/dashboard/admin/user_management_screen.dart';
 import 'package:lms/screens/forgotpassword/forgotpassword_screen.dart';
 import 'package:lms/screens/help/help_screen.dart';
@@ -64,6 +67,10 @@ class AppRouter {
   static const String lessonDetail = '/lesson-detail';
   static const String quizResultDetail = '/quiz-result-detail';
   static const String adminUsers = '/admin/users';
+  static const String adminUserDetail = '/admin/users/detail';
+  static const String adminDashboard = '/admin/dashboard';
+  static const String adminCourses = '/admin/courses';
+  static const String adminCategories = '/admin/categories';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     Widget page;
@@ -196,6 +203,25 @@ class AppRouter {
         break;
       case adminUsers:
         page = const UserManagementScreen();
+        break;
+      case adminUserDetail:
+        final args = settings.arguments;
+        if (args is String) {
+          page = UserDetailScreen(uid: args);
+        } else {
+          page = const Scaffold(
+            body: Center(child: Text('Không tìm thấy User UID')),
+          );
+        }
+        break;
+      case adminDashboard:
+        page = const AdminDashboardScreen(userName: 'Admin');
+        break;
+      case adminCourses:
+        page = const CourseManagementScreen();
+        break;
+      case adminCategories:
+        page = const CategoryManagementScreen();
         break;
       default:
         page = const Scaffold(
