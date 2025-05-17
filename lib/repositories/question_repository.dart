@@ -1,5 +1,5 @@
 import 'package:lms/models/quiz/question_model.dart';
-import 'package:lms/repository/base_repository.dart';
+import 'package:lms/repositories/base_repository.dart';
 import 'package:lms/services/question_service.dart';
 
 class QuestionRepository extends BaseRepository<QuestionService> {

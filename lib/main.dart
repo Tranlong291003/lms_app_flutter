@@ -12,17 +12,20 @@ import 'package:lms/blocs/mentors/mentors_bloc.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_event.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
+import 'package:lms/cubits/admin/admin_user_cubit.dart';
 import 'package:lms/cubits/category/category_cubit.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/cubits/lessons/lesson_detail_cubit.dart';
 import 'package:lms/cubits/notification/notification_cubit.dart';
-import 'package:lms/repository/category_repository.dart';
-import 'package:lms/repository/course_repository.dart';
-import 'package:lms/repository/mentor_repository.dart';
-import 'package:lms/repository/user_repository.dart';
+import 'package:lms/repositories/admin_user_repository.dart';
+import 'package:lms/repositories/category_repository.dart';
+import 'package:lms/repositories/course_repository.dart';
+import 'package:lms/repositories/mentor_repository.dart';
+import 'package:lms/repositories/user_repository.dart';
 import 'package:lms/screens/Introduction/cubit/intro_cubit.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/my_app.dart';
+import 'package:lms/services/admin_user_service.dart';
 import 'package:lms/services/category_service.dart';
 import 'package:lms/services/mentor_service.dart';
 import 'package:lms/services/notification_service.dart';
@@ -56,11 +59,13 @@ Future<void> main() async {
   final mentorService = MentorService();
   final categoryService = CategoryService(dio);
   final notificationService = NotificationService();
+  final adminUserService = AdminUserService();
 
   // 2. Tạo Repositories
   final userRepository = UserRepository(userService);
   final mentorRepository = MentorRepository(mentorService);
   final categoryRepository = CategoryRepository(categoryService);
+  final adminUserRepository = AdminUserRepository(adminUserService);
 
   // 3. Các Cubit/Bloc không phụ thuộc vào BuildContext
   final themeBloc = ThemeBloc()..add(ThemeStarted());
@@ -70,6 +75,7 @@ Future<void> main() async {
   final mentorBloc = MentorsBloc(mentorRepository);
   final mentorDetailBloc = MentorDetailBloc(mentorRepository);
   final notifCubit = NotificationCubit(notificationService);
+  final adminUserCubit = AdminUserCubit(adminUserRepository);
 
   // 4. Khởi động các service cần await trước khi chạy UI
   await notificationService.initialize();
@@ -112,6 +118,7 @@ Future<void> main() async {
           BlocProvider<LessonDetailCubit>(
             create: (context) => LessonDetailCubit(),
           ),
+          BlocProvider<AdminUserCubit>(create: (_) => adminUserCubit),
         ],
         child: MyApp(notificationService: notificationService),
       ),

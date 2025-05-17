@@ -6,7 +6,7 @@ import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_state.dart';
 import 'package:lms/cubits/question/question_cubit.dart';
 import 'package:lms/models/quiz/quiz_model.dart';
-import 'package:lms/repository/question_repository.dart';
+import 'package:lms/repositories/question_repository.dart';
 import 'package:lms/screens/quiz/components/quiz_detailed_result.dart';
 import 'package:lms/screens/quiz/components/quiz_navigation.dart';
 import 'package:lms/screens/quiz/components/quiz_question_card.dart';

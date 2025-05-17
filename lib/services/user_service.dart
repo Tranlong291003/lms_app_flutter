@@ -66,4 +66,18 @@ class UserService extends BaseService {
       throw Exception('Cập nhật thất bại: $e');
     }
   }
+
+  /// Lấy danh sách tất cả người dùng
+  Future<List<User>> getAllUsers() async {
+    try {
+      final response = await get(ApiConfig.getAllUsers);
+      if (response.statusCode == 200) {
+        final List<dynamic> usersJson = response.data['users'];
+        return usersJson.map((json) => User.fromJson(json)).toList();
+      }
+      throw Exception('Không thể tải danh sách người dùng');
+    } catch (e) {
+      throw Exception('Lỗi khi tải danh sách người dùng: $e');
+    }
+  }
 }

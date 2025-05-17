@@ -1,5 +1,5 @@
 import 'package:lms/models/user_model.dart';
-import 'package:lms/repository/base_repository.dart';
+import 'package:lms/repositories/base_repository.dart';
 import 'package:lms/services/mentor_service.dart';
 
 class MentorRepository extends BaseRepository<MentorService> {

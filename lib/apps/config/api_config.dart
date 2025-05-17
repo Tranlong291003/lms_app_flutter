@@ -3,6 +3,7 @@ class ApiConfig {
   static const String baseUrl = "http://192.168.10.203:3000";
 
   // users
+  static String get getAllUsers => "$baseUrl/api/users";
   static String get login => "$baseUrl/api/users/login";
   static String get signUp => "$baseUrl/api/users/create";
   static String get getUserByUid => "$baseUrl/api/users";
@@ -11,6 +12,8 @@ class ApiConfig {
   static String get getAllCategory => "$baseUrl/api/course-categories";
   static String get getAllCourses => "$baseUrl/api/courses";
   static String get getMentorDetail => "$baseUrl/api/users";
+  static String updateUserStatus(String uid) =>
+      "$baseUrl/api/users/$uid/status";
 
   //lesson
   static String get getAllLessons => "$baseUrl/api/lessons";

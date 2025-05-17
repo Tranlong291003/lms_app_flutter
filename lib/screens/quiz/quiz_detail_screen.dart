@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../apps/config/app_router.dart';
 import '../../models/quiz/quiz_model.dart';
-import '../../repository/question_repository.dart';
+import '../../repositories/question_repository.dart';
 import '../../services/question_service.dart';
 
 class QuizDetailScreen extends StatefulWidget {

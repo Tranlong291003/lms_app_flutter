@@ -275,8 +275,8 @@ class _StatsGrid extends StatelessWidget {
     final List<_Stat> stats = [
       _Stat('Tổng khóa học', '125', Icons.school, Colors.indigo),
       _Stat('Tổng người dùng', '1,458', Icons.people, Colors.teal),
-      _Stat('Doanh thu (triệu)', '45.8', Icons.paid, Colors.amber.shade700),
-      _Stat('Khóa học mới/tháng', '18', Icons.trending_up, Colors.purple),
+      _Stat('Số bài kiểm tra', '432', Icons.quiz, Colors.red),
+      _Stat('Lượt đánh giá', '758', Icons.star_rate, Colors.amber),
     ];
 
     return GridView.builder(

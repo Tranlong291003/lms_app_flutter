@@ -1,6 +1,6 @@
 // lib/blocs/cubit/category/category_cubit.dart
 import 'package:bloc/bloc.dart';
-import 'package:lms/repository/category_repository.dart';
+import 'package:lms/repositories/category_repository.dart';
 
 import 'category_state.dart';
 

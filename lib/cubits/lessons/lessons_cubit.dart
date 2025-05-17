@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/models/lesson_model.dart';
-import 'package:lms/repository/lesson_repository.dart';
+import 'package:lms/repositories/lesson_repository.dart';
 
 // State
 abstract class LessonsState {}

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:lms/models/user_model.dart';
-import 'package:lms/repository/base_repository.dart';
+import 'package:lms/repositories/base_repository.dart';
 import 'package:lms/services/user_service.dart';
 
 class UserRepository extends BaseRepository<UserService> {
@@ -42,5 +42,14 @@ class UserRepository extends BaseRepository<UserService> {
     }
 
     return result;
+  }
+
+  /* ---------- Lấy danh sách tất cả người dùng ---------- */
+  Future<List<User>> getAllUsers() async {
+    try {
+      return await service.getAllUsers();
+    } catch (e) {
+      throw Exception('Không thể lấy danh sách người dùng: $e');
+    }
   }
 }

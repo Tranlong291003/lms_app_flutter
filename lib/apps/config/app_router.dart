@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/cubits/lessons/lessons_cubit.dart';
-import 'package:lms/repository/course_repository.dart';
+import 'package:lms/repositories/course_repository.dart';
 import 'package:lms/screens/Introduction/intro_screen.dart';
 import 'package:lms/screens/app_entry_gate.dart';
 import 'package:lms/screens/bookmark/bookmark_screen.dart';
 import 'package:lms/screens/course_detail/course_detail_screen.dart';
 import 'package:lms/screens/course_detail/lesson_detail_screen.dart';
+import 'package:lms/screens/dashboard/admin/user_management_screen.dart';
 import 'package:lms/screens/forgotpassword/forgotpassword_screen.dart';
 import 'package:lms/screens/help/help_screen.dart';
 import 'package:lms/screens/invite/invite_screen.dart';
 import 'package:lms/screens/language/language_screen.dart';
 import 'package:lms/screens/listCourse/listCourse_screen.dart';
 import 'package:lms/screens/listMentor/listMentor_screen.dart';
-import 'package:lms/screens/listMentor/mentor_detail_screen.dart';
 import 'package:lms/screens/login/loginWithPassword_screen.dart';
 import 'package:lms/screens/login/login_screen.dart';
 import 'package:lms/screens/notification/notification_setting_screen.dart';
@@ -30,6 +30,7 @@ import 'package:lms/screens/quiz/quiz_screen.dart';
 import 'package:lms/screens/security/change_password_screen.dart';
 import 'package:lms/screens/security/security_screen.dart';
 import 'package:lms/screens/signup/signup_screen.dart';
+import 'package:lms/screens/user_detail_screen.dart';
 
 import '../utils/bottomNavigationBar.dart';
 
@@ -62,6 +63,7 @@ class AppRouter {
   static const String changePassword = '/change-password';
   static const String lessonDetail = '/lesson-detail';
   static const String quizResultDetail = '/quiz-result-detail';
+  static const String adminUsers = '/admin/users';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     Widget page;
@@ -161,7 +163,7 @@ class AppRouter {
       case mentorDetail:
         final args = settings.arguments;
         if (args is String) {
-          page = MentorDetailScreen(uid: args);
+          page = UserDetailScreen(uid: args);
         } else {
           page = const Scaffold(
             body: Center(child: Text('Không tìm thấy Mentor UID')),
@@ -191,6 +193,9 @@ class AppRouter {
         break;
       case quizResultDetail:
         page = const QuizResultDetailScreen();
+        break;
+      case adminUsers:
+        page = const UserManagementScreen();
         break;
       default:
         page = const Scaffold(

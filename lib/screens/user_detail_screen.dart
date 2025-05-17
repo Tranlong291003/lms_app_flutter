@@ -13,15 +13,15 @@ import 'package:lms/blocs/mentors/mentors_state.dart';
 import 'package:shimmer/shimmer.dart';
 
 /// Màn hình chi tiết Mentor, chỉ cần truyền UID
-class MentorDetailScreen extends StatefulWidget {
+class UserDetailScreen extends StatefulWidget {
   final String uid;
-  const MentorDetailScreen({super.key, required this.uid});
+  const UserDetailScreen({super.key, required this.uid});
 
   @override
-  _MentorDetailScreenState createState() => _MentorDetailScreenState();
+  _UserDetailScreenState createState() => _UserDetailScreenState();
 }
 
-class _MentorDetailScreenState extends State<MentorDetailScreen> {
+class _UserDetailScreenState extends State<UserDetailScreen> {
   @override
   void initState() {
     super.initState();

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:lms/models/courses/course_detail_model.dart';
 import 'package:lms/models/courses/courses_model.dart';
-import 'package:lms/repository/base_repository.dart';
+import 'package:lms/repositories/base_repository.dart';
 import 'package:lms/services/course_service.dart';
 
 class CourseRepository extends BaseRepository<CourseService> {

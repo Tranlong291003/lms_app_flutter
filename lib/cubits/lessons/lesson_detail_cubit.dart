@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/cubits/lessons/lesson_detail_state.dart';
-import 'package:lms/repository/lesson_repository.dart';
+import 'package:lms/repositories/lesson_repository.dart';
 
 class LessonDetailCubit extends Cubit<LessonDetailState> {
   final LessonRepository _lessonRepository;

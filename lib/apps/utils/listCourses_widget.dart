@@ -7,7 +7,7 @@ import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
 import 'package:lms/cubits/bookmark/bookmark_state.dart';
 import 'package:lms/models/courses/courses_model.dart';
-import 'package:lms/repository/bookmark_repository.dart';
+import 'package:lms/repositories/bookmark_repository.dart';
 import 'package:lms/services/bookmark_service.dart';
 import 'package:lms/widgets/bookmark_button.dart';
 

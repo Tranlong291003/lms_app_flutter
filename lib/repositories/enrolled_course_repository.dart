@@ -1,5 +1,5 @@
 import 'package:lms/models/enrolledCourse_model.dart';
-import 'package:lms/repository/base_repository.dart';
+import 'package:lms/repositories/base_repository.dart';
 import 'package:lms/services/enrolled_course_service.dart';
 
 class EnrolledCourseRepository extends BaseRepository<EnrolledCourseService> {

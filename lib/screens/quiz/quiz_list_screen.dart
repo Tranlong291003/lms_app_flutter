@@ -6,7 +6,7 @@ import 'package:lms/cubits/quiz/quiz_cubit.dart';
 import 'package:lms/cubits/quiz/quiz_state.dart';
 import 'package:lms/models/quiz/quiz_course_model.dart';
 import 'package:lms/models/quiz/quiz_model.dart';
-import 'package:lms/repository/quiz_repository.dart';
+import 'package:lms/repositories/quiz_repository.dart';
 import 'package:lms/screens/quiz/user_quiz_results_screen.dart';
 import 'package:lms/services/quiz_service.dart';
 

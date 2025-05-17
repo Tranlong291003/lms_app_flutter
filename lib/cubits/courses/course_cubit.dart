@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/models/courses/course_detail_model.dart';
 import 'package:lms/models/courses/courses_model.dart';
-import 'package:lms/repository/course_repository.dart';
+import 'package:lms/repositories/course_repository.dart';
 
 part 'course_detail_state.dart';
 part 'course_state.dart';

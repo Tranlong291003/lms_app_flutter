@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/cubits/quiz/quiz_state.dart';
 import 'package:lms/models/quiz/quiz_result_model.dart';
-import 'package:lms/repository/question_repository.dart';
-import 'package:lms/repository/quiz_repository.dart';
+import 'package:lms/repositories/question_repository.dart';
+import 'package:lms/repositories/quiz_repository.dart';
 
 part 'quiz_result_state.dart';
 

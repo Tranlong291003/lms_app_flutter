@@ -1,5 +1,5 @@
 import 'package:lms/models/bookmark_model.dart';
-import 'package:lms/repository/base_repository.dart';
+import 'package:lms/repositories/base_repository.dart';
 import 'package:lms/services/bookmark_service.dart';
 
 class BookmarkRepository extends BaseRepository<BookmarkService> {

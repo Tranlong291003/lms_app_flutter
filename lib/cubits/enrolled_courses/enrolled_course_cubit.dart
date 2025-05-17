@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:lms/cubits/enrolled_courses/enrolled_course_state.dart';
 import 'package:lms/models/enrolledCourse_model.dart';
-import 'package:lms/repository/enrolled_course_repository.dart';
+import 'package:lms/repositories/enrolled_course_repository.dart';
 
 class EnrolledCourseCubit extends Cubit<EnrolledCourseState> {
   final EnrolledCourseRepository _repository;

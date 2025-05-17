@@ -1,6 +1,6 @@
 // lib/repositories/category_repository.dart
 import 'package:lms/models/category_model.dart';
-import 'package:lms/repository/base_repository.dart';
+import 'package:lms/repositories/base_repository.dart';
 import 'package:lms/services/category_service.dart';
 
 class CategoryRepository extends BaseRepository<CategoryService> {

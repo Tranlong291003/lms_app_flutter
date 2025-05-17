@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/cubits/reviews/review_state.dart';
-import 'package:lms/repository/review_repository.dart';
+import 'package:lms/repositories/review_repository.dart';
 
 class ReviewCubit extends Cubit<ReviewState> {
   final ReviewRepository _repository;

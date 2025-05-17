@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/blocs/user/user_state.dart';
-import 'package:lms/repository/user_repository.dart';
+import 'package:lms/repositories/user_repository.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
   final UserRepository _userRepository;

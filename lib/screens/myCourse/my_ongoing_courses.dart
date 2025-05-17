@@ -7,7 +7,7 @@ import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/cubits/enrolled_courses/enrolled_course_cubit.dart';
 import 'package:lms/cubits/enrolled_courses/enrolled_course_state.dart';
-import 'package:lms/repository/course_repository.dart';
+import 'package:lms/repositories/course_repository.dart';
 import 'package:lms/screens/course_detail/course_detail_screen.dart';
 import 'package:lms/screens/myCourse/course_card_widget.dart';
 

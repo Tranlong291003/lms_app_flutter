@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/models/quiz/question_model.dart';
 import 'package:lms/models/quiz/quiz_model.dart';
-import 'package:lms/repository/question_repository.dart';
+import 'package:lms/repositories/question_repository.dart';
 
 enum QuestionStatus { initial, loading, loaded, error, submitted }
 

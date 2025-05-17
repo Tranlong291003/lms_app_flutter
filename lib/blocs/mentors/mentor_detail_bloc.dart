@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:lms/blocs/mentors/mentors_event.dart';
 import 'package:lms/blocs/mentors/mentors_state.dart';
-import 'package:lms/repository/mentor_repository.dart';
+import 'package:lms/repositories/mentor_repository.dart';
 
 class MentorDetailBloc extends Bloc<MentorsEvent, MentorsState> {
   final MentorRepository mentorRepository;

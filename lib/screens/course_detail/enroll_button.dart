@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lms/repository/course_repository.dart';
+import 'package:lms/repositories/course_repository.dart';
 import 'package:lms/services/notification_service.dart';
 import 'package:provider/provider.dart';
 

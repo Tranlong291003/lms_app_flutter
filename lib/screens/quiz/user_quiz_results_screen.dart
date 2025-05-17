@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/cubits/quiz/quiz_cubit.dart';
-import 'package:lms/repository/quiz_repository.dart';
+import 'package:lms/repositories/quiz_repository.dart';
 import 'package:lms/services/quiz_service.dart';
 
 class UserQuizResultsScreen extends StatelessWidget {

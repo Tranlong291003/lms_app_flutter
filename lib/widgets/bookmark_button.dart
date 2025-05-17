@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
 import 'package:lms/cubits/bookmark/bookmark_state.dart';
 import 'package:lms/models/bookmark_model.dart';
-import 'package:lms/repository/bookmark_repository.dart';
+import 'package:lms/repositories/bookmark_repository.dart';
 import 'package:lms/services/bookmark_service.dart';
 
 class BookmarkButton extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:lms/models/reivew_model.dart';
-import 'package:lms/repository/base_repository.dart';
+import 'package:lms/repositories/base_repository.dart';
 import 'package:lms/services/review_service.dart';
 
 class ReviewRepository extends BaseRepository<ReviewService> {
