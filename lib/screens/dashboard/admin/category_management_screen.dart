@@ -1,9 +1,13 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
+import 'package:lms/cubits/category/category_cubit.dart';
 
 class CategoryManagementScreen extends StatefulWidget {
   const CategoryManagementScreen({super.key});
@@ -17,6 +21,12 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    context.read<CategoryCubit>().fetchAllCategory();
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
@@ -28,6 +38,12 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
       AppRouter.listCourse,
       arguments: {'categoryId': categoryId},
     );
+  }
+
+  String? _getIconUrl(String? icon) {
+    if (icon == null || icon.isEmpty) return null;
+    if (icon.startsWith('http')) return icon;
+    return ApiConfig.baseUrl + icon;
   }
 
   @override
@@ -58,21 +74,37 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
             },
           ),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                ...List.generate(
-                  10,
-                  (index) => _buildCategoryCard(
-                    context,
-                    id: index + 1,
-                    name: 'Danh mục ${index + 1}',
-                    description: 'Mô tả danh mục ${index + 1}',
-                    courseCount: (index + 1) * 5,
-                    iconPath: null,
-                  ),
-                ),
-              ],
+            child: BlocBuilder<CategoryCubit, CategoryState>(
+              builder: (context, state) {
+                if (state is CategoryLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (state is CategoryError) {
+                  return Center(child: Text('Lỗi: ${state.message}'));
+                }
+                if (state is CategoryLoaded) {
+                  final categories = state.categories;
+                  if (categories.isEmpty) {
+                    return const Center(child: Text('Không có danh mục nào'));
+                  }
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      final cat = categories[index];
+                      return _buildCategoryCard(
+                        context,
+                        id: cat.categoryId,
+                        name: cat.name,
+                        description: cat.description ?? '',
+                        courseCount: cat.courseCount,
+                        iconPath: cat.icon,
+                      );
+                    },
+                  );
+                }
+                return const SizedBox();
+              },
             ),
           ),
         ],
@@ -105,10 +137,13 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           child:
-              iconPath != null
+              _getIconUrl(iconPath) != null
                   ? ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.file(File(iconPath), fit: BoxFit.cover),
+                    child: Image.network(
+                      _getIconUrl(iconPath)!,
+                      fit: BoxFit.cover,
+                    ),
                   )
                   : Icon(Icons.category, color: colorScheme.primary, size: 28),
         ),
@@ -186,10 +221,6 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     final nameController = TextEditingController(text: name);
     final descriptionController = TextEditingController(text: description);
     File? selectedIcon;
-
-    if (iconPath != null) {
-      selectedIcon = File(iconPath);
-    }
 
     return showDialog<void>(
       context: context,
@@ -306,43 +337,62 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                                               ]
                                               : null,
                                     ),
-                                    child:
-                                        selectedIcon != null
-                                            ? ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                              child: Image.file(
-                                                selectedIcon!,
-                                                width: 120,
-                                                height: 120,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            )
-                                            : Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  Icons.image_rounded,
-                                                  size: 48,
-                                                  color: colorScheme.primary
-                                                      .withOpacity(0.8),
-                                                ),
-                                                const SizedBox(height: 8),
-                                                Text(
-                                                  'Chọn icon',
-                                                  style: theme
-                                                      .textTheme
-                                                      .bodyMedium
-                                                      ?.copyWith(
-                                                        color:
-                                                            colorScheme.primary,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                ),
-                                              ],
+                                    child: Builder(
+                                      builder: (context) {
+                                        if (selectedIcon != null) {
+                                          return ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              20,
                                             ),
+                                            child: Image.file(
+                                              selectedIcon!,
+                                              width: 120,
+                                              height: 120,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          );
+                                        } else if (iconPath != null &&
+                                            _getIconUrl(iconPath) != null) {
+                                          return ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                            child: Image.network(
+                                              _getIconUrl(iconPath)!,
+                                              width: 120,
+                                              height: 120,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          );
+                                        } else {
+                                          return Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.image_rounded,
+                                                size: 48,
+                                                color: colorScheme.primary
+                                                    .withOpacity(0.8),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                'Chọn icon',
+                                                style: theme
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      color:
+                                                          colorScheme.primary,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                      },
+                                    ),
                                   ),
                                   Positioned(
                                     bottom: 0,
@@ -475,20 +525,30 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                           ),
                           const SizedBox(width: 12),
                           FilledButton.icon(
-                            onPressed: () {
-                              // TODO: Lưu danh mục vào cơ sở dữ liệu
-                              // Đây là nơi sẽ thực hiện API call
+                            onPressed: () async {
+                              final uid =
+                                  FirebaseAuth.instance.currentUser?.uid ?? '';
+                              if (isEdit) {
+                                await context
+                                    .read<CategoryCubit>()
+                                    .updateCategory(
+                                      categoryId: id!,
+                                      name: nameController.text,
+                                      description: descriptionController.text,
+                                      uid: uid,
+                                      icon: selectedIcon,
+                                    );
+                              } else {
+                                await context
+                                    .read<CategoryCubit>()
+                                    .createCategory(
+                                      name: nameController.text,
+                                      description: descriptionController.text,
+                                      uid: uid,
+                                      icon: selectedIcon,
+                                    );
+                              }
                               Navigator.of(dialogContext).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    isEdit
-                                        ? 'Đã cập nhật danh mục "${nameController.text}"'
-                                        : 'Đã thêm danh mục "${nameController.text}"',
-                                  ),
-                                  backgroundColor: colorScheme.primary,
-                                ),
-                              );
                             },
                             icon: Icon(isEdit ? Icons.save : Icons.add),
                             label: Text(isEdit ? 'Cập nhật' : 'Thêm mới'),
@@ -612,15 +672,31 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
               ),
             ),
             FilledButton(
-              onPressed: () {
-                // TODO: Xóa danh mục từ cơ sở dữ liệu
+              onPressed: () async {
+                try {
+                  final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+                  await context.read<CategoryCubit>().deleteCategory(id, uid);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Đã xóa danh mục "$name"'),
+                        backgroundColor: colorScheme.error,
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Xóa danh mục thất bại: \\${e.toString()}',
+                        ),
+                        backgroundColor: colorScheme.error,
+                      ),
+                    );
+                  }
+                }
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Đã xóa danh mục "$name"'),
-                    backgroundColor: colorScheme.error,
-                  ),
-                );
               },
               style: FilledButton.styleFrom(backgroundColor: colorScheme.error),
               child: const Text('Xóa'),

@@ -27,6 +27,7 @@ import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/my_app.dart';
 import 'package:lms/services/admin_user_service.dart';
 import 'package:lms/services/category_service.dart';
+import 'package:lms/services/course_service.dart';
 import 'package:lms/services/mentor_service.dart';
 import 'package:lms/services/notification_service.dart';
 import 'package:lms/services/user_service.dart';
@@ -57,7 +58,8 @@ Future<void> main() async {
   final dio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl));
   final userService = UserService();
   final mentorService = MentorService();
-  final categoryService = CategoryService(dio);
+  final categoryService = CategoryService();
+  final courseService = CourseService();
   final notificationService = NotificationService();
   final adminUserService = AdminUserService();
 
@@ -65,6 +67,7 @@ Future<void> main() async {
   final userRepository = UserRepository(userService);
   final mentorRepository = MentorRepository(mentorService);
   final categoryRepository = CategoryRepository(categoryService);
+  final courseRepository = CourseRepository(courseService);
   final adminUserRepository = AdminUserRepository(adminUserService);
 
   // 3. Các Cubit/Bloc không phụ thuộc vào BuildContext
@@ -76,6 +79,7 @@ Future<void> main() async {
   final mentorDetailBloc = MentorDetailBloc(mentorRepository);
   final notifCubit = NotificationCubit(notificationService);
   final adminUserCubit = AdminUserCubit(adminUserRepository);
+  final courseCubit = CourseCubit(courseRepository);
 
   // 4. Khởi động các service cần await trước khi chạy UI
   await notificationService.initialize();
@@ -87,16 +91,10 @@ Future<void> main() async {
       providers: [
         RepositoryProvider<UserRepository>(create: (_) => userRepository),
         RepositoryProvider<MentorRepository>(create: (_) => mentorRepository),
-
         RepositoryProvider<CategoryRepository>(
           create: (_) => categoryRepository,
         ),
-        RepositoryProvider<CourseRepository>(
-          create:
-              (_) => CourseRepository(
-                Dio(BaseOptions(baseUrl: ApiConfig.baseUrl)),
-              ),
-        ),
+        RepositoryProvider<CourseRepository>(create: (_) => courseRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -107,17 +105,11 @@ Future<void> main() async {
           BlocProvider<NotificationCubit>(create: (_) => notifCubit),
           BlocProvider<MentorsBloc>(create: (_) => mentorBloc),
           BlocProvider<MentorDetailBloc>(create: (_) => mentorDetailBloc),
-
           BlocProvider<CategoryCubit>(
-            create:
-                (context) =>
-                    CategoryCubit(context.read<CategoryRepository>())
-                      ..loadCategories(),
+            create: (_) => CategoryCubit(categoryRepository),
           ),
-          BlocProvider(create: (_) => CourseCubit()),
-          BlocProvider<LessonDetailCubit>(
-            create: (context) => LessonDetailCubit(),
-          ),
+          BlocProvider<CourseCubit>(create: (_) => courseCubit),
+          BlocProvider<LessonDetailCubit>(create: (_) => LessonDetailCubit()),
           BlocProvider<AdminUserCubit>(create: (_) => adminUserCubit),
         ],
         child: MyApp(notificationService: notificationService),

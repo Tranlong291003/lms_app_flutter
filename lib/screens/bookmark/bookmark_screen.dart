@@ -9,6 +9,7 @@ import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/models/bookmark_model.dart';
 import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/repositories/bookmark_repository.dart';
+import 'package:lms/repositories/course_repository.dart';
 import 'package:lms/services/bookmark_service.dart';
 import 'package:lms/widgets/bookmark_button.dart';
 
@@ -49,7 +50,8 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
     _bookmarkCubit = BookmarkCubit(bookmarkRepository);
 
     // Khởi tạo course cubit
-    _courseCubit = CourseCubit();
+    final courseRepository = RepositoryProvider.of<CourseRepository>(context);
+    _courseCubit = CourseCubit(courseRepository);
 
     try {
       // Tải danh sách bookmark

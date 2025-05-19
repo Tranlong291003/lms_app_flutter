@@ -39,32 +39,46 @@ class AdminUserCubit extends Cubit<AdminUserState> {
   }
 
   /* ---------- Thay đổi trạng thái người dùng ---------- */
-  Future<void> toggleUserStatus(String uid) async {
-    debugPrint('🧩 AdminUserCubit: Toggling status for user $uid');
+  Future<void> toggleUserStatus(String uid, {required String status}) async {
+    debugPrint('🧩 AdminUserCubit: Toggling status for user $uid to $status');
     try {
+      debugPrint('🧩 AdminUserCubit: Current state: ${state.runtimeType}');
       debugPrint(
-        '🧩 AdminUserCubit: Calling repository.toggleUserStatus($uid)',
+        '🧩 AdminUserCubit: Calling repository.toggleUserStatus($uid, $status)',
       );
-      await _repository.toggleUserStatus(uid);
-      debugPrint(
-        '🧩 AdminUserCubit: Status toggled successfully, refreshing user list',
-      );
-      getAllUsers();
+
+      await _repository.toggleUserStatus(uid, status: status);
+
+      debugPrint('🧩 AdminUserCubit: Status toggled successfully');
+      debugPrint('🧩 AdminUserCubit: Refreshing user list...');
+      await getAllUsers();
+      debugPrint('🧩 AdminUserCubit: User list refreshed successfully');
     } catch (e) {
       debugPrint('❌ AdminUserCubit: toggleUserStatus failed with error: $e');
+      debugPrint('❌ AdminUserCubit: Error details:');
+      debugPrint('  - User ID: $uid');
+      debugPrint('  - Target Status: $status');
+      debugPrint('  - Error Type: ${e.runtimeType}');
+      debugPrint('  - Error Message: $e');
+      debugPrint('❌ AdminUserCubit: Emitting error state');
       emit(AdminUserError(e.toString()));
     }
   }
 
   /* ---------- Thay đổi vai trò người dùng ---------- */
-  // Future<void> updateUserRole(String uid, String newRole) async {
-  //   try {
-  //     await _repository.updateUserRole(uid, newRole);
-  //     getAllUsers(); // Refresh the list after update
-  //   } catch (e) {
-  //     emit(AdminUserError(e.toString()));
-  //   }
-  // }
+  Future<void> updateUserRole(String targetUid, String role) async {
+    debugPrint('🧩 AdminUserCubit: Updating role for user $targetUid to $role');
+    emit(AdminUserLoading());
+    try {
+      await _repository.updateUserRole(targetUid, role);
+      debugPrint('🧩 AdminUserCubit: Role updated successfully');
+      await getAllUsers();
+      debugPrint('🧩 AdminUserCubit: User list refreshed after role update');
+    } catch (e) {
+      debugPrint('❌ AdminUserCubit: updateUserRole failed with error: $e');
+      emit(AdminUserError(e.toString()));
+    }
+  }
 
   @override
   void onChange(Change<AdminUserState> change) {

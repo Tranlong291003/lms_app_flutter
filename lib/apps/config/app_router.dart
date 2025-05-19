@@ -218,11 +218,12 @@ class AppRouter {
         page = const AdminDashboardScreen(userName: 'Admin');
         break;
       case adminCourses:
-        page = const CourseManagementScreen();
+        page = const CourseManagementAdminScreen();
         break;
       case adminCategories:
         page = const CategoryManagementScreen();
         break;
+
       default:
         page = const Scaffold(
           body: Center(child: Text('Không tìm thấy trang')),
@@ -232,7 +233,7 @@ class AppRouter {
     return _buildAnimatedRoute(page, settings);
   }
 
-  /// Helper để tạo PageRoute với hiệu ứng slide + fade hiện đại, mượt mà.
+  /// Hevới hiệu ứng slide + fade hiện đại, mượt mà.
   static PageRouteBuilder _buildAnimatedRoute(
     Widget page,
     RouteSettings settings,

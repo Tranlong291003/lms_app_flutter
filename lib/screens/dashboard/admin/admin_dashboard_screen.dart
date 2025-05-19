@@ -107,6 +107,9 @@ class _QuickActionsList extends StatelessWidget {
           color: Colors.teal,
           onTap: () => _navigateToCourseManagement(context),
         ),
+
+        const SizedBox(height: 12),
+
         const SizedBox(height: 12),
         _QuickActionCard(
           icon: Icons.category,

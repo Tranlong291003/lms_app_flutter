@@ -11,6 +11,8 @@ class ListCoursescreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Always load approved courses on build
+    context.read<CourseCubit>().loadCourses(status: 'approved');
     return Scaffold(
       appBar: CustomAppBar(
         showBack: true,
@@ -19,7 +21,10 @@ class ListCoursescreen extends StatelessWidget {
         title: 'Danh sách khoá học',
         onSearchChanged: (value) {
           // Gọi API tìm kiếm ở đây
-          context.read<CourseCubit>().loadCourses(search: value);
+          context.read<CourseCubit>().loadCourses(
+            status: 'approved',
+            search: value,
+          );
         },
       ),
       body: SingleChildScrollView(

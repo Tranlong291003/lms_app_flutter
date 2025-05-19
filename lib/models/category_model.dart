@@ -5,6 +5,7 @@ class CourseCategory {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final String? icon;
+  final int courseCount;
 
   CourseCategory({
     required this.categoryId,
@@ -13,6 +14,7 @@ class CourseCategory {
     this.createdAt,
     this.updatedAt,
     this.icon,
+    this.courseCount = 0,
   });
 
   /// Tạo từ JSON map (ví dụ lấy từ API)
@@ -30,6 +32,7 @@ class CourseCategory {
               ? DateTime.parse(json['updated_at'] as String)
               : null,
       icon: json['icon'] as String?,
+      courseCount: json['course_count'] as int? ?? 0,
     );
   }
 
@@ -42,6 +45,7 @@ class CourseCategory {
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
       'icon': icon,
+      'course_count': courseCount,
     };
   }
 
@@ -49,6 +53,6 @@ class CourseCategory {
   String toString() {
     return 'Category(categoryId: $categoryId, name: $name, '
         'description: $description, createdAt: $createdAt, '
-        'updatedAt: $updatedAt, icon: $icon)';
+        'updatedAt: $updatedAt, icon: $icon, courseCount: $courseCount)';
   }
 }

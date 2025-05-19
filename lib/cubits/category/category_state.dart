@@ -1,34 +1,19 @@
 // lib/cubit/category_state.dart
-import 'package:equatable/equatable.dart';
-import 'package:lms/models/category_model.dart';
+part of 'category_cubit.dart';
 
-abstract class CategoryState extends Equatable {
-  const CategoryState();
-  @override
-  List<Object?> get props => [];
-}
+abstract class CategoryState {}
 
-class CategoryInitial extends CategoryState {
-  const CategoryInitial();
-}
+class CategoryInitial extends CategoryState {}
 
-class CategoryLoading extends CategoryState {
-  const CategoryLoading();
-}
+class CategoryLoading extends CategoryState {}
 
 class CategoryLoaded extends CategoryState {
   final List<CourseCategory> categories;
   final int? selectedId;
-  const CategoryLoaded(this.categories, {this.selectedId});
-
-  @override
-  List<Object?> get props => [categories, selectedId];
+  CategoryLoaded(this.categories, {this.selectedId});
 }
 
 class CategoryError extends CategoryState {
   final String message;
-  const CategoryError(this.message);
-
-  @override
-  List<Object?> get props => [message];
+  CategoryError(this.message);
 }

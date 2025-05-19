@@ -29,29 +29,45 @@ class AdminUserRepository extends BaseRepository<AdminUserService> {
   }
 
   /* ---------- Thay đổi trạng thái người dùng ---------- */
-  Future<bool> toggleUserStatus(String uid) async {
-    debugPrint('📚 AdminUserRepository: Toggling status for user $uid');
+  Future<bool> toggleUserStatus(String uid, {required String status}) async {
+    debugPrint(
+      '📚 AdminUserRepository: Toggling status for user $uid to $status',
+    );
     try {
       debugPrint(
-        '📚 AdminUserRepository: Calling service.toggleUserStatus($uid)',
+        '📚 AdminUserRepository: Calling service.toggleUserStatus($uid, $status)',
       );
-      await service.toggleUserStatus(uid);
-      debugPrint('📚 AdminUserRepository: Toggle status result: $uid');
+      await service.toggleUserStatus(uid, status: status);
+      debugPrint(
+        '📚 AdminUserRepository: Toggle status successful for user $uid',
+      );
       return true;
     } catch (e) {
       debugPrint(
         '❌ AdminUserRepository: toggleUserStatus failed with error: $e',
       );
+      debugPrint('❌ AdminUserRepository: Error details:');
+      debugPrint('  - User ID: $uid');
+      debugPrint('  - Target Status: $status');
+      debugPrint('  - Error Type: ${e.runtimeType}');
+      debugPrint('  - Error Message: $e');
       throw Exception('Không thể thay đổi trạng thái người dùng: $e');
     }
   }
 
-  // /* ---------- Thay đổi vai trò người dùng ---------- */
-  // Future<bool> changeUserRole(String uid, String role) async {
-  //   try {
-  //     return await service.changeUserRole(uid, role);
-  //   } catch (e) {
-  //     throw Exception('Không thể thay đổi vai trò người dùng: $e');
-  //   }
-  // }
+  /* ---------- Thay đổi vai trò người dùng ---------- */
+  Future<void> updateUserRole(String targetUid, String role) async {
+    debugPrint(
+      '📚 AdminUserRepository: Updating role for user $targetUid to $role',
+    );
+    try {
+      await service.updateUserRole(targetUid, role);
+      debugPrint(
+        '📚 AdminUserRepository: Update role successful for user $targetUid',
+      );
+    } catch (e) {
+      debugPrint('❌ AdminUserRepository: updateUserRole failed with error: $e');
+      throw Exception('Không thể cập nhật vai trò người dùng: $e');
+    }
+  }
 }

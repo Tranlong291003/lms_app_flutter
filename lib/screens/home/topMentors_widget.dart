@@ -44,6 +44,8 @@ class _TopMentorsState extends State<TopMentors> {
 
   @override
   Widget build(BuildContext context) {
+    const defaultAvatar = 'https://www.gravatar.com/avatar/?d=mp';
+
     return SizedBox(
       height: 90,
       child: ListView.separated(
@@ -53,7 +55,10 @@ class _TopMentorsState extends State<TopMentors> {
         itemBuilder: (context, index) {
           final mentor = _randomizedMentors[index];
           final displayName = getDisplayName(mentor.name);
-          final avatarUrl = ApiConfig.getImageUrl(mentor.avatarUrl);
+          final avatarUrl =
+              (mentor.avatarUrl.isNotEmpty)
+                  ? ApiConfig.getImageUrl(mentor.avatarUrl)
+                  : defaultAvatar;
           final imageProvider = NetworkImage(avatarUrl);
 
           return InkWell(
@@ -73,9 +78,7 @@ class _TopMentorsState extends State<TopMentors> {
                   radius: 30,
                   backgroundColor: Colors.transparent,
                   backgroundImage: imageProvider,
-                  onBackgroundImageError:
-                      (_, __) =>
-                          const Icon(Icons.person, color: Colors.transparent),
+                  onBackgroundImageError: (_, __) {},
                 ),
                 const SizedBox(height: 8),
                 SizedBox(

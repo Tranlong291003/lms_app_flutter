@@ -1,61 +1,117 @@
 // lib/services/category_service.dart
-import 'package:dio/dio.dart';
-import 'package:lms/apps/config/api_config.dart';
+import 'dart:io';
 
-class CategoryService {
-  final Dio _dio;
-  CategoryService(Dio dio) : _dio = dio {
-    // // Nếu chưa thêm, bạn có thể bật interceptor để log request/response:
-    // _dio.interceptors.add(
-    //   LogInterceptor(
-    //     requestHeader: true,
-    //     requestBody: true,
-    //     responseBody: true,
-    //     responseHeader: false,
-    //     error: true,
-    //     logPrint: (obj) => print('🦄 [Dio] $obj'),
-    //   ),
-    // );
-  }
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/models/category_model.dart';
+import 'package:lms/services/base_service.dart';
+
+class CategoryService extends BaseService {
+  CategoryService() : super();
 
   /// Lấy danh sách tất cả category dưới dạng JSON Map
-  Future<List<Map<String, dynamic>>> fetchAllCategory() async {
-    try {
-      final url = '${_dio.options.baseUrl}${ApiConfig.getAllCategory}';
-      // print('➡️ [CategoryService] GET $url');
-
-      final res = await _dio.get(ApiConfig.getAllCategory);
-      // print('⬅️ [CategoryService] status: ${res.statusCode}');
-      // print('⬅️ [CategoryService] data.runtimeType: ${res.data.runtimeType}');
-      // print('⬅️ [CategoryService] data: ${res.data}');
-
-      if (res.statusCode == 200 && res.data is List) {
-        return List<Map<String, dynamic>>.from(res.data as List);
+  Future<List<CourseCategory>> fetchAllCategory() async {
+    debugPrint('CategoryService: fetchAllCategory called');
+    final response = await get(ApiConfig.getAllCategory);
+    debugPrint(
+      'CategoryService: fetchAllCategory response: \\${response.data}',
+    );
+    if (response.statusCode == 200 && response.data is List) {
+      return (response.data as List)
+          .map((json) => CourseCategory.fromJson(json))
+          .toList();
+    }
+    if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
+      final map = response.data as Map<String, dynamic>;
+      if (map['data'] is List) {
+        return (map['data'] as List)
+            .map((json) => CourseCategory.fromJson(json))
+            .toList();
       }
-      if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
-        final map = res.data as Map<String, dynamic>;
-        if (map['data'] is List) {
-          // print('🟢 [CategoryService] found list in map["data"]');
-          return List<Map<String, dynamic>>.from(map['data'] as List);
-        }
-      }
+    }
+    debugPrint('CategoryService: fetchAllCategory throw Exception');
+    throw Exception('Không thể tải danh sách category');
+  }
 
-      throw Exception(
-        'Không thể tải danh sách category '
-        '(status: ${res.statusCode}, '
-        'kiểu trả về: ${res.data.runtimeType})',
-      );
-    } on DioException catch (e) {
-      // print(
-      //   '❌ [CategoryService] DioError type=${e.type}, message=${e.message}',
-      // );
-      if (e.response != null) {
-        // print('❌ [CategoryService] response data: ${e.response?.data}');
-      }
-      throw Exception('Lỗi Dio khi tải category: ${e.message}');
-    } catch (e) {
-      // print('❌ [CategoryService] Unknown error: $e');
-      throw Exception('Lỗi không xác định khi tải category: $e');
+  Future<void> createCategory({
+    required String name,
+    required String description,
+    required String uid,
+    File? icon,
+  }) async {
+    debugPrint(
+      'CategoryService: createCategory called with name=$name, description=$description, uid=$uid, icon=${icon?.path}',
+    );
+    final formData = FormData.fromMap({
+      'name': name,
+      'description': description,
+      'uid': uid,
+      if (icon != null)
+        'icon': await MultipartFile.fromFile(
+          icon.path,
+          filename: icon.path.split('/').last,
+        ),
+    });
+    final response = await post(
+      '${ApiConfig.baseUrl}/api/course-categories/create',
+      data: formData,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+    debugPrint('CategoryService: createCategory response: \\${response.data}');
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      debugPrint('CategoryService: createCategory throw Exception');
+      throw Exception('Tạo danh mục thất bại: ${response.data}');
+    }
+  }
+
+  Future<void> deleteCategory(int categoryId, String uid) async {
+    debugPrint(
+      'CategoryService: deleteCategory called with categoryId=$categoryId, uid=$uid',
+    );
+    final url = '${ApiConfig.baseUrl}/api/course-categories/delete/$categoryId';
+    final response = await delete(
+      url,
+      data: {'uid': uid},
+      options: Options(contentType: 'application/json'),
+    );
+    debugPrint('CategoryService: deleteCategory response: ${response.data}');
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      debugPrint('CategoryService: deleteCategory throw Exception');
+      throw Exception('Xóa danh mục thất bại: ${response.data}');
+    }
+  }
+
+  Future<void> updateCategory({
+    required int categoryId,
+    required String name,
+    required String description,
+    required String uid,
+    File? icon,
+  }) async {
+    debugPrint(
+      'CategoryService: updateCategory called with categoryId=$categoryId, name=$name, description=$description, uid=$uid, icon=${icon?.path}',
+    );
+    final formData = FormData.fromMap({
+      'name': name,
+      'description': description,
+      'uid': uid,
+      if (icon != null)
+        'icon': await MultipartFile.fromFile(
+          icon.path,
+          filename: icon.path.split('/').last,
+        ),
+    });
+    final url = '${ApiConfig.baseUrl}/api/course-categories/update/$categoryId';
+    final response = await put(
+      url,
+      data: formData,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+    debugPrint('CategoryService: updateCategory response: ${response.data}');
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      debugPrint('CategoryService: updateCategory throw Exception');
+      throw Exception('Cập nhật danh mục thất bại: ${response.data}');
     }
   }
 }

@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/category/category_cubit.dart';
-import 'package:lms/cubits/category/category_state.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/models/category_model.dart';
 

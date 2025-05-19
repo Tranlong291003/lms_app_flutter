@@ -13,7 +13,6 @@ import 'package:lms/blocs/mentors/mentors_state.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/cubits/category/category_cubit.dart';
-import 'package:lms/cubits/category/category_state.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/screens/home/appBar_widget.dart';
 import 'package:lms/screens/home/discountSlider_widget.dart';
@@ -32,7 +31,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     super.initState();
     _loadMentor();
     _loadCurrentUser();
-    context.read<CourseCubit>().loadCourses(status: 'true');
+    context.read<CourseCubit>().loadCourses(status: 'approved');
+    context.read<CategoryCubit>().fetchAllCategory();
   }
 
   void _loadMentor() {
@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       appBar: AppBarHome(context, 'title'),
       body: RefreshIndicator(
         onRefresh: () async {
-          context.read<CourseCubit>().refreshCourses();
+          context.read<CourseCubit>().loadCourses(status: 'approved');
           context.read<MentorsBloc>().add(RefreshMentorsEvent());
           context.read<UserBloc>().add(RefreshUserEvent());
           context.read<CategoryCubit>().refreshCategories();
@@ -110,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                         builder: (context, courseState) {
                           if (courseState is CourseLoading) {
                             return const SizedBox(
+                              height: 200,
                               child: Center(child: LoadingIndicator()),
                             );
                           } else if (courseState is CourseLoaded) {
@@ -127,16 +128,87 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                       )
                                       .toList();
                             }
-                            final limitedList = list.take(10).toList();
+
+                            if (list.isEmpty) {
+                              return SizedBox(
+                                height: 200,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.school_outlined,
+                                        size: 64,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary.withOpacity(0.5),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        'Chưa có khóa học nào',
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      TextButton(
+                                        onPressed: () {
+                                          context
+                                              .read<CategoryCubit>()
+                                              .selectCategory(null);
+                                          context
+                                              .read<CourseCubit>()
+                                              .loadCourses(status: 'approved');
+                                        },
+                                        child: const Text('Làm mới'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+
                             return ListCoursesWidget(
-                              courses: limitedList,
+                              courses: list,
                               userUid:
                                   FirebaseAuth.instance.currentUser?.uid ?? '',
                             );
                           } else if (courseState is CourseError) {
-                            return const SizedBox(
+                            return SizedBox(
+                              height: 200,
                               child: Center(
-                                child: Text('Không có khoá học nào tổn tại'),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline,
+                                      size: 48,
+                                      color:
+                                          Theme.of(context).colorScheme.error,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'Lỗi: ${courseState.message}',
+                                      textAlign: TextAlign.center,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium?.copyWith(
+                                        color:
+                                            Theme.of(context).colorScheme.error,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    TextButton(
+                                      onPressed: () {
+                                        context.read<CourseCubit>().loadCourses(
+                                          status: 'approved',
+                                        );
+                                      },
+                                      child: const Text('Thử lại'),
+                                    ),
+                                  ],
+                                ),
                               ),
                             );
                           }

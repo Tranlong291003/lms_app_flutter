@@ -75,19 +75,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
   }
 
   Future<void> _checkAttempts() async {
-    if (widget.quizInfo != null) {
-      final attemptsUsed = widget.quizInfo!.attemptsUsed ?? 0;
-      if (attemptsUsed >= widget.quizInfo!.attemptLimit) {
-        // Đã đạt giới hạn số lần làm
-        if (mounted) {
-          _showMaxAttemptsReachedDialog();
-        }
-      } else {
-        await _loadQuestions();
-      }
-    } else {
-      await _loadQuestions();
-    }
+    await _loadQuestions();
   }
 
   Future<void> _loadQuestions() async {
@@ -157,7 +145,6 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
       });
       // Gọi nộp bài tự động khi hết giờ
       await _submitQuizAuto();
-      _showTimeUpDialog();
     }
   }
 
@@ -241,111 +228,6 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
       return Colors.orange.withOpacity(0.2);
     } else {
       return Colors.green.withOpacity(0.2);
-    }
-  }
-
-  void _showTimeUpDialog() {
-    if (mounted) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder:
-            (context) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: Row(
-                children: [
-                  const Icon(Icons.timer_off, color: Colors.red),
-                  const SizedBox(width: 8),
-                  const Text('Hết thời gian'),
-                ],
-              ),
-              content: const Text(
-                'Thời gian làm bài đã hết. Bài làm của bạn đã được nộp tự động.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Đóng'),
-                ),
-              ],
-            ),
-      );
-    }
-  }
-
-  void _showMaxAttemptsReachedDialog() {
-    if (mounted) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder:
-            (context) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: Row(
-                children: [
-                  const Icon(Icons.block, color: Colors.red),
-                  const SizedBox(width: 8),
-                  const Text('Đã đạt giới hạn'),
-                ],
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Bạn đã làm bài kiểm tra này ${widget.quizInfo!.attemptsUsed} lần, đạt giới hạn cho phép.',
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.red.withOpacity(0.5)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.info_outline,
-                          color: Colors.red,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Mỗi bài kiểm tra chỉ được làm tối đa ${widget.quizInfo!.attemptLimit} lần.',
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  ),
-                  child: const Text('Đóng'),
-                ),
-              ],
-            ),
-      );
     }
   }
 

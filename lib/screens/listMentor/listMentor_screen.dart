@@ -13,6 +13,8 @@ import 'package:lms/blocs/mentors/mentors_state.dart';
 import 'package:lms/models/user_model.dart';
 import 'package:shimmer/shimmer.dart';
 
+const defaultAvatar = 'https://www.gravatar.com/avatar/?d=mp';
+
 class ListMentorScreen extends StatefulWidget {
   const ListMentorScreen({super.key});
 
@@ -84,13 +86,9 @@ class _MentorListItem extends StatelessWidget {
     final avatarUrl =
         mentor.avatarUrl.isNotEmpty
             ? ApiConfig.getImageUrl(mentor.avatarUrl)
-            : null;
+            : defaultAvatar;
 
-    final imageProvider =
-        avatarUrl != null
-            ? CachedNetworkImageProvider(avatarUrl)
-            : const AssetImage('assets/images/default_avatar.png')
-                as ImageProvider;
+    final imageProvider = CachedNetworkImageProvider(avatarUrl);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -101,9 +99,7 @@ class _MentorListItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: () async {
           // Pre-cache avatar
-          if (avatarUrl != null) {
-            await precacheImage(imageProvider, context);
-          }
+          await precacheImage(imageProvider, context);
           Navigator.pushNamed(
             context,
             AppRouter.mentorDetail,
@@ -116,8 +112,7 @@ class _MentorListItem extends StatelessWidget {
             children: [
               ClipOval(
                 child: CachedNetworkImage(
-                  imageUrl:
-                      avatarUrl ?? 'https://www.gravatar.com/avatar/?d=mp',
+                  imageUrl: avatarUrl,
                   width: 60,
                   height: 60,
                   fit: BoxFit.cover,
@@ -170,9 +165,7 @@ class _MentorListItem extends StatelessWidget {
                 icon: const Icon(Icons.arrow_forward_ios, size: 16),
                 color: primary,
                 onPressed: () async {
-                  if (avatarUrl != null) {
-                    await precacheImage(imageProvider, context);
-                  }
+                  await precacheImage(imageProvider, context);
                   Navigator.pushNamed(
                     context,
                     AppRouter.mentorDetail,
