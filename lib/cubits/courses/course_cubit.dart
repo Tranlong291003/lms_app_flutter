@@ -168,13 +168,14 @@ class CourseCubit extends Cubit<CourseState> {
         }).toList();
       }
 
-      // Cập nhật tất cả danh sách khóa học
+      // Cập nhật tất cả các danh sách khóa học
       final updatedCourses = updateList(loaded.courses);
       final updatedRandomCourses = updateList(loaded.randomCourses);
       final updatedApprovedCourses = updateList(loaded.approvedCourses);
       final updatedPendingCourses = updateList(loaded.pendingCourses);
       final updatedRejectedCourses = updateList(loaded.rejectedCourses);
 
+      // Emit trạng thái mới
       emit(
         CourseLoaded(
           updatedCourses,
@@ -193,6 +194,77 @@ class CourseCubit extends Cubit<CourseState> {
   /// [isBookmarked] - Trạng thái đánh dấu mới
   void updateCourseBookmarkStatus(int courseId, bool isBookmarked) {
     updateBookmarkStatus([courseId], isBookmarked);
+  }
+
+  /// Lấy danh sách khóa học của giảng viên (mentor)
+  ///
+  /// [instructorUid] - ID của giảng viên cần lấy khóa học
+  /// [status] - Trạng thái khóa học để lọc (tùy chọn)
+  ///
+  /// Trả về danh sách các đối tượng [Course]
+  Future<List<Course>> getMentorCourses(
+    String instructorUid, {
+    String? status,
+  }) async {
+    try {
+      emit(CourseLoading());
+      final courses = await _repo.getCoursesByInstructor(
+        instructorUid,
+        status: status,
+      );
+      return courses;
+    } catch (e) {
+      emit(CourseError(e.toString()));
+      return [];
+    }
+  }
+
+  /// Gửi lại khóa học đã bị từ chối để duyệt lại
+  ///
+  /// [courseId] - ID khóa học cần gửi lại
+  /// [instructorUid] - ID của mentor sở hữu khóa học
+  ///
+  /// Cập nhật trạng thái của khóa học từ rejected thành pending
+  Future<void> resubmitCourse(
+    int courseId, {
+    required String instructorUid,
+  }) async {
+    try {
+      await _repo.updateCourseStatus(
+        courseId: courseId,
+        status: 'pending',
+        uid: instructorUid,
+      );
+    } catch (e) {
+      emit(CourseError(e.toString()));
+      rethrow;
+    }
+  }
+
+  /// Tạo khóa học mới
+  ///
+  /// [data] - Map chứa thông tin khóa học, với các trường:
+  /// - title: Tên khóa học (bắt buộc)
+  /// - description: Mô tả khóa học (bắt buộc)
+  /// - category_id: ID danh mục (bắt buộc)
+  /// - price: Giá khóa học
+  /// - discount_price: Giá khuyến mãi
+  /// - level: Cấp độ khóa học
+  /// - thumbnail: File ảnh thumbnail
+  /// - language: Ngôn ngữ khóa học
+  /// - tags: Tags của khóa học
+  /// - instructor_uid: ID của mentor (bắt buộc)
+  ///
+  /// Không trả về ID, chỉ cần thành công là đủ
+  Future<void> createCourse(Map<String, dynamic> data) async {
+    try {
+      emit(CourseLoading());
+      await _repo.createCourse(data);
+      await fetchAllCourses(); // Refresh danh sách khóa học sau khi tạo mới
+    } catch (e) {
+      emit(CourseError(e.toString()));
+      rethrow;
+    }
   }
 }
 

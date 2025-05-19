@@ -1,7 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lms/cubits/category/category_cubit.dart';
+import 'package:lms/cubits/courses/course_cubit.dart';
+import 'package:lms/models/category_model.dart';
+import 'package:lms/widgets/custom_snackbar.dart';
 
 class CourseFormScreen extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -26,37 +33,42 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
   String? _thumbnailUrl;
   String _selectedLevel = 'Cơ bản';
   final List<String> _levels = ['Cơ bản', 'Trung bình', 'Nâng cao'];
+  List<CourseCategory> _categories = [];
   int? _selectedCategoryId;
   String? _selectedCategoryName;
-  final List<Map<String, dynamic>> _categories = [
-    {'id': 1, 'name': 'Lập trình Web'},
-    {'id': 2, 'name': 'Lập trình Mobile'},
-    {'id': 3, 'name': 'Khoa học Dữ liệu'},
-  ];
 
   @override
   void initState() {
     super.initState();
     if (widget.initialData != null) {
       final d = widget.initialData!;
-      _titleController.text = d['title'] ?? '';
-      _descriptionController.text = d['description'] ?? '';
-      _selectedCategoryId = d['category_id'] ?? 2;
-      _selectedCategoryName =
-          d['category_name'] ??
-          _categories.firstWhere(
-            (c) => c['id'] == _selectedCategoryId,
-            orElse: () => _categories[0],
-          )['name'];
-      _selectedLevel = d['level'] ?? 'Cơ bản';
+      print('===== DEBUG: initialData =====');
+      d.forEach((k, v) => print('$k: $v ([33m${v.runtimeType}[0m)'));
+      print('==============================');
+      _titleController.text = d['title']?.toString() ?? '';
+      _descriptionController.text = d['description']?.toString() ?? '';
+      // Đảm bảo _selectedCategoryId luôn là int
+      _selectedCategoryId = null;
+      if (d['category_id'] != null) {
+        final dynamic raw = d['category_id'];
+        if (raw is int) {
+          _selectedCategoryId = raw;
+        } else if (raw is String) {
+          final parsed = int.tryParse(raw);
+          if (parsed != null) _selectedCategoryId = parsed;
+        } else {
+          final parsed = int.tryParse(raw.toString());
+          if (parsed != null) _selectedCategoryId = parsed;
+        }
+      }
+      _selectedCategoryName = d['category_name']?.toString();
+      _selectedLevel = d['level']?.toString() ?? 'Cơ bản';
       _priceController.text = d['price']?.toString() ?? '';
       _discountPriceController.text = d['discount_price']?.toString() ?? '';
-      _languageController.text = d['language'] ?? '';
-      _tagsController.text = d['tags'] ?? '';
-      _thumbnailUrl = d['thumbnail_url'] ?? d['thumbnail'];
-    } else {
-      _selectedCategoryId = _categories[0]['id'];
-      _selectedCategoryName = _categories[0]['name'];
+      _languageController.text = d['language']?.toString() ?? '';
+      _tagsController.text = d['tags']?.toString() ?? '';
+      _thumbnailUrl =
+          d['thumbnail_url']?.toString() ?? d['thumbnail']?.toString();
     }
   }
 
@@ -84,38 +96,129 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
     }
   }
 
-  void _submit() {
+  void _submit() async {
     if (_formKey.currentState?.validate() ?? false) {
-      // TODO: Gửi dữ liệu lên backend hoặc Bloc
-      final data = {
-        'title': _titleController.text.trim(),
-        'description': _descriptionController.text.trim(),
-        'category_id': _selectedCategoryId,
-        'category_name': _selectedCategoryName,
-        'level': _selectedLevel,
-        'price': int.tryParse(_priceController.text.trim()) ?? 0,
-        'discount_price':
-            int.tryParse(_discountPriceController.text.trim()) ?? 0,
-        'language': _languageController.text.trim(),
-        'tags': _tagsController.text.trim(),
-        'thumbnail_url':
-            _thumbnail != null
-                ? 'file://${_thumbnail!.path}' // Tạm thời, sẽ thay bằng URL thật sau khi upload
-                : (_thumbnailUrl ?? 'https://via.placeholder.com/400x200'),
-      };
+      try {
+        // Lấy UID của người dùng hiện tại
+        final currentUser = FirebaseAuth.instance.currentUser;
+        if (currentUser == null) {
+          throw Exception('Bạn cần đăng nhập để tạo khóa học');
+        }
 
-      // Thêm các trường khác nếu là chỉnh sửa để không bị mất dữ liệu
-      if (widget.isEdit && widget.initialData != null) {
-        // Giữ lại các trường không thay đổi từ dữ liệu ban đầu
-        data['enrollment_count'] = widget.initialData!['enrollment_count'] ?? 0;
-        data['lessons'] = widget.initialData!['lessons'] ?? 0;
-        data['rating'] = widget.initialData!['rating'] ?? 0.0;
-        data['status'] = widget.initialData!['status'] ?? true;
-        data['lessonsList'] = widget.initialData!['lessonsList'] ?? [];
-        data['quizList'] = widget.initialData!['quizList'] ?? [];
+        // Đảm bảo _selectedCategoryId là int
+        final int? categoryId =
+            _selectedCategoryId is int
+                ? _selectedCategoryId
+                : int.tryParse(_selectedCategoryId.toString());
+        if (categoryId == null) {
+          throw Exception('Danh mục không hợp lệ');
+        }
+
+        // DEBUG: Log chi tiết trước khi submit
+        print('===== DEBUG: Trước khi submit =====');
+        print(
+          'category_id: $_selectedCategoryId ([33m${_selectedCategoryId.runtimeType}[0m)',
+        );
+        print(
+          'price: [36m${_priceController.text}[0m ([33m${_priceController.text.runtimeType}[0m)',
+        );
+        print(
+          'discount_price: [36m${_discountPriceController.text}[0m ([33m${_discountPriceController.text.runtimeType}[0m)',
+        );
+        print(
+          'level: $_selectedLevel ([33m${_selectedLevel.runtimeType}[0m)',
+        );
+        print(
+          'language: ${_languageController.text} ([33m${_languageController.text.runtimeType}[0m)',
+        );
+        print(
+          'tags: ${_tagsController.text} ([33m${_tagsController.text.runtimeType}[0m)',
+        );
+        print(
+          'uid: ${currentUser.uid} ([33m${currentUser.uid.runtimeType}[0m)',
+        );
+        print('thumbnail: ${_thumbnail?.path}');
+        print('===================================');
+
+        // Chuẩn bị dữ liệu gửi lên API
+        final Map<String, dynamic> apiData = {
+          'title': _titleController.text.trim(),
+          'description': _descriptionController.text.trim(),
+          'category_id': categoryId, // Đảm bảo là int
+          'level': _selectedLevel,
+          'price': int.tryParse(_priceController.text.trim()) ?? 0,
+          'discount_price':
+              int.tryParse(_discountPriceController.text.trim()) ?? 0,
+          'language': _languageController.text.trim(),
+          'tags': _tagsController.text.trim(),
+          'uid': currentUser.uid,
+          'status': 'pending',
+        };
+
+        // Thêm thumbnail nếu có
+        if (_thumbnail != null) {
+          apiData['thumbnail'] = File(_thumbnail!.path);
+        }
+
+        // DEBUG: Log map gửi lên API
+        print('===== DEBUG: MAP gửi lên API =====');
+        apiData.forEach((k, v) => print('$k: $v ([33m${v.runtimeType}[0m)'));
+        print('==================================');
+
+        // DEBUG: In ra JSON gửi lên API
+        final logData = Map<String, dynamic>.from(apiData);
+        if (logData['thumbnail'] is File) {
+          logData['thumbnail'] = logData['thumbnail'].path;
+        }
+        print('===== DEBUG: COURSE CREATE JSON =====');
+        print(jsonEncode(logData));
+        print('======================================');
+
+        // Hiển thị loading dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder:
+              (context) => const Center(child: CircularProgressIndicator()),
+        );
+
+        if (widget.isEdit && widget.initialData != null) {
+          // TODO: Implement update course API
+          // Tạm thời giả lập thành công
+          Navigator.of(context).pop(); // Đóng dialog loading
+          CustomSnackBar.showSuccess(
+            context: context,
+            message: 'Đã cập nhật khóa học thành công',
+          );
+          Navigator.of(context).pop(true); // Trở về màn hình trước
+        } else {
+          // Tạo khóa học mới
+          await context.read<CourseCubit>().createCourse(apiData);
+
+          // Đóng dialog loading
+          Navigator.of(context).pop();
+
+          // Hiển thị thông báo thành công
+          CustomSnackBar.showSuccess(
+            context: context,
+            message: 'Đã tạo khóa học mới thành công!',
+          );
+
+          // Trở về màn hình trước
+          Navigator.of(context).pop(true);
+        }
+      } catch (e) {
+        // Đóng dialog loading nếu đang hiển thị
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+
+        // Hiển thị lỗi
+        CustomSnackBar.showError(
+          context: context,
+          message: 'Không thể lưu khóa học: ${e.toString()}',
+        );
       }
-
-      Navigator.of(context).pop(data);
     }
   }
 
@@ -217,37 +320,71 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
               ),
               const SizedBox(height: 16),
               // Dropdown danh mục
-              DropdownButtonFormField<int>(
-                value: _selectedCategoryId,
-                items:
-                    _categories
-                        .map(
-                          (cat) => DropdownMenuItem(
-                            value: cat['id'] as int,
-                            child: Text(cat['name'] as String),
-                          ),
-                        )
-                        .toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedCategoryId = value;
-                      _selectedCategoryName =
-                          _categories.firstWhere(
-                            (c) => c['id'] == value,
-                          )['name'];
-                    });
+              BlocBuilder<CategoryCubit, CategoryState>(
+                builder: (context, state) {
+                  if (state is CategoryLoading) {
+                    return const Center(child: CircularProgressIndicator());
                   }
+                  if (state is CategoryLoaded) {
+                    _categories = state.categories;
+                    // Nếu chưa có selected, set mặc định là phần tử đầu tiên
+                    if (_selectedCategoryId == null && _categories.isNotEmpty) {
+                      _selectedCategoryId = _categories[0].categoryId;
+                      _selectedCategoryName = _categories[0].name;
+                    } else if (_selectedCategoryId != null &&
+                        _categories.isNotEmpty) {
+                      // Đảm bảo _selectedCategoryId luôn là int
+                      final found = _categories.where(
+                        (c) => c.categoryId == _selectedCategoryId,
+                      );
+                      if (found.isEmpty) {
+                        _selectedCategoryId = _categories[0].categoryId;
+                        _selectedCategoryName = _categories[0].name;
+                      }
+                    }
+                    return DropdownButtonFormField<int>(
+                      value:
+                          _selectedCategoryId is int
+                              ? _selectedCategoryId
+                              : int.tryParse(_selectedCategoryId.toString()),
+                      items:
+                          _categories
+                              .map(
+                                (cat) => DropdownMenuItem(
+                                  value: cat.categoryId, // luôn là int
+                                  child: Text(cat.name),
+                                ),
+                              )
+                              .toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            _selectedCategoryId = value; // value là int
+                            // Đảm bảo truy cập đúng index
+                            final cat = _categories.firstWhere(
+                              (c) => c.categoryId == value,
+                              orElse: () => _categories[0],
+                            );
+                            _selectedCategoryName = cat.name;
+                            print(
+                              'DEBUG: Chọn danh mục: id=$value ([33m${value.runtimeType}[0m), name=${cat.name}',
+                            );
+                          });
+                        }
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Danh mục',
+                        prefixIcon: const Icon(Icons.category),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                      ),
+                      validator: (v) => v == null ? 'Chọn danh mục' : null,
+                    );
+                  }
+                  return const SizedBox();
                 },
-                decoration: InputDecoration(
-                  labelText: 'Danh mục',
-                  prefixIcon: const Icon(Icons.category),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                ),
-                validator: (v) => v == null ? 'Chọn danh mục' : null,
               ),
               const SizedBox(height: 16),
               // Dropdown trình độ

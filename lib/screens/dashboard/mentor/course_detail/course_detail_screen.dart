@@ -32,11 +32,10 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final course = widget.course;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chi tiết khóa học'),
+        title: Text(widget.course['title'] ?? 'Chi tiết khóa học'),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
@@ -57,9 +56,9 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          InfoTab(course: course),
-          LessonsTab(course: course),
-          QuizTab(course: course),
+          InfoTab(course: widget.course),
+          LessonsTab(course: widget.course),
+          QuizTab(course: widget.course),
         ],
       ),
     );

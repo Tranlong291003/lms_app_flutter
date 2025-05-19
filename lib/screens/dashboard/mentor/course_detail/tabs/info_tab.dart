@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lms/apps/config/api_config.dart';
 
 class InfoTab extends StatelessWidget {
   final Map<String, dynamic> course;
@@ -21,25 +22,41 @@ class InfoTab extends StatelessWidget {
         // ---------- ẢNH THUMBNAIL ----------
         AspectRatio(
           aspectRatio: 16 / 9,
-          child: CachedNetworkImage(
-            imageUrl: course['thumbnail_url'] ?? '',
-            fit: BoxFit.cover,
-            placeholder:
-                (_, __) => Container(
-                  decoration: BoxDecoration(
-                    color: colors.surfaceContainerHighest,
-                    borderRadius: radius12,
+          child:
+              course['thumbnail_url'] != null
+                  ? CachedNetworkImage(
+                    imageUrl:
+                        course['thumbnail_url']!.startsWith('http')
+                            ? course['thumbnail_url']!
+                            : '${ApiConfig.baseUrl}${course['thumbnail_url']}',
+                    fit: BoxFit.cover,
+                    placeholder:
+                        (_, __) => Container(
+                          decoration: BoxDecoration(
+                            color: colors.surfaceContainerHighest,
+                            borderRadius: radius12,
+                          ),
+                        ),
+                    errorWidget:
+                        (_, __, ___) => Container(
+                          decoration: BoxDecoration(
+                            color: colors.surfaceContainerHighest,
+                            borderRadius: radius12,
+                          ),
+                          child: const Icon(Icons.broken_image, size: 60),
+                        ),
+                  )
+                  : Container(
+                    decoration: BoxDecoration(
+                      color: colors.surfaceContainerHighest,
+                      borderRadius: radius12,
+                    ),
+                    child: Icon(
+                      Icons.image_outlined,
+                      size: 60,
+                      color: colors.primary.withOpacity(0.5),
+                    ),
                   ),
-                ),
-            errorWidget:
-                (_, __, ___) => Container(
-                  decoration: BoxDecoration(
-                    color: colors.surfaceContainerHighest,
-                    borderRadius: radius12,
-                  ),
-                  child: const Icon(Icons.broken_image, size: 60),
-                ),
-          ),
         ),
 
         // ---------- TIÊU ĐỀ + ĐÁNH GIÁ (CÙNG DÒNG) ----------

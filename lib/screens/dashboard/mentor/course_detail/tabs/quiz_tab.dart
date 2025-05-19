@@ -1,150 +1,240 @@
 import 'package:flutter/material.dart';
 
-import '../dialogs/question_list_dialog.dart';
-import '../dialogs/quiz_form_dialog.dart';
-
-class QuizTab extends StatefulWidget {
+class QuizTab extends StatelessWidget {
   final Map<String, dynamic> course;
-
   const QuizTab({super.key, required this.course});
-
-  @override
-  State<QuizTab> createState() => _QuizTabState();
-}
-
-class _QuizTabState extends State<QuizTab> {
-  late List<Map<String, dynamic>> quizzes;
-
-  @override
-  void initState() {
-    super.initState();
-    quizzes = List<Map<String, dynamic>>.from(widget.course['quizList'] ?? []);
-  }
-
-  void addQuiz() async {
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (ctx) => const QuizFormDialog(),
-    );
-    if (result != null) {
-      setState(() {
-        quizzes.add(result);
-        widget.course['quizList'] = quizzes;
-      });
-    }
-  }
-
-  void editQuiz(int index) async {
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (ctx) => QuizFormDialog(initialData: quizzes[index]),
-    );
-    if (result != null) {
-      setState(() {
-        quizzes[index] = result;
-        widget.course['quizList'] = quizzes;
-      });
-    }
-  }
-
-  void deleteQuiz(int index) async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text('Xác nhận xoá'),
-            content: const Text('Bạn có chắc chắn muốn xoá quiz này?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Huỷ'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('Xoá', style: TextStyle(color: Colors.red)),
-              ),
-            ],
-          ),
-    );
-    if (confirm == true) {
-      setState(() {
-        quizzes.removeAt(index);
-        widget.course['quizList'] = quizzes;
-      });
-    }
-  }
-
-  void showQuestions(int quizIndex) async {
-    await showDialog(
-      context: context,
-      builder: (ctx) => QuestionListDialog(quiz: quizzes[quizIndex]),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colors = theme.colorScheme;
+    final textTheme = theme.textTheme;
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            children: [
-              const Text(
-                'Danh sách Quiz',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+    // Lấy danh sách quiz từ khóa học, nếu không có thì sử dụng mảng rỗng
+    final quizList = course['quizList'] as List<dynamic>? ?? [];
+
+    if (quizList.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.quiz_outlined,
+              size: 56,
+              color: colors.onSurfaceVariant.withOpacity(0.3),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Chưa có bài kiểm tra nào',
+              style: textTheme.titleMedium?.copyWith(
+                color: colors.onSurfaceVariant,
               ),
-              const Spacer(),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.add),
-                label: const Text('Thêm Quiz'),
-                onPressed: addQuiz,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Các bài kiểm tra sẽ sớm được cập nhật',
+              style: textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant.withOpacity(0.7),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        Expanded(
-          child: ListView.separated(
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: quizList.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 16),
+      itemBuilder: (context, index) {
+        final quiz = quizList[index];
+        return _QuizCard(
+          title: quiz['title'] ?? 'Bài kiểm tra không tên',
+          type: quiz['type'] ?? 'Không xác định',
+          timeLimit: quiz['time_limit'] ?? 0,
+          passingScore: quiz['passing_score'] ?? 0,
+          questionCount: (quiz['questions'] as List<dynamic>?)?.length ?? 0,
+        );
+      },
+    );
+  }
+}
+
+class _QuizCard extends StatelessWidget {
+  final String title;
+  final String type;
+  final int timeLimit;
+  final int passingScore;
+  final int questionCount;
+
+  const _QuizCard({
+    required this.title,
+    required this.type,
+    required this.timeLimit,
+    required this.passingScore,
+    required this.questionCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title section with quiz type badge
+          Container(
             padding: const EdgeInsets.all(16),
-            itemCount: quizzes.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final quiz = quizzes[index];
-              return Card(
-                child: ListTile(
-                  leading: Icon(Icons.quiz, color: theme.colorScheme.primary),
-                  title: Text(quiz['title'] ?? 'Quiz'),
-                  subtitle: Text(quiz['type'] ?? ''),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
+            decoration: BoxDecoration(
+              color: colors.primaryContainer.withOpacity(0.6),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.question_answer),
-                        tooltip: 'Xem câu hỏi',
-                        onPressed: () => showQuestions(index),
+                      Text(
+                        title,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        tooltip: 'Sửa quiz',
-                        onPressed: () => editQuiz(index),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        color: theme.colorScheme.error,
-                        tooltip: 'Xóa quiz',
-                        onPressed: () => deleteQuiz(index),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$questionCount câu hỏi · Điểm đạt: $passingScore%',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colors.onSurface.withOpacity(0.7),
+                        ),
                       ),
                     ],
                   ),
-                  onTap: () {},
                 ),
-              );
-            },
+                // Quiz type badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colors.primary,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    type,
+                    style: textTheme.labelSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+
+          // Divider
+          Divider(height: 1, color: colors.outlineVariant.withOpacity(0.2)),
+
+          // Quiz info
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                _QuizInfoItem(
+                  icon: Icons.timer,
+                  label: 'Thời gian',
+                  value: '$timeLimit phút',
+                  color: colors.primary,
+                ),
+                const SizedBox(width: 16),
+                _QuizInfoItem(
+                  icon: Icons.help_outline,
+                  label: 'Số câu hỏi',
+                  value: '$questionCount câu',
+                  color: colors.secondary,
+                ),
+                const SizedBox(width: 16),
+                _QuizInfoItem(
+                  icon: Icons.check_circle_outline,
+                  label: 'Điểm đạt',
+                  value: '$passingScore%',
+                  color: Colors.green,
+                ),
+              ],
+            ),
+          ),
+
+          // Action button
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton.tonal(
+                onPressed: () {},
+                child: const Text('Xem chi tiết'),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuizInfoItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _QuizInfoItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    return Expanded(
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.7),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
     );
   }
 }
