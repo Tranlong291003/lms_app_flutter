@@ -209,17 +209,19 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                                 Row(
                                   children: [
                                     Text(
-                                      "${priceFmt.format(actualPrice)} VND",
+                                      c.displayPrice,
                                       style: theme.textTheme.bodyLarge
                                           ?.copyWith(
                                             fontWeight: FontWeight.bold,
                                             color: theme.colorScheme.primary,
                                           ),
                                     ),
-                                    if (c.discountPrice > 0) ...[
+                                    if (c.discountPrice > 0 && c.price > 0) ...[
                                       const SizedBox(width: 8),
                                       Text(
-                                        "${priceFmt.format(c.price)} VND",
+                                        c.price == 0
+                                            ? ''
+                                            : '${c.price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} VND',
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
                                               color: theme.colorScheme.onSurface

@@ -29,7 +29,7 @@ class ListCoursescreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
               BlocBuilder<CourseCubit, CourseState>(

@@ -163,24 +163,39 @@ class Course {
   });
 
   factory Course.fromJson(Map<String, dynamic> json) {
+    int parseInt(dynamic value, [int defaultValue = 0]) {
+      if (value == null) return defaultValue;
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value) ?? defaultValue;
+      return defaultValue;
+    }
+
+    double parseDouble(dynamic value, [double defaultValue = 0.0]) {
+      if (value == null) return defaultValue;
+      if (value is double) return value;
+      if (value is int) return value.toDouble();
+      if (value is String) return double.tryParse(value) ?? defaultValue;
+      return defaultValue;
+    }
+
     return Course(
-      courseId: json['course_id'] as int,
+      courseId: parseInt(json['course_id']),
       title: json['title'] as String,
       description: json['description'] as String? ?? '',
       instructorUid: json['instructor_uid'] as String,
-      categoryId: json['category_id'] as int,
-      price: json['price'] as int,
+      categoryId: parseInt(json['category_id']),
+      price: parseInt(json['price']),
       level: json['level'] as String,
-      discountPrice: json['discount_price'] as int,
+      discountPrice: parseInt(json['discount_price']),
       thumbnailUrl: json['thumbnail_url'] as String?,
       status: json['status'] as String,
       updatedAt: DateTime.parse(json['updated_at'] as String),
       instructorName: json['instructor_name'] as String,
       instructorAvatar: json['instructor_avatar'] as String?,
       categoryName: json['category_name'] as String,
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
-      enrollCount: json['enroll_count'] as int? ?? 0,
-      lessonCount: json['lesson_count'] as int? ?? 0,
+      rating: parseDouble(json['rating']),
+      enrollCount: parseInt(json['enroll_count']),
+      lessonCount: parseInt(json['lesson_count']),
       totalDuration: json['total_duration'] as String? ?? '00:00:00',
       isBookmarked: json['is_bookmarked'] as bool? ?? false,
       rejectionReason: json['rejection_reason'] as String?,
@@ -235,4 +250,13 @@ class Course {
       rejectionReason: rejectionReason,
     );
   }
+
+  // Getter kiểm tra miễn phí
+  bool get isFree => price == 0;
+
+  // Hàm hiển thị giá
+  String get displayPrice =>
+      isFree
+          ? 'Miễn phí'
+          : '${price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} đ';
 }

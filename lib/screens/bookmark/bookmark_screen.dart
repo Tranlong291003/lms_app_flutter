@@ -336,14 +336,36 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                             const SizedBox(height: 6),
 
                             // Price
-                            Text(
-                              "${priceFmt.format(actualPrice)} VND",
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  course.displayPrice,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                                if (course.discountPrice > 0 &&
+                                    course.price > 0) ...[
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    course.price == 0
+                                        ? ''
+                                        : '${course.price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} VND',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface.withOpacity(0.6),
+                                      decoration: TextDecoration.lineThrough,
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                             const SizedBox(height: 6),
 
