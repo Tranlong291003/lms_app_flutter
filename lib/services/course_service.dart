@@ -389,6 +389,64 @@ class CourseService extends BaseService {
       throw Exception('Tạo khóa học thất bại: $e');
     }
   }
+
+  Future<void> updateCourse(int courseId, Map<String, dynamic> data) async {
+    try {
+      final formData = FormData.fromMap(data);
+      if (data['thumbnail'] != null && data['thumbnail'] is File) {
+        final file = data['thumbnail'] as File;
+        final fileName = file.path.split('/').last;
+        formData.files.add(
+          MapEntry(
+            'thumbnail',
+            await MultipartFile.fromFile(file.path, filename: fileName),
+          ),
+        );
+      }
+      final response = await put(
+        '${ApiConfig.baseUrl}/api/courses/update/$courseId',
+        data: formData,
+        options: Options(contentType: 'multipart/form-data'),
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(
+          response.data?['message'] ?? 'Cập nhật khóa học thất bại',
+        );
+      }
+    } catch (e) {
+      throw Exception('Cập nhật khóa học thất bại: $e');
+    }
+  }
+
+  /// Xóa khóa học theo ID
+  ///
+  /// [courseId] - ID của khóa học cần xóa
+  /// [instructorUid] - ID của giảng viên sở hữu khóa học
+  ///
+  /// Trả về true nếu xóa thành công, ngược lại throw Exception
+  Future<bool> deleteCourse({
+    required int courseId,
+    required String instructorUid,
+  }) async {
+    try {
+      final response = await delete(
+        '${ApiConfig.baseUrl}/api/courses/delete/$courseId',
+        data: {'uid': instructorUid},
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      }
+      throw Exception('Không thể xóa khóa học: ${response.statusMessage}');
+    } catch (e) {
+      if (e is DioException) {
+        throw Exception(
+          'Lỗi khi xóa khóa học: ${e.response?.data?['message'] ?? e.message}',
+        );
+      }
+      throw Exception('Lỗi khi xóa khóa học: $e');
+    }
+  }
 }
 
 /// Extension to add convenience methods to CourseListResponse

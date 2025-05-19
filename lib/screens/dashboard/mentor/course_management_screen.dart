@@ -152,14 +152,25 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
   }
 
   Future<void> _editCourse(Course course) async {
+    final initialData = {
+      'id': course.courseId,
+      'title': course.title,
+      'description': course.description,
+      'category_id': course.categoryId,
+      'price': course.price,
+      'discount_price': course.discountPrice,
+      'level': course.level,
+      'thumbnail':
+          course.thumbnailUrl != null
+              ? '${ApiConfig.baseUrl}${course.thumbnailUrl}'
+              : null,
+      'instructor_uid': course.instructorUid,
+    };
     final result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
         builder:
-            (_) => CourseFormScreen(
-              isEdit: true,
-              initialData: {'id': course.courseId},
-            ),
+            (_) => CourseFormScreen(isEdit: true, initialData: initialData),
       ),
     );
     if (result == true) {
@@ -188,11 +199,34 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
     );
 
     if (ok ?? false) {
-      // TODO: Implement delete course API call
-      CustomSnackBar.showInfo(
-        context: context,
-        message: 'Chức năng xóa khóa học đang được phát triển',
-      );
+      try {
+        // Lấy uid của mentor hiện tại
+        final currentUser = FirebaseAuth.instance.currentUser;
+        if (currentUser == null) {
+          throw Exception('Bạn cần đăng nhập để thực hiện chức năng này');
+        }
+
+        // Gọi API xóa khóa học
+        await context.read<CourseCubit>().deleteCourse(
+          courseId: course.courseId,
+          instructorUid: currentUser.uid,
+        );
+
+        // Hiển thị thông báo thành công
+        CustomSnackBar.showSuccess(
+          context: context,
+          message: 'Đã xóa khóa học thành công',
+        );
+
+        // Refresh danh sách khóa học
+        _fetchCourses();
+      } catch (e) {
+        // Hiển thị thông báo lỗi
+        CustomSnackBar.showError(
+          context: context,
+          message: 'Không thể xóa khóa học: $e',
+        );
+      }
     }
   }
 

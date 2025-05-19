@@ -224,4 +224,29 @@ class CourseRepository extends BaseRepository<CourseService> {
 ''');
     print('=======================================\n');
   }
+
+  Future<void> updateCourse(int courseId, Map<String, dynamic> data) async {
+    await service.updateCourse(courseId, data);
+  }
+
+  /// Xóa khóa học theo ID
+  ///
+  /// [courseId] - ID của khóa học cần xóa
+  /// [instructorUid] - ID của giảng viên sở hữu khóa học
+  ///
+  /// Trả về true nếu xóa thành công, ngược lại throw Exception
+  Future<bool> deleteCourse({
+    required int courseId,
+    required String instructorUid,
+  }) async {
+    try {
+      return await service.deleteCourse(
+        courseId: courseId,
+        instructorUid: instructorUid,
+      );
+    } catch (e) {
+      print('[CourseRepository] Lỗi khi xóa khóa học: $e');
+      rethrow;
+    }
+  }
 }

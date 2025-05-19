@@ -183,8 +183,10 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
         );
 
         if (widget.isEdit && widget.initialData != null) {
-          // TODO: Implement update course API
-          // Tạm thời giả lập thành công
+          final courseId =
+              widget.initialData!['id'] ?? widget.initialData!['course_id'];
+          await context.read<CourseCubit>().updateCourse(courseId, apiData);
+
           Navigator.of(context).pop(); // Đóng dialog loading
           CustomSnackBar.showSuccess(
             context: context,

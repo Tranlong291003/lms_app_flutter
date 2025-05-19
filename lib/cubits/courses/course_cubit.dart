@@ -266,6 +266,68 @@ class CourseCubit extends Cubit<CourseState> {
       rethrow;
     }
   }
+
+  Future<void> updateCourse(int courseId, Map<String, dynamic> data) async {
+    try {
+      emit(CourseLoading());
+      await _repo.updateCourse(courseId, data);
+      await fetchAllCourses();
+    } catch (e) {
+      emit(CourseError(e.toString()));
+      rethrow;
+    }
+  }
+
+  /// Xóa khóa học theo ID
+  ///
+  /// [courseId] - ID của khóa học cần xóa
+  /// [instructorUid] - ID của giảng viên sở hữu khóa học
+  ///
+  /// Nếu xóa thành công, cập nhật state bằng cách loại bỏ khóa học đã xóa
+  Future<void> deleteCourse({
+    required int courseId,
+    required String instructorUid,
+  }) async {
+    try {
+      emit(CourseLoading());
+      await _repo.deleteCourse(
+        courseId: courseId,
+        instructorUid: instructorUid,
+      );
+
+      // Cập nhật state bằng cách loại bỏ khóa học đã xóa
+      if (state is CourseLoaded) {
+        final loaded = state as CourseLoaded;
+        final updatedCourses =
+            loaded.courses.where((c) => c.courseId != courseId).toList();
+        final updatedRandomCourses =
+            loaded.randomCourses.where((c) => c.courseId != courseId).toList();
+        final updatedApprovedCourses =
+            loaded.approvedCourses
+                .where((c) => c.courseId != courseId)
+                .toList();
+        final updatedPendingCourses =
+            loaded.pendingCourses.where((c) => c.courseId != courseId).toList();
+        final updatedRejectedCourses =
+            loaded.rejectedCourses
+                .where((c) => c.courseId != courseId)
+                .toList();
+
+        emit(
+          CourseLoaded(
+            updatedCourses,
+            updatedRandomCourses,
+            approvedCourses: updatedApprovedCourses,
+            pendingCourses: updatedPendingCourses,
+            rejectedCourses: updatedRejectedCourses,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(CourseError(e.toString()));
+      rethrow;
+    }
+  }
 }
 
 /// Quản lý trạng thái và thao tác với thông tin chi tiết khóa học
