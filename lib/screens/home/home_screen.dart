@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     super.initState();
     _loadMentor();
     _loadCurrentUser();
-    context.read<CourseCubit>().loadCourses(status: 'approved');
+    _loadCourses();
     context.read<CategoryCubit>().fetchAllCategory();
   }
 
@@ -44,6 +44,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     if (uid != null) {
       context.read<UserBloc>().add(GetUserByUidEvent(uid));
     }
+  }
+
+  void _loadCourses() {
+    context.read<CourseCubit>().loadCourses(status: 'approved');
   }
 
   @override
@@ -59,6 +63,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   }
 
   @override
+  void didPopNext() {
+    // Khi quay lại từ trang khác, reload lại courses
+    _loadCourses();
+    super.didPopNext();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
@@ -67,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       appBar: AppBarHome(context, 'title'),
       body: RefreshIndicator(
         onRefresh: () async {
-          context.read<CourseCubit>().loadCourses(status: 'approved');
+          _loadCourses();
           context.read<MentorsBloc>().add(RefreshMentorsEvent());
           context.read<UserBloc>().add(RefreshUserEvent());
           context.read<CategoryCubit>().refreshCategories();
@@ -157,9 +168,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                           context
                                               .read<CategoryCubit>()
                                               .selectCategory(null);
-                                          context
-                                              .read<CourseCubit>()
-                                              .loadCourses(status: 'approved');
+                                          _loadCourses();
                                         },
                                         child: const Text('Làm mới'),
                                       ),
@@ -201,9 +210,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                     const SizedBox(height: 8),
                                     TextButton(
                                       onPressed: () {
-                                        context.read<CourseCubit>().loadCourses(
-                                          status: 'approved',
-                                        );
+                                        _loadCourses();
                                       },
                                       child: const Text('Thử lại'),
                                     ),
