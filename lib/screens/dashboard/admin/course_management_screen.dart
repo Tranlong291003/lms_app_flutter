@@ -46,120 +46,121 @@ class _CourseManagementAdminScreenState
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Quản lý khóa học - Admin'),
-
-        bottom: TabBar(
-          dividerColor: Colors.transparent,
-          controller: _tabController,
-          indicatorColor: isDark ? colorScheme.primary : colorScheme.onPrimary,
-          indicatorWeight: 3,
-          labelColor: isDark ? colorScheme.primary : colorScheme.onPrimary,
-          unselectedLabelColor:
-              isDark
-                  ? colorScheme.onSurface.withOpacity(0.7)
-                  : colorScheme.onPrimary.withOpacity(0.7),
-          labelStyle: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Quản lý khóa học - Admin'),
+          bottom: TabBar(
+            dividerColor: Colors.transparent,
+            labelColor: colorScheme.primary,
+            unselectedLabelColor: colorScheme.onSurface.withOpacity(0.7),
+            labelStyle: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+            unselectedLabelStyle: theme.textTheme.titleMedium,
+            indicator: UnderlineTabIndicator(
+              borderSide: BorderSide(width: 3, color: colorScheme.primary),
+              insets: EdgeInsets.zero,
+            ),
+            indicatorWeight: 3,
+            indicatorSize: TabBarIndicatorSize.label,
+            tabs: const [
+              Tab(text: 'Đã duyệt'),
+              Tab(text: 'Chờ duyệt'),
+              Tab(text: 'Đã từ chối'),
+            ],
           ),
-          tabs: const [
-            Tab(text: 'Đã duyệt'),
-            Tab(text: 'Chờ duyệt'),
-            Tab(text: 'Đã từ chối'),
-          ],
         ),
-      ),
-      body: Column(
-        children: [
-          const SizedBox(height: 16),
-          SearchBarWidget(
-            controller: _searchController,
-            hintText: 'Tìm kiếm khóa học...',
-            onFilter: () {
-              _showFilterDialog(context);
-            },
-            onChanged: (value) {
-              context.read<CourseCubit>().searchCourses(value);
-            },
-          ),
-          Expanded(
-            child: BlocBuilder<CourseCubit, CourseState>(
-              builder: (context, state) {
-                if (state is CourseLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (state is CourseError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 48,
-                          color: colorScheme.error,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          state.message,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: colorScheme.error,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        FilledButton.icon(
-                          onPressed: () {
-                            context.read<CourseCubit>().fetchAllCourses();
-                          },
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Thử lại'),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                if (state is CourseLoaded) {
-                  return TabBarView(
-                    controller: _tabController,
-                    children: [
-                      // Tab 1: Khóa học đã duyệt
-                      _buildCourseList(
-                        isApproved: true,
-                        courses:
-                            state.courses
-                                .where((c) => c.status == 'approved')
-                                .toList(),
-                      ),
-
-                      // Tab 2: Khóa học chờ duyệt
-                      _buildCourseList(
-                        isApproved: false,
-                        courses:
-                            state.courses
-                                .where((c) => c.status == 'pending')
-                                .toList(),
-                      ),
-
-                      // Tab 3: Khóa học đã từ chối
-                      _buildCourseList(
-                        isApproved: false,
-                        isRejected: true,
-                        courses:
-                            state.courses
-                                .where((c) => c.status == 'rejected')
-                                .toList(),
-                      ),
-                    ],
-                  );
-                }
-
-                return const Center(child: Text('Không có dữ liệu'));
+        body: Column(
+          children: [
+            const SizedBox(height: 16),
+            SearchBarWidget(
+              controller: _searchController,
+              hintText: 'Tìm kiếm khóa học...',
+              onFilter: () {
+                _showFilterDialog(context);
+              },
+              onChanged: (value) {
+                context.read<CourseCubit>().searchCourses(value);
               },
             ),
-          ),
-        ],
+            Expanded(
+              child: BlocBuilder<CourseCubit, CourseState>(
+                builder: (context, state) {
+                  if (state is CourseLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (state is CourseError) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            size: 48,
+                            color: colorScheme.error,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            state.message,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: colorScheme.error,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          FilledButton.icon(
+                            onPressed: () {
+                              context.read<CourseCubit>().fetchAllCourses();
+                            },
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Thử lại'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (state is CourseLoaded) {
+                    return TabBarView(
+                      children: [
+                        // Tab 1: Khóa học đã duyệt
+                        _buildCourseList(
+                          isApproved: true,
+                          courses:
+                              state.courses
+                                  .where((c) => c.status == 'approved')
+                                  .toList(),
+                        ),
+                        // Tab 2: Khóa học chờ duyệt
+                        _buildCourseList(
+                          isApproved: false,
+                          courses:
+                              state.courses
+                                  .where((c) => c.status == 'pending')
+                                  .toList(),
+                        ),
+                        // Tab 3: Khóa học đã từ chối
+                        _buildCourseList(
+                          isApproved: false,
+                          isRejected: true,
+                          courses:
+                              state.courses
+                                  .where((c) => c.status == 'rejected')
+                                  .toList(),
+                        ),
+                      ],
+                    );
+                  }
+
+                  return const Center(child: Text('Không có dữ liệu'));
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

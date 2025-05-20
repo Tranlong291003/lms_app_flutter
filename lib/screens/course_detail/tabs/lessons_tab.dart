@@ -78,6 +78,7 @@ class _LessonsList extends StatelessWidget {
 
     final user = FirebaseAuth.instance.currentUser;
     final userUid = user?.uid ?? '';
+    final theme = Theme.of(context);
 
     return FutureBuilder<bool>(
       future: CourseService().checkEnrollment(
@@ -86,7 +87,6 @@ class _LessonsList extends StatelessWidget {
       ),
       builder: (context, snapshot) {
         final isEnrolled = snapshot.data == true;
-        final theme = Theme.of(context);
 
         return ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -94,41 +94,50 @@ class _LessonsList extends StatelessWidget {
           itemBuilder: (context, index) {
             final lesson = lessons[index];
 
-            bool isFirst = index == 0;
-            bool isLocked = !isEnrolled && !isFirst;
-
-            IconData iconData;
-            Color iconColor;
-            Widget? trailingIcon;
+            // Khai báo biến trước khi sử dụng
+            bool isLocked = false;
             bool canTap = false;
+            IconData iconData = Icons.lock_open;
+            Color iconColor = theme.colorScheme.primary;
+            Widget? trailingIcon;
 
-            if (!isEnrolled) {
-              // CHƯA đăng ký: chỉ cho xem bài đầu tiên
-              if (isFirst) {
-                iconData = Icons.lock_open;
-                iconColor = theme.colorScheme.primary;
-                trailingIcon = Icon(
-                  Icons.play_circle_fill,
-                  color: theme.colorScheme.primary,
-                  size: 32,
-                );
-                canTap = true;
-              } else {
-                iconData = Icons.lock_outline;
-                iconColor = theme.colorScheme.onSurface.withOpacity(0.5);
-                trailingIcon = null;
-                canTap = false;
-              }
-            } else {
-              // ĐÃ đăng ký: cho xem tất cả bài học
-              iconData = Icons.play_circle_outline;
+            // Xác định trạng thái bài học
+            bool prevCompleted =
+                index == 0 ? true : lessons[index - 1].isCompleted;
+            bool isCurrentCompleted = lesson.isCompleted;
+            if (isCurrentCompleted) {
+              // Đã học xong
+              isLocked = false;
+              canTap = true;
+              iconData = Icons.check_circle;
+              iconColor = Colors.green;
+              trailingIcon = Icon(
+                Icons.check_circle,
+                color: Colors.green,
+                size: 28,
+              );
+            } else if (index == 0 || prevCompleted) {
+              // Được phép học (bài 1 hoặc bài trước đã hoàn thành)
+              isLocked = false;
+              canTap = true;
+              iconData = Icons.lock_open;
               iconColor = theme.colorScheme.primary;
               trailingIcon = Icon(
                 Icons.play_circle_fill,
                 color: theme.colorScheme.primary,
                 size: 32,
               );
-              canTap = true;
+            } else {
+              // Chưa được phép học
+              isLocked = true;
+              canTap = false;
+              iconData = Icons.lock_outline;
+              iconColor = theme.colorScheme.onSurface.withOpacity(0.5);
+              trailingIcon = Icon(
+                Icons.lock,
+                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                size: 28,
+              );
             }
 
             return Opacity(
@@ -139,14 +148,39 @@ class _LessonsList extends StatelessWidget {
                 child: InkWell(
                   onTap:
                       canTap
-                          ? () {
-                            Navigator.pushNamed(
+                          ? () async {
+                            await Navigator.pushNamed(
                               context,
                               AppRouter.lessonDetail,
                               arguments: lesson.lessonId,
                             );
+                            // Sau khi quay lại, refresh lại danh sách bài học
+                            final user = FirebaseAuth.instance.currentUser;
+                            final userUid = user?.uid ?? '';
+                            context.read<LessonsCubit>().loadLessons(
+                              courseId: courseId,
+                              userUid: userUid,
+                            );
                           }
-                          : null,
+                          : () {
+                            if (!isEnrolled) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Bạn cần đăng ký khoá học để học tiếp các bài sau!',
+                                  ),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Hãy hoàn thành bài trước để mở khoá bài này!',
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                   child: Padding(
                     padding: const EdgeInsets.all(12),
                     child: Row(
@@ -169,7 +203,7 @@ class _LessonsList extends StatelessWidget {
                             ],
                           ),
                         ),
-                        if (trailingIcon != null) trailingIcon,
+                        trailingIcon,
                       ],
                     ),
                   ),

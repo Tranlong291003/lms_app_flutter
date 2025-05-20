@@ -12,6 +12,7 @@ class Lesson {
   final String creatorUid;
   final String? videoId;
   final String? videoDuration;
+  final bool isCompleted;
 
   Lesson({
     required this.lessonId,
@@ -27,6 +28,7 @@ class Lesson {
     required this.creatorUid,
     this.videoId,
     this.videoDuration,
+    this.isCompleted = false,
   });
 
   factory Lesson.fromJson(Map<String, dynamic> json) => Lesson(
@@ -58,6 +60,7 @@ class Lesson {
     creatorUid: json['creator_uid']?.toString() ?? '',
     videoId: json['video_id']?.toString(),
     videoDuration: json['video_duration']?.toString(),
+    isCompleted: json['is_completed'] == 1,
   );
 
   Map<String, dynamic> toJson() => {
@@ -74,10 +77,11 @@ class Lesson {
     'creator_uid': creatorUid,
     'video_id': videoId,
     'video_duration': videoDuration,
+    'is_completed': isCompleted ? 1 : 0,
   };
 
   @override
   String toString() {
-    return 'Lesson(lessonId: $lessonId, title: $title, videoUrl: $videoUrl, content: $content, order: $order,  pdfUrl: $pdfUrl, slideUrl: $slideUrl)';
+    return 'Lesson(lessonId: $lessonId, title: $title, videoUrl: $videoUrl, content: $content, order: $order, pdfUrl: $pdfUrl, slideUrl: $slideUrl, isCompleted: $isCompleted)';
   }
 }
