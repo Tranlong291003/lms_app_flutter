@@ -1,4 +1,5 @@
 import 'package:lms/models/quiz/quiz_course_model.dart';
+import 'package:lms/models/quiz/quiz_model.dart';
 import 'package:lms/models/quiz/quiz_result_model.dart';
 import 'package:lms/repositories/base_repository.dart';
 import 'package:lms/services/quiz_service.dart';
@@ -51,5 +52,21 @@ class QuizRepository extends BaseRepository<QuizService> {
     final results = await service.getUserQuizResults(userUid);
     print('QuizRepository: Đã lấy được ${results.length} kết quả');
     return results;
+  }
+
+  Future<List<QuizModel>> getQuizzesByCourseId(int courseId) async {
+    return await service.getQuizzesByCourseId(courseId);
+  }
+
+  Future<bool> createQuiz(Map<String, dynamic> data) async {
+    return await service.createQuiz(data);
+  }
+
+  Future<bool> updateQuiz(int quizId, Map<String, dynamic> data) async {
+    return await service.updateQuiz(quizId, data);
+  }
+
+  Future<bool> deleteQuiz(int quizId, Map<String, dynamic> data) async {
+    return await service.deleteQuiz(quizId, data);
   }
 }

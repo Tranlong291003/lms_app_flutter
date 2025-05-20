@@ -18,11 +18,13 @@ import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/cubits/lessons/lesson_detail_cubit.dart';
 import 'package:lms/cubits/lessons/lessons_cubit.dart';
 import 'package:lms/cubits/notification/notification_cubit.dart';
+import 'package:lms/cubits/question/question_cubit.dart';
 import 'package:lms/repositories/admin_user_repository.dart';
 import 'package:lms/repositories/category_repository.dart';
 import 'package:lms/repositories/course_repository.dart';
 import 'package:lms/repositories/lesson_repository.dart';
 import 'package:lms/repositories/mentor_repository.dart';
+import 'package:lms/repositories/question_repository.dart';
 import 'package:lms/repositories/user_repository.dart';
 import 'package:lms/screens/Introduction/cubit/intro_cubit.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
@@ -33,6 +35,7 @@ import 'package:lms/services/course_service.dart';
 import 'package:lms/services/lesson_service.dart';
 import 'package:lms/services/mentor_service.dart';
 import 'package:lms/services/notification_service.dart';
+import 'package:lms/services/question_service.dart';
 import 'package:lms/services/user_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -66,6 +69,7 @@ Future<void> main() async {
   final courseService = CourseService();
   final notificationService = NotificationService();
   final adminUserService = AdminUserService();
+  final questionService = QuestionService();
 
   // 2. Tạo Repositories
   final userRepository = UserRepository(userService);
@@ -73,6 +77,7 @@ Future<void> main() async {
   final categoryRepository = CategoryRepository(categoryService);
   final courseRepository = CourseRepository(courseService);
   final adminUserRepository = AdminUserRepository(adminUserService);
+  final questionRepository = QuestionRepository(questionService);
 
   // 3. Các Cubit/Bloc không phụ thuộc vào BuildContext
   final themeBloc = ThemeBloc()..add(ThemeStarted());
@@ -127,6 +132,9 @@ Future<void> main() async {
           BlocProvider<CourseCubit>(create: (_) => courseCubit),
           BlocProvider<LessonDetailCubit>(create: (_) => LessonDetailCubit()),
           BlocProvider<AdminUserCubit>(create: (_) => adminUserCubit),
+          BlocProvider<QuestionCubit>(
+            create: (_) => QuestionCubit(questionRepository),
+          ),
         ],
         child: MyApp(notificationService: notificationService),
       ),

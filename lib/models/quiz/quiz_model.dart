@@ -42,6 +42,8 @@ class QuizModel {
   final DateTime? updatedAt;
   final int? attemptsUsed;
   final List<QuestionModel>? questions;
+  final int totalQuestions;
+  final double averageScore;
 
   const QuizModel({
     required this.quizId,
@@ -55,9 +57,29 @@ class QuizModel {
     this.updatedAt,
     this.attemptsUsed,
     this.questions,
+    this.totalQuestions = 0,
+    this.averageScore = 0.0,
   });
 
   factory QuizModel.fromJson(Map<String, dynamic> json) {
+    int totalQuestions = 0;
+    double averageScore = 0.0;
+    // Xử lý an toàn cho total_questions
+    if (json['total_questions'] is int) {
+      totalQuestions = json['total_questions'] as int;
+    } else if (json['total_questions'] is String) {
+      totalQuestions = int.tryParse(json['total_questions']) ?? 0;
+    }
+    // Xử lý an toàn cho average_score
+    if (json['average_score'] is int) {
+      averageScore = (json['average_score'] as int).toDouble();
+    } else if (json['average_score'] is double) {
+      averageScore = json['average_score'] as double;
+    } else if (json['average_score'] is String) {
+      averageScore = double.tryParse(json['average_score']) ?? 0.0;
+    } else if (json['average_score'] is num) {
+      averageScore = (json['average_score'] as num).toDouble();
+    }
     return QuizModel(
       quizId: json['quiz_id'] as int,
       title: json['title'] as String,
@@ -78,6 +100,8 @@ class QuizModel {
                   .map((q) => QuestionModel.fromJson(q))
                   .toList()
               : null,
+      totalQuestions: totalQuestions,
+      averageScore: averageScore,
     );
   }
 
@@ -94,6 +118,8 @@ class QuizModel {
       'updated_at': updatedAt?.toIso8601String(),
       'attempts_used': attemptsUsed,
       'questions': questions?.map((q) => q.toJson()).toList(),
+      'total_questions': totalQuestions,
+      'average_score': averageScore,
     };
   }
 

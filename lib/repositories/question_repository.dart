@@ -85,4 +85,34 @@ class QuestionRepository extends BaseRepository<QuestionService> {
       rethrow;
     }
   }
+
+  Future<bool> updateQuestion(int questionId, Map<String, dynamic> data) async {
+    return await service.updateQuestion(questionId, data);
+  }
+
+  Future<bool> deleteQuestion(int questionId, Map<String, dynamic> data) async {
+    return await service.deleteQuestion(questionId, data);
+  }
+
+  /// Tạo câu hỏi bằng tay
+  Future<bool> createQuestionManual(Map<String, dynamic> data) async {
+    try {
+      print('QuestionRepository: Đang tạo câu hỏi bằng tay');
+      return await service.createQuestionManual(data);
+    } catch (e) {
+      print('QuestionRepository: Lỗi khi tạo câu hỏi bằng tay: $e');
+      return false;
+    }
+  }
+
+  /// Tạo câu hỏi bằng AI
+  Future<bool> createQuestionAI(Map<String, dynamic> data) async {
+    try {
+      print('QuestionRepository: Đang tạo câu hỏi bằng AI');
+      return await service.createQuestionAI(data);
+    } catch (e) {
+      print('QuestionRepository: Lỗi khi tạo câu hỏi bằng AI: $e');
+      return false;
+    }
+  }
 }

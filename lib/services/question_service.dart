@@ -143,4 +143,58 @@ class QuestionService extends BaseService {
       return {'success': false, 'message': 'Lỗi khi lấy kết quả: $e'};
     }
   }
+
+  Future<bool> updateQuestion(int questionId, Map<String, dynamic> data) async {
+    try {
+      final response = await put(
+        '${ApiConfig.baseUrl}/api/questions/update/$questionId',
+        data: data,
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      print('QuestionService: Lỗi khi cập nhật câu hỏi: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteQuestion(int questionId, Map<String, dynamic> data) async {
+    try {
+      final response = await delete(
+        '${ApiConfig.baseUrl}/api/questions/delete/$questionId',
+        data: data,
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      print('QuestionService: Lỗi khi xoá câu hỏi: $e');
+      return false;
+    }
+  }
+
+  /// Tạo câu hỏi bằng tay
+  Future<bool> createQuestionManual(Map<String, dynamic> data) async {
+    try {
+      final response = await post(
+        '${ApiConfig.baseUrl}/api/questions/createbyuser',
+        data: data,
+      );
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      print('QuestionService: Lỗi khi tạo câu hỏi bằng tay: $e');
+      return false;
+    }
+  }
+
+  /// Tạo câu hỏi bằng AI
+  Future<bool> createQuestionAI(Map<String, dynamic> data) async {
+    try {
+      final response = await post(
+        '${ApiConfig.baseUrl}/api/questions/createbyai',
+        data: data,
+      );
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      print('QuestionService: Lỗi khi tạo câu hỏi bằng AI: $e');
+      return false;
+    }
+  }
 }

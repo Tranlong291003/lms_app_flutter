@@ -10,7 +10,6 @@ import 'package:lms/cubits/lessons/lessons_cubit.dart';
 import 'package:lms/cubits/lessons/lessons_state.dart';
 import 'package:lms/models/lesson_model.dart';
 import 'package:lms/screens/course_detail/lesson_detail_screen.dart';
-import 'package:lms/screens/course_detail/lesson_edit_screen.dart';
 import 'package:lms/widgets/custom_snackbar.dart';
 
 class LessonMentorTab extends StatelessWidget {
@@ -153,28 +152,29 @@ class LessonMentorTab extends StatelessWidget {
     });
   }
 
-  /// Xử lý chỉnh sửa bài học
+  /// Xử lý chỉnh sửa bài học bằng dialog
   Future<void> _editLesson(BuildContext context, Lesson lesson) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => LessonEditScreen(
-              lesson: lesson,
-              courseId: courseId,
-              userUid: FirebaseAuth.instance.currentUser?.uid ?? '',
-            ),
-      ),
+    final result = await showDialog<bool>(
+      context: context,
+      builder:
+          (ctx) => LessonFormDialog(
+            courseId: courseId,
+            userUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+            lesson: lesson,
+            isEditing: true,
+          ),
     );
     if (result == true && context.mounted) {
-      context.read<LessonsCubit>().loadLessons(
+      await context.read<LessonsCubit>().loadLessons(
         courseId: courseId,
         userUid: FirebaseAuth.instance.currentUser?.uid ?? '',
       );
-      CustomSnackBar.showSuccess(
-        context: context,
-        message: 'Cập nhật bài học thành công',
-      );
+      if (context.mounted) {
+        CustomSnackBar.showSuccess(
+          context: context,
+          message: 'Cập nhật bài học thành công',
+        );
+      }
     }
   }
 

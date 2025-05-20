@@ -1,4 +1,5 @@
 import 'package:lms/models/quiz/quiz_course_model.dart';
+import 'package:lms/models/quiz/quiz_model.dart';
 
 enum QuizStatus { initial, loading, loaded, error }
 
@@ -8,6 +9,7 @@ class QuizState {
   final List<QuizCourseModel> notEnrolledCourses;
   final String errorMessage;
   final bool isLoading;
+  final List<QuizModel> quizzesByCourseId;
 
   QuizState({
     this.status = QuizStatus.initial,
@@ -15,6 +17,7 @@ class QuizState {
     this.notEnrolledCourses = const [],
     this.errorMessage = '',
     this.isLoading = false,
+    this.quizzesByCourseId = const [],
   });
 
   QuizState copyWith({
@@ -23,6 +26,7 @@ class QuizState {
     List<QuizCourseModel>? notEnrolledCourses,
     String? errorMessage,
     bool? isLoading,
+    List<QuizModel>? quizzesByCourseId,
   }) {
     return QuizState(
       status: status ?? this.status,
@@ -30,6 +34,7 @@ class QuizState {
       notEnrolledCourses: notEnrolledCourses ?? this.notEnrolledCourses,
       errorMessage: errorMessage ?? this.errorMessage,
       isLoading: isLoading ?? this.isLoading,
+      quizzesByCourseId: quizzesByCourseId ?? this.quizzesByCourseId,
     );
   }
 }

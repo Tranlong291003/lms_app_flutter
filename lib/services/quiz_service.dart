@@ -81,4 +81,59 @@ class QuizService extends BaseService {
       return [];
     }
   }
+
+  Future<List<QuizModel>> getQuizzesByCourseId(int courseId) async {
+    try {
+      final response = await get(
+        'http://192.168.10.203:3000/api/quizzes/getquizbycoures/$courseId',
+      );
+      if (response.statusCode == 200 && response.data['data'] != null) {
+        final List<dynamic> data = response.data['data'];
+        return data.map((e) => QuizModel.fromJson(e)).toList();
+      }
+      return [];
+    } catch (e) {
+      print('QuizService: Lỗi khi lấy quiz theo courseId: $e');
+      return [];
+    }
+  }
+
+  Future<bool> createQuiz(Map<String, dynamic> data) async {
+    try {
+      final response = await post(
+        'http://192.168.10.203:3000/api/quizzes/create',
+        data: data,
+      );
+      return response.statusCode == 201;
+    } catch (e) {
+      print('QuizService: Lỗi khi tạo quiz: $e');
+      return false;
+    }
+  }
+
+  Future<bool> updateQuiz(int quizId, Map<String, dynamic> data) async {
+    try {
+      final response = await put(
+        'http://192.168.10.203:3000/api/quizzes/update/$quizId',
+        data: data,
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      print('QuizService: Lỗi khi cập nhật quiz: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteQuiz(int quizId, Map<String, dynamic> data) async {
+    try {
+      final response = await delete(
+        'http://192.168.10.203:3000/api/quizzes/delete/$quizId',
+        data: data,
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      print('QuizService: Lỗi khi xoá quiz: $e');
+      return false;
+    }
+  }
 }

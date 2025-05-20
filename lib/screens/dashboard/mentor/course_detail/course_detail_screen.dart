@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/cubits/quiz/quiz_cubit.dart';
+import 'package:lms/repositories/quiz_repository.dart';
+import 'package:lms/services/quiz_service.dart';
 
 import 'tabs/info_tab.dart';
 import 'tabs/lesson_mentor_tab.dart';
@@ -59,7 +63,13 @@ class CourseDetailScreen extends StatelessWidget {
           children: [
             InfoTab(course: course),
             LessonMentorTab(courseId: course['id']),
-            QuizTab(course: course),
+            BlocProvider(
+              create:
+                  (_) =>
+                      QuizCubit(QuizRepository(QuizService()))
+                        ..getQuizzesByCourseId(course['id']),
+              child: QuizTab(courseId: course['id']),
+            ),
           ],
         ),
       ),

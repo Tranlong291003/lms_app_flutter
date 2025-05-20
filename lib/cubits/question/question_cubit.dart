@@ -197,4 +197,73 @@ class QuestionCubit extends Cubit<QuestionState> {
       return {'success': false, 'message': e.toString()};
     }
   }
+
+  Future<bool> updateQuestion(
+    int questionId,
+    Map<String, dynamic> data,
+    int quizId,
+  ) async {
+    emit(state.copyWith(status: QuestionStatus.loading));
+    final result = await _repository.updateQuestion(questionId, data);
+    if (result) {
+      await loadQuestionsByQuizId(quizId);
+      emit(state.copyWith(status: QuestionStatus.loaded));
+    } else {
+      emit(
+        state.copyWith(
+          status: QuestionStatus.error,
+          errorMessage: 'Cập nhật câu hỏi thất bại',
+        ),
+      );
+    }
+    return result;
+  }
+
+  Future<bool> deleteQuestion(
+    int questionId,
+    Map<String, dynamic> data,
+    int quizId,
+  ) async {
+    final result = await _repository.deleteQuestion(questionId, data);
+    return result;
+  }
+
+  /// Tạo câu hỏi bằng tay
+  Future<bool> createQuestionManual(
+    Map<String, dynamic> data,
+    int quizId,
+  ) async {
+    emit(state.copyWith(status: QuestionStatus.loading));
+    final result = await _repository.createQuestionManual(data);
+    if (result) {
+      await loadQuestionsByQuizId(quizId);
+      emit(state.copyWith(status: QuestionStatus.loaded));
+    } else {
+      emit(
+        state.copyWith(
+          status: QuestionStatus.error,
+          errorMessage: 'Tạo câu hỏi bằng tay thất bại',
+        ),
+      );
+    }
+    return result;
+  }
+
+  /// Tạo câu hỏi bằng AI
+  Future<bool> createQuestionAI(Map<String, dynamic> data, int quizId) async {
+    emit(state.copyWith(status: QuestionStatus.loading));
+    final result = await _repository.createQuestionAI(data);
+    if (result) {
+      await loadQuestionsByQuizId(quizId);
+      emit(state.copyWith(status: QuestionStatus.loaded));
+    } else {
+      emit(
+        state.copyWith(
+          status: QuestionStatus.error,
+          errorMessage: 'Tạo câu hỏi bằng AI thất bại',
+        ),
+      );
+    }
+    return result;
+  }
 }

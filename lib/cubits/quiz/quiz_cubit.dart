@@ -95,6 +95,66 @@ class QuizCubit extends Cubit<QuizState> {
     }
     return total;
   }
+
+  Future<void> getQuizzesByCourseId(int courseId) async {
+    try {
+      emit(state.copyWith(status: QuizStatus.loading, isLoading: true));
+      final quizzes = await _quizRepository.getQuizzesByCourseId(courseId);
+      emit(
+        state.copyWith(
+          status: QuizStatus.loaded,
+          quizzesByCourseId: quizzes,
+          isLoading: false,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: QuizStatus.error,
+          errorMessage: 'Không thể lấy danh sách quiz: $e',
+          isLoading: false,
+        ),
+      );
+    }
+  }
+
+  Future<bool> createQuiz(Map<String, dynamic> data, int courseId) async {
+    emit(state.copyWith(isLoading: true));
+    final result = await _quizRepository.createQuiz(data);
+    if (result) {
+      await getQuizzesByCourseId(courseId);
+    }
+    emit(state.copyWith(isLoading: false));
+    return result;
+  }
+
+  Future<bool> updateQuiz(
+    int quizId,
+    Map<String, dynamic> data,
+    int courseId,
+  ) async {
+    emit(state.copyWith(isLoading: true));
+    final result = await _quizRepository.updateQuiz(quizId, data);
+    if (result) {
+      await getQuizzesByCourseId(courseId);
+    }
+    emit(state.copyWith(isLoading: false));
+    return result;
+  }
+
+  Future<bool> deleteQuiz(
+    int quizId,
+    int courseId,
+    Map<String, dynamic> data,
+  ) async {
+    emit(state.copyWith(isLoading: true));
+    final result = await _quizRepository.deleteQuiz(quizId, data);
+    if (result) {
+      await getQuizzesByCourseId(courseId);
+    }
+    emit(state.copyWith(isLoading: false));
+    return result;
+  }
 }
 
 class QuizResultCubit extends Cubit<QuizResultState> {

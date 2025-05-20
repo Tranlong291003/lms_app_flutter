@@ -239,10 +239,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Quản lý khóa học'),
-        actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: _fetchCourses),
-          IconButton(icon: const Icon(Icons.add), onPressed: _addCourse),
-        ],
+        centerTitle: false,
         bottom: TabBar(
           controller: _tabController,
           dividerColor: Colors.transparent,
@@ -266,39 +263,50 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
           ],
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: _fetchCourses,
-        child:
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _errorMessage != null
-                ? _buildErrorWidget(theme, colors)
-                : TabBarView(
-                  controller: _tabController,
-                  children: [
-                    // Tab đã duyệt
-                    _buildCoursesList(
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _errorMessage != null
+              ? _buildErrorWidget(theme, colors)
+              : TabBarView(
+                controller: _tabController,
+                children: [
+                  // Tab đã duyệt
+                  RefreshIndicator(
+                    onRefresh: _fetchCourses,
+                    child: _buildCoursesList(
                       _approvedCourses,
                       theme,
                       colors,
                       'Đã duyệt',
                     ),
-                    // Tab chờ duyệt
-                    _buildCoursesList(
+                  ),
+                  // Tab chờ duyệt
+                  RefreshIndicator(
+                    onRefresh: _fetchCourses,
+                    child: _buildCoursesList(
                       _pendingCourses,
                       theme,
                       colors,
                       'Chờ duyệt',
                     ),
-                    // Tab từ chối
-                    _buildCoursesList(
+                  ),
+                  // Tab từ chối
+                  RefreshIndicator(
+                    onRefresh: _fetchCourses,
+                    child: _buildCoursesList(
                       _rejectedCourses,
                       theme,
                       colors,
                       'Từ chối',
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addCourse,
+        tooltip: 'Thêm khóa học mới',
+        child: const Icon(Icons.add),
       ),
     );
   }
