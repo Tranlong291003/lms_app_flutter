@@ -20,71 +20,80 @@ class InfoTab extends StatelessWidget {
       physics: const ClampingScrollPhysics(),
       children: [
         // ---------- ẢNH THUMBNAIL ----------
-        AspectRatio(
-          aspectRatio: 16 / 9,
-          child:
-              course['thumbnail_url'] != null
-                  ? CachedNetworkImage(
-                    imageUrl:
-                        course['thumbnail_url']!.startsWith('http')
-                            ? course['thumbnail_url']!
-                            : '${ApiConfig.baseUrl}${course['thumbnail_url']}',
-                    fit: BoxFit.cover,
-                    placeholder:
-                        (_, __) => Container(
-                          decoration: BoxDecoration(
-                            color: colors.surfaceContainerHighest,
-                            borderRadius: radius12,
-                          ),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child:
+                  course['thumbnail_url'] != null
+                      ? CachedNetworkImage(
+                        imageUrl:
+                            course['thumbnail_url']!.startsWith('http')
+                                ? course['thumbnail_url']!
+                                : '${ApiConfig.baseUrl}${course['thumbnail_url']}',
+                        fit: BoxFit.cover,
+                        height: 180,
+                        width: double.infinity,
+                        placeholder:
+                            (_, __) => Container(
+                              color: colors.surfaceContainerHighest,
+                              height: 180,
+                            ),
+                        errorWidget:
+                            (_, __, ___) => Container(
+                              color: colors.surfaceContainerHighest,
+                              height: 180,
+                              child: const Icon(Icons.broken_image, size: 60),
+                            ),
+                      )
+                      : Container(
+                        color: colors.surfaceContainerHighest,
+                        height: 180,
+                        child: Icon(
+                          Icons.image_outlined,
+                          size: 60,
+                          color: colors.primary.withOpacity(0.5),
                         ),
-                    errorWidget:
-                        (_, __, ___) => Container(
-                          decoration: BoxDecoration(
-                            color: colors.surfaceContainerHighest,
-                            borderRadius: radius12,
-                          ),
-                          child: const Icon(Icons.broken_image, size: 60),
-                        ),
-                  )
-                  : Container(
-                    decoration: BoxDecoration(
-                      color: colors.surfaceContainerHighest,
-                      borderRadius: radius12,
-                    ),
-                    child: Icon(
-                      Icons.image_outlined,
-                      size: 60,
-                      color: colors.primary.withOpacity(0.5),
-                    ),
-                  ),
+                      ),
+            ),
+          ),
         ),
 
-        // ---------- TIÊU ĐỀ + ĐÁNH GIÁ (CÙNG DÒNG) ----------
+        // ---------- TIÊU ĐỀ + ĐÁNH GIÁ ----------
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
             children: [
-              Expanded(
-                child: Text(
-                  course['title'] ?? 'Không có tên',
-                  style: textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+              Text(
+                course['title'] ?? 'Không có tên',
+                style: textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _Stars(rating: (course['rating'] ?? 0).toDouble()),
-                  const SizedBox(height: 2),
+                  const SizedBox(width: 6),
                   Text(
                     (course['rating'] ?? 0).toString(),
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: colors.onSurface.withOpacity(0.8),
                     ),
@@ -95,13 +104,11 @@ class InfoTab extends StatelessWidget {
           ),
         ),
 
-        // ---------- CATEGORY + CẤP ĐỘ + LANGUAGE (CÙNG DÒNG) ----------
-        SizedBox(
-          height: 44,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            physics: const BouncingScrollPhysics(),
+        // ---------- CHIP THÔNG TIN ----------
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _InfoChip(
                 icon: Icons.category,
@@ -126,16 +133,26 @@ class InfoTab extends StatelessWidget {
 
         // ---------- GIÁ ----------
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: _buildPriceSection(course, colors),
         ),
 
         // ---------- MÔ TẢ ----------
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-          child: Text(
-            course['description'] ?? 'Không có mô tả',
-            style: textTheme.bodyMedium,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Card(
+            color: colors.surfaceContainerHighest,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                course['description'] ?? 'Không có mô tả',
+                style: textTheme.bodyMedium,
+              ),
+            ),
           ),
         ),
 
@@ -152,31 +169,24 @@ class InfoTab extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-
-              // Grid thông tin cơ bản
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                childAspectRatio: 3,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+              Row(
                 children: [
-                  _InfoTile(
+                  _InfoStatCard(
                     icon: Icons.people,
                     label: '${course['enrollment_count'] ?? 0} học viên',
+                    color: colors.primary,
                   ),
-                  _InfoTile(
+                  const SizedBox(width: 12),
+                  _InfoStatCard(
                     icon: Icons.menu_book,
                     label: '${course['lessons'] ?? 0} bài học',
+                    color: colors.secondary,
                   ),
-                  _InfoTile(
+                  const SizedBox(width: 12),
+                  _InfoStatCard(
                     icon: Icons.timer,
                     label: course['total_video_duration'] ?? '00:00:00',
-                  ),
-                  _InfoTile(
-                    icon: Icons.calendar_today,
-                    label: _formatDate(course['created_at']),
+                    color: colors.tertiary,
                   ),
                 ],
               ),
@@ -387,5 +397,53 @@ class _Stars extends StatelessWidget {
         const Icon(Icons.star_border, size: 16, color: Colors.amber),
     ];
     return Row(children: icons);
+  }
+}
+
+class _InfoStatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  const _InfoStatCard({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+          border: Border.all(color: color.withOpacity(0.08)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 32, color: color),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

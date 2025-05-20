@@ -120,6 +120,25 @@ class _QuizListScreenState extends State<QuizListScreen>
           title: const Text('Bài kiểm tra'),
           bottom: TabBar(
             controller: _tabController,
+            dividerColor: Colors.transparent,
+            labelColor: Theme.of(context).colorScheme.primary,
+            unselectedLabelColor: Theme.of(
+              context,
+            ).colorScheme.onSurface.withOpacity(0.7),
+            labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+            unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
+            indicator: UnderlineTabIndicator(
+              borderSide: BorderSide(
+                width: 3,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              insets: EdgeInsets.zero,
+            ),
+            indicatorWeight: 3,
+            indicatorSize: TabBarIndicatorSize.label,
             tabs: const [
               Tab(text: 'Tất cả bài kiểm tra'),
               Tab(text: 'Bài đã làm'),

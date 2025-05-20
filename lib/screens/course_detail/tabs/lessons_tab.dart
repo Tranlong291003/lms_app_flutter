@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/lessons/lessons_cubit.dart';
+import 'package:lms/cubits/lessons/lessons_state.dart';
 import 'package:lms/models/lesson_model.dart';
 import 'package:lms/services/course_service.dart';
 
@@ -15,32 +16,49 @@ class LessonsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final userUid = user?.uid ?? '';
+    final cubit = context.read<LessonsCubit>();
 
-    return BlocProvider(
-      create:
-          (_) =>
-              LessonsCubit()..loadLessons(courseId: courseId, userUid: userUid),
-      child: BlocBuilder<LessonsCubit, LessonsState>(
-        builder: (context, state) {
-          if (state is LessonsLoading) {
-            return const Center(child: LoadingIndicator());
-          }
-          if (state is LessonsError) {
-            return Center(child: Text('Lỗi: ${state.message}'));
-          }
-          if (state is LessonsLoaded) {
-            return _LessonsList(lessons: state.lessons);
-          }
-          return const SizedBox();
-        },
-      ),
+    // Load lessons when widget is built
+    cubit.loadLessons(courseId: courseId, userUid: userUid);
+
+    return BlocBuilder<LessonsCubit, LessonsState>(
+      builder: (context, state) {
+        if (state is LessonsLoading) {
+          return const Center(child: LoadingIndicator());
+        }
+        if (state is LessonsError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Lỗi: ${state.message}'),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed:
+                      () => cubit.loadLessons(
+                        courseId: courseId,
+                        userUid: userUid,
+                      ),
+                  child: const Text('Thử lại'),
+                ),
+              ],
+            ),
+          );
+        }
+        if (state is LessonsLoaded) {
+          return _LessonsList(lessons: state.lessons, courseId: courseId);
+        }
+        return const SizedBox();
+      },
     );
   }
 }
 
 class _LessonsList extends StatelessWidget {
   final List<Lesson> lessons;
-  const _LessonsList({required this.lessons});
+  final int courseId;
+
+  const _LessonsList({required this.lessons, required this.courseId});
 
   @override
   Widget build(BuildContext context) {
@@ -64,17 +82,11 @@ class _LessonsList extends StatelessWidget {
     return FutureBuilder<bool>(
       future: CourseService().checkEnrollment(
         userUid: userUid,
-        courseId: lessons.first.courseId,
+        courseId: courseId,
       ),
       builder: (context, snapshot) {
         final isEnrolled = snapshot.data == true;
         final theme = Theme.of(context);
-
-        // ❗️Bài đầu tiên chưa hoàn thành
-        int firstUnfinishedIndex = lessons.indexWhere(
-          (l) => !l.isPreview,
-        ); // SỬA
-        if (firstUnfinishedIndex == -1) firstUnfinishedIndex = lessons.length;
 
         return ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -83,9 +95,7 @@ class _LessonsList extends StatelessWidget {
             final lesson = lessons[index];
 
             bool isFirst = index == 0;
-            bool isCompleted = lesson.isPreview; // SỬA
-            bool isCurrent = index == firstUnfinishedIndex;
-            bool isLocked = index > firstUnfinishedIndex;
+            bool isLocked = !isEnrolled && !isFirst;
 
             IconData iconData;
             Color iconColor;
@@ -93,7 +103,7 @@ class _LessonsList extends StatelessWidget {
             bool canTap = false;
 
             if (!isEnrolled) {
-              /// CHƯA đăng ký: chỉ cho xem bài đầu tiên (preview)
+              // CHƯA đăng ký: chỉ cho xem bài đầu tiên
               if (isFirst) {
                 iconData = Icons.lock_open;
                 iconColor = theme.colorScheme.primary;
@@ -110,41 +120,15 @@ class _LessonsList extends StatelessWidget {
                 canTap = false;
               }
             } else {
-              /// ĐÃ đăng ký
-              if (isCompleted) {
-                iconData = Icons.check_circle;
-                iconColor = Colors.green;
-                trailingIcon = Icon(
-                  Icons.play_circle_fill,
-                  color: theme.colorScheme.primary,
-                  size: 32,
-                );
-                canTap = true;
-              } else if (isCurrent) {
-                iconData = Icons.play_circle_outline;
-                iconColor = theme.colorScheme.primary;
-                trailingIcon = Icon(
-                  Icons.play_circle_fill,
-                  color: theme.colorScheme.primary,
-                  size: 32,
-                );
-                canTap = true;
-              } else if (isLocked) {
-                iconData = Icons.lock_outline;
-                iconColor = theme.colorScheme.onSurface.withOpacity(0.5);
-                trailingIcon = null;
-                canTap = false;
-              } else {
-                // Trường hợp còn lại (chưa hoàn thành nhưng được phép xem)
-                iconData = Icons.play_circle_outline;
-                iconColor = theme.colorScheme.primary;
-                trailingIcon = Icon(
-                  Icons.play_circle_fill,
-                  color: theme.colorScheme.primary,
-                  size: 32,
-                );
-                canTap = true;
-              }
+              // ĐÃ đăng ký: cho xem tất cả bài học
+              iconData = Icons.play_circle_outline;
+              iconColor = theme.colorScheme.primary;
+              trailingIcon = Icon(
+                Icons.play_circle_fill,
+                color: theme.colorScheme.primary,
+                size: 32,
+              );
+              canTap = true;
             }
 
             return Opacity(

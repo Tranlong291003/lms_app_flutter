@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/models/lesson_model.dart';
@@ -7,63 +9,25 @@ import 'base_service.dart';
 class LessonService extends BaseService {
   LessonService({super.token});
 
-  /// Lấy danh sách tất cả bài học của khóa học
-  Future<Response> getAllLessons({
-    required int courseId,
-    required String userUid,
-  }) async {
-    try {
-      final url = ApiConfig.getLessonsByCourseAndUser(courseId, userUid);
-      print('[LessonService] ▶️ GET $url');
-      final response = await get(url);
-      print(
-        '[LessonService] ✅ ${response.statusCode} - data: ${response.data}',
-      );
-      return response;
-    } on DioException catch (e) {
-      print(
-        '[LessonService] ❌ DIO ERROR status=${e.response?.statusCode} - message=${e.message}',
-      );
-      rethrow;
-    } catch (e) {
-      print('[LessonService] ❌ UNEXPECTED ERROR - $e');
-      rethrow;
+  Future<List<Lesson>> getAllLessons(int courseId, String userUid) async {
+    final response = await get(
+      ApiConfig.getLessonsByCourseAndUser(courseId, userUid),
+    );
+    if (response.statusCode == 200 && response.data['data'] is List) {
+      return (response.data['data'] as List)
+          .map((json) => Lesson.fromJson(json))
+          .toList();
     }
+    throw Exception('Không thể lấy danh sách bài học');
   }
 
   /// Lấy chi tiết bài học
   Future<Lesson> getLessonDetail(int lessonId) async {
-    try {
-      final url = ApiConfig.getLessonDetail(lessonId);
-      print('[LessonService] ▶️ GET $url');
-      final response = await get(url);
-      print(
-        '[LessonService] ✅ ${response.statusCode} - data: ${response.data}',
-      );
-
-      if (response.statusCode == 200) {
-        try {
-          final data = response.data['data'];
-          if (data == null) {
-            throw Exception('Không tìm thấy dữ liệu bài học');
-          }
-          return Lesson.fromJson(data);
-        } catch (e) {
-          print('[LessonService] ❌ PARSE ERROR - $e');
-          throw Exception('Dữ liệu bài học không hợp lệ: $e');
-        }
-      } else {
-        throw Exception('Không thể tải thông tin bài học');
-      }
-    } on DioException catch (e) {
-      print(
-        '[LessonService] ❌ DIO ERROR status=${e.response?.statusCode} - message=${e.message}',
-      );
-      throw Exception('Lỗi kết nối: ${e.message}');
-    } catch (e) {
-      print('[LessonService] ❌ UNEXPECTED ERROR - $e');
-      throw Exception('Lỗi không xác định: $e');
+    final response = await get(ApiConfig.getLessonDetail(lessonId));
+    if (response.statusCode == 200 && response.data['data'] != null) {
+      return Lesson.fromJson(response.data['data']);
     }
+    throw Exception('Không thể lấy chi tiết bài học');
   }
 
   Future<void> completeLesson(
@@ -121,6 +85,94 @@ class LessonService extends BaseService {
       print('[LessonService] ❌ Error: $e');
       print('==========================================');
       throw Exception('Không thể đánh dấu bài học đã hoàn thành: $e');
+    }
+  }
+
+  /// Cập nhật bài học
+  Future<void> updateLesson({
+    required int lessonId,
+    required Map<String, dynamic> data,
+    File? pdf,
+    File? slide,
+  }) async {
+    Response response;
+    if (pdf != null || slide != null) {
+      final formData = FormData.fromMap({
+        ...data,
+        if (pdf != null)
+          'pdf': await MultipartFile.fromFile(
+            pdf.path,
+            filename: pdf.path.split('/').last,
+          ),
+        if (slide != null)
+          'slide': await MultipartFile.fromFile(
+            slide.path,
+            filename: slide.path.split('/').last,
+          ),
+      });
+      response = await put(
+        ApiConfig.updateLesson(lessonId),
+        data: formData,
+        options: Options(contentType: 'multipart/form-data'),
+      );
+    } else {
+      response = await put(ApiConfig.updateLesson(lessonId), data: data);
+    }
+    if (response.statusCode != 200) {
+      throw Exception('Cập nhật bài học thất bại');
+    }
+  }
+
+  /// Xoá bài học
+  Future<void> deleteLesson({
+    required int lessonId,
+    required String uid,
+  }) async {
+    final response = await delete(
+      ApiConfig.deleteLesson(lessonId),
+      data: {'uid': uid},
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Xóa bài học thất bại');
+    }
+  }
+
+  /// Gọi API tạo mới bài học
+  Future<void> createLesson({
+    required int courseId,
+    required String title,
+    required String videoUrl,
+    required String content,
+    required int order,
+    required String uid,
+    File? pdf,
+    File? slide,
+  }) async {
+    final formData = FormData.fromMap({
+      'course_id': courseId,
+      'title': title,
+      'video_url': videoUrl,
+      'content': content,
+      'order': order,
+      'uid': uid,
+      if (pdf != null)
+        'pdf': await MultipartFile.fromFile(
+          pdf.path,
+          filename: pdf.path.split('/').last,
+        ),
+      if (slide != null)
+        'slide': await MultipartFile.fromFile(
+          slide.path,
+          filename: slide.path.split('/').last,
+        ),
+    });
+    final response = await post(
+      ApiConfig.createLesson,
+      data: formData,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Tạo bài học thất bại');
     }
   }
 }

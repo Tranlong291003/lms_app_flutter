@@ -49,9 +49,9 @@ class _CourseManagementAdminScreenState
     return Scaffold(
       appBar: AppBar(
         title: const Text('Quản lý khóa học - Admin'),
-        backgroundColor: isDark ? colorScheme.surface : colorScheme.primary,
-        foregroundColor: isDark ? colorScheme.onSurface : colorScheme.onPrimary,
+
         bottom: TabBar(
+          dividerColor: Colors.transparent,
           controller: _tabController,
           indicatorColor: isDark ? colorScheme.primary : colorScheme.onPrimary,
           indicatorWeight: 3,
@@ -72,6 +72,7 @@ class _CourseManagementAdminScreenState
       ),
       body: Column(
         children: [
+          const SizedBox(height: 16),
           SearchBarWidget(
             controller: _searchController,
             hintText: 'Tìm kiếm khóa học...',

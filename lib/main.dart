@@ -16,10 +16,12 @@ import 'package:lms/cubits/admin/admin_user_cubit.dart';
 import 'package:lms/cubits/category/category_cubit.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/cubits/lessons/lesson_detail_cubit.dart';
+import 'package:lms/cubits/lessons/lessons_cubit.dart';
 import 'package:lms/cubits/notification/notification_cubit.dart';
 import 'package:lms/repositories/admin_user_repository.dart';
 import 'package:lms/repositories/category_repository.dart';
 import 'package:lms/repositories/course_repository.dart';
+import 'package:lms/repositories/lesson_repository.dart';
 import 'package:lms/repositories/mentor_repository.dart';
 import 'package:lms/repositories/user_repository.dart';
 import 'package:lms/screens/Introduction/cubit/intro_cubit.dart';
@@ -28,10 +30,12 @@ import 'package:lms/screens/my_app.dart';
 import 'package:lms/services/admin_user_service.dart';
 import 'package:lms/services/category_service.dart';
 import 'package:lms/services/course_service.dart';
+import 'package:lms/services/lesson_service.dart';
 import 'package:lms/services/mentor_service.dart';
 import 'package:lms/services/notification_service.dart';
 import 'package:lms/services/user_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
 Future<void> requestPermissions() async {
   // Xin quyền thông báo (Android 13+)
@@ -87,7 +91,7 @@ Future<void> main() async {
 
   // 5. Chạy app, bọc MyApp trong RepositoryProvider và BlocProvider
   runApp(
-    MultiRepositoryProvider(
+    MultiProvider(
       providers: [
         RepositoryProvider<UserRepository>(create: (_) => userRepository),
         RepositoryProvider<MentorRepository>(create: (_) => mentorRepository),
@@ -95,6 +99,18 @@ Future<void> main() async {
           create: (_) => categoryRepository,
         ),
         RepositoryProvider<CourseRepository>(create: (_) => courseRepository),
+        Provider<LessonService>(create: (context) => LessonService()),
+        Provider<LessonRepository>(
+          create:
+              (context) => LessonRepository(
+                lessonService: context.read<LessonService>(),
+              ),
+        ),
+        BlocProvider<LessonsCubit>(
+          create:
+              (context) =>
+                  LessonsCubit(repository: context.read<LessonRepository>()),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [

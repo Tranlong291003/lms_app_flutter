@@ -21,7 +21,11 @@ class ApiConfig {
       "$baseUrl/api/lessons/courses/$courseId/$userUid";
   static String getLessonDetail(int lessonId) =>
       "$baseUrl/api/lessons/detail/$lessonId";
-
+  static String updateLesson(int lessonId) =>
+      "$baseUrl/api/lessons/update/$lessonId";
+  static String deleteLesson(int lessonId) =>
+      "$baseUrl/api/lessons/delete/$lessonId";
+  static String get createLesson => "$baseUrl/api/lessons/create";
   static String get completeLesson => "$baseUrl/api/lessons/complete";
 
   static String checkEnrollment(String userUid, int courseId) =>

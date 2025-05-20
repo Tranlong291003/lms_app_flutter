@@ -1,4 +1,5 @@
-import 'package:dio/dio.dart';
+import 'dart:io';
+
 import 'package:lms/models/lesson_model.dart';
 import 'package:lms/services/lesson_service.dart';
 
@@ -8,27 +9,11 @@ class LessonRepository {
   LessonRepository({LessonService? lessonService})
     : _lessonService = lessonService ?? LessonService();
 
-  Future<Response> getAllLessons({
-    required int courseId,
-    required String userUid,
-  }) async {
-    try {
-      return await _lessonService.getAllLessons(
-        courseId: courseId,
-        userUid: userUid,
-      );
-    } catch (e) {
-      throw Exception('Không thể lấy danh sách bài học: $e');
-    }
-  }
+  Future<List<Lesson>> getAllLessons(int courseId, String userUid) =>
+      _lessonService.getAllLessons(courseId, userUid);
 
-  Future<Lesson> getLessonDetail(int lessonId) async {
-    try {
-      return await _lessonService.getLessonDetail(lessonId);
-    } catch (e) {
-      throw Exception('Không thể lấy thông tin bài học: $e');
-    }
-  }
+  Future<Lesson> getLessonDetail(int lessonId) =>
+      _lessonService.getLessonDetail(lessonId);
 
   Future<void> completeLesson(
     int lessonId,
@@ -51,4 +36,42 @@ class LessonRepository {
       throw Exception('Không thể đánh dấu bài học đã hoàn thành: $e');
     }
   }
+
+  /// Tạo mới bài học
+  Future<void> createLesson({
+    required int courseId,
+    required String title,
+    required String videoUrl,
+    required String content,
+    required int order,
+    required String uid,
+    File? pdf,
+    File? slide,
+  }) => _lessonService.createLesson(
+    courseId: courseId,
+    title: title,
+    videoUrl: videoUrl,
+    content: content,
+    order: order,
+    uid: uid,
+    pdf: pdf,
+    slide: slide,
+  );
+
+  /// Cập nhật bài học
+  Future<void> updateLesson({
+    required int lessonId,
+    required Map<String, dynamic> data,
+    File? pdf,
+    File? slide,
+  }) => _lessonService.updateLesson(
+    lessonId: lessonId,
+    data: data,
+    pdf: pdf,
+    slide: slide,
+  );
+
+  /// Xoá bài học
+  Future<void> deleteLesson({required int lessonId, required String uid}) =>
+      _lessonService.deleteLesson(lessonId: lessonId, uid: uid);
 }

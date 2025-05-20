@@ -240,10 +240,25 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
       appBar: AppBar(
         title: const Text('Quản lý khóa học'),
         actions: [
+          IconButton(icon: const Icon(Icons.refresh), onPressed: _fetchCourses),
           IconButton(icon: const Icon(Icons.add), onPressed: _addCourse),
         ],
         bottom: TabBar(
           controller: _tabController,
+          dividerColor: Colors.transparent,
+          labelColor: colors.primary,
+          unselectedLabelColor: colors.onSurface.withOpacity(0.7),
+          labelStyle: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+          unselectedLabelStyle: theme.textTheme.titleMedium,
+          indicator: UnderlineTabIndicator(
+            borderSide: BorderSide(width: 3, color: colors.primary),
+            insets: EdgeInsets.zero,
+          ),
+          indicatorWeight: 3,
+          indicatorSize: TabBarIndicatorSize.label,
           tabs: const [
             Tab(text: 'Đã duyệt'),
             Tab(text: 'Chờ duyệt'),

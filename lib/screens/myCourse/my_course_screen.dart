@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/cubits/enrolled_courses/enrolled_course_cubit.dart';
 import 'package:lms/screens/myCourse/my_completed_courses.dart';
 import 'package:lms/screens/myCourse/my_ongoing_courses.dart';
@@ -44,77 +43,37 @@ class _MyCourseScreenState extends State<MyCourseScreen> {
       child: DefaultTabController(
         length: 2,
         child: Scaffold(
-          appBar: CustomAppBar(
-            // Chỉ hiện nút back nếu bạn cần (ở đây không dùng)
-            showBack: false,
-            // Tiêu đề
-            title: 'Khoá học của tôi',
-            // Cho phép bật/tắt search
-            showSearch: true,
-            onSearchChanged: (query) {
-              // TODO: xử lý tìm kiếm ở đây
-            },
-            // Cho phép menu 3 chấm
-            showMenu: true,
-            menuItems: [
-              PopupMenuItem(
-                value: 'linear',
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.linear_scale,
-                      color:
-                          !showCircular
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withOpacity(0.6),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text('Dạng thanh tiến trình'),
-                    const Spacer(),
-                    if (!showCircular)
-                      Icon(
-                        Icons.check_rounded,
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 18,
-                      ),
-                  ],
-                ),
+          appBar: AppBar(
+            elevation: 0,
+            title: Text(
+              'Khoá học của tôi',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
               ),
-              PopupMenuItem(
-                value: 'circle',
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.donut_large,
-                      color:
-                          showCircular
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withOpacity(0.6),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text('Dạng vòng tròn'),
-                    const Spacer(),
-                    if (showCircular)
-                      Icon(
-                        Icons.check_rounded,
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 18,
-                      ),
-                  ],
-                ),
+            ),
+            bottom: TabBar(
+              dividerColor: Colors.transparent,
+              labelColor: Theme.of(context).colorScheme.primary,
+              unselectedLabelColor: Theme.of(
+                context,
+              ).colorScheme.onSurface.withOpacity(0.7),
+              labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
               ),
-            ],
-            onMenuSelected: (value) {
-              setState(() {
-                showCircular = value == 'circle';
-              });
-            },
-            // TabBar bên dưới
-            tabs: const [Tab(text: 'Đang học'), Tab(text: 'Đã hoàn thành')],
+              unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
+              indicator: UnderlineTabIndicator(
+                borderSide: BorderSide(
+                  width: 3,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                insets: EdgeInsets.zero,
+              ),
+              indicatorWeight: 3,
+              indicatorSize: TabBarIndicatorSize.label,
+              tabs: const [Tab(text: 'Đang học'), Tab(text: 'Đã hoàn thành')],
+            ),
           ),
           body: TabBarView(
             children: [

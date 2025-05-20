@@ -492,7 +492,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SelectableText(
-                                  lesson.content,
+                                  lesson.content ?? '',
                                   style: theme.textTheme.bodyLarge?.copyWith(
                                     color: colorScheme.onSurface,
                                     height: 1.6,
