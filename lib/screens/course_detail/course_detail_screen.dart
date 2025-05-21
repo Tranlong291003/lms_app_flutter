@@ -26,6 +26,47 @@ class CourseDetailScreen extends StatelessWidget {
             body: const Center(child: LoadingIndicator()),
           );
         }
+
+        if (state is CourseDetailError) {
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: theme.colorScheme.error,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Đã xảy ra lỗi khi tải thông tin khóa học',
+                    style: theme.textTheme.titleMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      context.read<CourseDetailCubit>().fetchCourseDetail(
+                        courseId,
+                      );
+                    },
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Thử lại'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
         if (state is CourseDetailLoaded) {
           final detail = state.detail;
           final user = FirebaseAuth.instance.currentUser;
@@ -47,14 +88,29 @@ class CourseDetailScreen extends StatelessWidget {
               ),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  // Có thể show loading hoặc để trống
-                  return const SizedBox.shrink();
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, -5),
+                        ),
+                      ],
+                    ),
+                    child: SafeArea(
+                      minimum: const EdgeInsets.all(20),
+                      child: SizedBox(
+                        height: 48,
+                        child: Center(child: LoadingIndicator()),
+                      ),
+                    ),
+                  );
                 }
                 if (snapshot.hasData && snapshot.data == true) {
-                  // Đã đăng ký, ẩn hoàn toàn
                   return const SizedBox.shrink();
                 }
-                // Chưa đăng ký, hiển thị nút
                 return Container(
                   decoration: BoxDecoration(
                     color: theme.scaffoldBackgroundColor,
@@ -78,30 +134,12 @@ class CourseDetailScreen extends StatelessWidget {
             ),
           );
         }
-        if (state is CourseDetailError) {
-          return Scaffold(
-            backgroundColor: theme.scaffoldBackgroundColor,
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: theme.colorScheme.error,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Lỗi: ${state.message}',
-                    style: theme.textTheme.titleMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-        return const SizedBox.shrink();
+
+        // Default loading state
+        return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          body: const Center(child: LoadingIndicator()),
+        );
       },
     );
   }

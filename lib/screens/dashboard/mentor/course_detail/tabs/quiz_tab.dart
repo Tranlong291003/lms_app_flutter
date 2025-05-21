@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/quiz/quiz_cubit.dart';
 import 'package:lms/cubits/quiz/quiz_state.dart';
 import 'package:lms/models/quiz/quiz_model.dart';
@@ -24,7 +25,7 @@ class QuizTab extends StatelessWidget {
         BlocBuilder<QuizCubit, QuizState>(
           builder: (context, state) {
             if (state.isLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: LoadingIndicator());
             }
             if (state.status == QuizStatus.error) {
               return Center(child: Text('Lỗi: \\${state.errorMessage}'));

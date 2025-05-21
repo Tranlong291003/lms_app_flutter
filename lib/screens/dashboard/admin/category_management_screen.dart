@@ -6,8 +6,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
 import 'package:lms/cubits/category/category_cubit.dart';
+import 'package:lms/widgets/custom_snackbar.dart';
 
 class CategoryManagementScreen extends StatefulWidget {
   const CategoryManagementScreen({super.key});
@@ -77,7 +79,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
             child: BlocBuilder<CategoryCubit, CategoryState>(
               builder: (context, state) {
                 if (state is CategoryLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: LoadingIndicator());
                 }
                 if (state is CategoryError) {
                   return Center(child: Text('Lỗi: ${state.message}'));
@@ -528,27 +530,51 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                             onPressed: () async {
                               final uid =
                                   FirebaseAuth.instance.currentUser?.uid ?? '';
-                              if (isEdit) {
-                                await context
-                                    .read<CategoryCubit>()
-                                    .updateCategory(
-                                      categoryId: id!,
-                                      name: nameController.text,
-                                      description: descriptionController.text,
-                                      uid: uid,
-                                      icon: selectedIcon,
+                              try {
+                                if (isEdit) {
+                                  await context
+                                      .read<CategoryCubit>()
+                                      .updateCategory(
+                                        categoryId: id!,
+                                        name: nameController.text,
+                                        description: descriptionController.text,
+                                        uid: uid,
+                                        icon: selectedIcon,
+                                      );
+                                  if (mounted) {
+                                    CustomSnackBar.showSuccess(
+                                      context: context,
+                                      message: 'Cập nhật danh mục thành công',
                                     );
-                              } else {
-                                await context
-                                    .read<CategoryCubit>()
-                                    .createCategory(
-                                      name: nameController.text,
-                                      description: descriptionController.text,
-                                      uid: uid,
-                                      icon: selectedIcon,
+                                  }
+                                } else {
+                                  await context
+                                      .read<CategoryCubit>()
+                                      .createCategory(
+                                        name: nameController.text,
+                                        description: descriptionController.text,
+                                        uid: uid,
+                                        icon: selectedIcon,
+                                      );
+                                  if (mounted) {
+                                    CustomSnackBar.showSuccess(
+                                      context: context,
+                                      message: 'Thêm danh mục mới thành công',
                                     );
+                                  }
+                                }
+                                Navigator.of(dialogContext).pop();
+                              } catch (e) {
+                                if (mounted) {
+                                  CustomSnackBar.showError(
+                                    context: context,
+                                    message:
+                                        isEdit
+                                            ? 'Cập nhật danh mục thất bại: ${e.toString()}'
+                                            : 'Thêm danh mục mới thất bại: ${e.toString()}',
+                                  );
+                                }
                               }
-                              Navigator.of(dialogContext).pop();
                             },
                             icon: Icon(isEdit ? Icons.save : Icons.add),
                             label: Text(isEdit ? 'Cập nhật' : 'Thêm mới'),
@@ -677,22 +703,16 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                   final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
                   await context.read<CategoryCubit>().deleteCategory(id, uid);
                   if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Đã xóa danh mục "$name"'),
-                        backgroundColor: colorScheme.error,
-                      ),
+                    CustomSnackBar.showSuccess(
+                      context: context,
+                      message: 'Đã xóa danh mục "$name" thành công',
                     );
                   }
                 } catch (e) {
                   if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Xóa danh mục thất bại: \\${e.toString()}',
-                        ),
-                        backgroundColor: colorScheme.error,
-                      ),
+                    CustomSnackBar.showError(
+                      context: context,
+                      message: 'Xóa danh mục thất bại: ${e.toString()}',
                     );
                   }
                 }

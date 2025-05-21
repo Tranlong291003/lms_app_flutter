@@ -87,7 +87,7 @@ class CourseService extends BaseService {
       }
 
       final response = await get(
-        '${ApiConfig.baseUrl}/api/courses/mentor/$instructorUid',
+        ApiConfig.getCoursesByInstructor(instructorUid),
         queryParameters: params.isEmpty ? null : params,
       );
 
@@ -351,7 +351,7 @@ class CourseService extends BaseService {
 
       // DEBUG: In thông tin request
       print('\n===== DEBUG: CREATE COURSE API REQUEST =====');
-      print('URL: ${ApiConfig.getAllCourses}/create');
+      print('URL: ${ApiConfig.createCourse}');
       print('Method: POST');
       print('Request body: ${formData.fields}');
       if (formData.files.isNotEmpty) {
@@ -360,10 +360,7 @@ class CourseService extends BaseService {
       print('=======================================\n');
 
       // Gửi request tạo khóa học
-      final response = await post(
-        '${ApiConfig.getAllCourses}/create',
-        data: formData,
-      );
+      final response = await post(ApiConfig.createCourse, data: formData);
 
       // DEBUG: In thông tin response
       print('\n===== DEBUG: CREATE COURSE API RESPONSE =====');
@@ -404,7 +401,7 @@ class CourseService extends BaseService {
         );
       }
       final response = await put(
-        '${ApiConfig.baseUrl}/api/courses/update/$courseId',
+        ApiConfig.updateCourse(courseId),
         data: formData,
         options: Options(contentType: 'multipart/form-data'),
       );
@@ -430,7 +427,7 @@ class CourseService extends BaseService {
   }) async {
     try {
       final response = await delete(
-        '${ApiConfig.baseUrl}/api/courses/delete/$courseId',
+        ApiConfig.deleteCourse(courseId),
         data: {'uid': instructorUid},
       );
 

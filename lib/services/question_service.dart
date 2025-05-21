@@ -68,10 +68,7 @@ class QuestionService extends BaseService {
       }
 
       // Endpoint API nộp bài kiểm tra
-      final response = await post(
-        '${ApiConfig.baseUrl}/api/quiz-results/submit',
-        data: payload,
-      );
+      final response = await post(ApiConfig.submitQuizResult, data: payload);
       print('QuestionService: Nhận được kết quả từ API: ${response.data}');
 
       // API trả về 201 là thành công
@@ -147,7 +144,7 @@ class QuestionService extends BaseService {
   Future<bool> updateQuestion(int questionId, Map<String, dynamic> data) async {
     try {
       final response = await put(
-        '${ApiConfig.baseUrl}/api/questions/update/$questionId',
+        ApiConfig.updateQuestion(questionId),
         data: data,
       );
       return response.statusCode == 200;
@@ -160,7 +157,7 @@ class QuestionService extends BaseService {
   Future<bool> deleteQuestion(int questionId, Map<String, dynamic> data) async {
     try {
       final response = await delete(
-        '${ApiConfig.baseUrl}/api/questions/delete/$questionId',
+        ApiConfig.deleteQuestion(questionId),
         data: data,
       );
       return response.statusCode == 200;
@@ -173,10 +170,7 @@ class QuestionService extends BaseService {
   /// Tạo câu hỏi bằng tay
   Future<bool> createQuestionManual(Map<String, dynamic> data) async {
     try {
-      final response = await post(
-        '${ApiConfig.baseUrl}/api/questions/createbyuser',
-        data: data,
-      );
+      final response = await post(ApiConfig.createQuestionManual, data: data);
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
       print('QuestionService: Lỗi khi tạo câu hỏi bằng tay: $e');
@@ -187,10 +181,7 @@ class QuestionService extends BaseService {
   /// Tạo câu hỏi bằng AI
   Future<bool> createQuestionAI(Map<String, dynamic> data) async {
     try {
-      final response = await post(
-        '${ApiConfig.baseUrl}/api/questions/createbyai',
-        data: data,
-      );
+      final response = await post(ApiConfig.createQuestionAI, data: data);
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
       print('QuestionService: Lỗi khi tạo câu hỏi bằng AI: $e');

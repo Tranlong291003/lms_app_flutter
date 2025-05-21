@@ -14,6 +14,8 @@ class ApiConfig {
   static String get getMentorDetail => "$baseUrl/api/users";
   static String updateUserStatus(String uid) =>
       "$baseUrl/api/users/$uid/status";
+  static String checkUserActive(String uid) =>
+      "$baseUrl/api/users/checkactive/$uid";
 
   //lesson
   static String get getAllLessons => "$baseUrl/api/lessons";
@@ -63,12 +65,46 @@ class ApiConfig {
     return url;
   }
 
+  static String getUserQuizResults(String userUid) =>
+      "$baseUrl/api/quiz-results/users/$userUid/results";
+  static String getQuizzesByCourseId(int courseId) =>
+      "$baseUrl/api/quizzes/getquizbycoures/$courseId";
+  static String get createQuiz => "$baseUrl/api/quizzes/create";
+  static String updateQuiz(int quizId) => "$baseUrl/api/quizzes/update/$quizId";
+  static String deleteQuiz(int quizId) => "$baseUrl/api/quizzes/delete/$quizId";
+
   // Questions
   static String getQuestionsByQuizId(int quizId) {
     final url = "$baseUrl/api/questions/$quizId";
     print('URL getQuestionsByQuizId: $url');
     return url;
   }
+
+  // Quiz Results & Questions
+  static String get submitQuizResult => "$baseUrl/api/quiz-results/submit";
+  static String updateQuestion(int questionId) =>
+      "$baseUrl/api/questions/update/$questionId";
+  static String deleteQuestion(int questionId) =>
+      "$baseUrl/api/questions/delete/$questionId";
+  static String get createQuestionManual =>
+      "$baseUrl/api/questions/createbyuser";
+  static String get createQuestionAI => "$baseUrl/api/questions/createbyai";
+
+  // Course related endpoints (excluding getAllCourses which is already there)
+  static String getCoursesByInstructor(String instructorUid) =>
+      "$baseUrl/api/courses/mentor/$instructorUid";
+  static String updateCourse(int courseId) =>
+      "$baseUrl/api/courses/update/$courseId";
+  static String deleteCourse(int courseId) =>
+      "$baseUrl/api/courses/delete/$courseId";
+  static String get createCourse => "$baseUrl/api/courses/create";
+
+  // Category related endpoints (excluding getAllCategory which is already there)
+  static String get createCategory => "$baseUrl/api/course-categories/create";
+  static String deleteCategory(int categoryId) =>
+      "$baseUrl/api/course-categories/delete/$categoryId";
+  static String updateCategory(int categoryId) =>
+      "$baseUrl/api/course-categories/update/$categoryId";
 
   // Helper method để nối URL với đường dẫn ảnh
   static String getImageUrl(String? imagePath) {

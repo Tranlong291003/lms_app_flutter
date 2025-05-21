@@ -66,9 +66,7 @@ class QuizService extends BaseService {
   Future<List<QuizResultModel>> getUserQuizResults(String userUid) async {
     try {
       print('QuizService: Gọi API lấy kết quả đã làm cho user $userUid');
-      final response = await get(
-        '${ApiConfig.baseUrl}/api/quiz-results/users/$userUid/results',
-      );
+      final response = await get(ApiConfig.getUserQuizResults(userUid));
       print('QuizService: Nhận dữ liệu từ API: ${response.data}');
       if (response.statusCode == 200 && response.data['results'] != null) {
         final List<dynamic> data = response.data['results'];
@@ -84,9 +82,7 @@ class QuizService extends BaseService {
 
   Future<List<QuizModel>> getQuizzesByCourseId(int courseId) async {
     try {
-      final response = await get(
-        'http://192.168.10.203:3000/api/quizzes/getquizbycoures/$courseId',
-      );
+      final response = await get(ApiConfig.getQuizzesByCourseId(courseId));
       if (response.statusCode == 200 && response.data['data'] != null) {
         final List<dynamic> data = response.data['data'];
         return data.map((e) => QuizModel.fromJson(e)).toList();
@@ -100,10 +96,7 @@ class QuizService extends BaseService {
 
   Future<bool> createQuiz(Map<String, dynamic> data) async {
     try {
-      final response = await post(
-        'http://192.168.10.203:3000/api/quizzes/create',
-        data: data,
-      );
+      final response = await post(ApiConfig.createQuiz, data: data);
       return response.statusCode == 201;
     } catch (e) {
       print('QuizService: Lỗi khi tạo quiz: $e');
@@ -113,10 +106,7 @@ class QuizService extends BaseService {
 
   Future<bool> updateQuiz(int quizId, Map<String, dynamic> data) async {
     try {
-      final response = await put(
-        'http://192.168.10.203:3000/api/quizzes/update/$quizId',
-        data: data,
-      );
+      final response = await put(ApiConfig.updateQuiz(quizId), data: data);
       return response.statusCode == 200;
     } catch (e) {
       print('QuizService: Lỗi khi cập nhật quiz: $e');
@@ -126,10 +116,7 @@ class QuizService extends BaseService {
 
   Future<bool> deleteQuiz(int quizId, Map<String, dynamic> data) async {
     try {
-      final response = await delete(
-        'http://192.168.10.203:3000/api/quizzes/delete/$quizId',
-        data: data,
-      );
+      final response = await delete(ApiConfig.deleteQuiz(quizId), data: data);
       return response.statusCode == 200;
     } catch (e) {
       print('QuizService: Lỗi khi xoá quiz: $e');

@@ -17,6 +17,7 @@ import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/screens/home/appBar_widget.dart';
 import 'package:lms/screens/home/discountSlider_widget.dart';
 import 'package:lms/screens/home/topMentors_widget.dart';
+import 'package:lms/services/user_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,13 +27,76 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with RouteAware {
+  late final UserService _userService;
+
   @override
   void initState() {
     super.initState();
+    _userService = UserService(token: FirebaseAuth.instance.currentUser?.uid);
     _loadMentor();
     _loadCurrentUser();
     _loadCourses();
+    _checkUserActive();
     context.read<CategoryCubit>().fetchAllCategory();
+  }
+
+  Future<void> _checkUserActive() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      try {
+        final isActive = await _userService.checkUserActive(currentUser.uid);
+        if (!isActive) {
+          await _handleInactiveUser();
+        }
+      } catch (e) {
+        if (mounted) {
+          String errorMessage = 'Lỗi kiểm tra trạng thái tài khoản';
+
+          // Handle specific Firebase Auth errors
+          if (e.toString().contains('account has been disabled')) {
+            await _handleInactiveUser();
+            return;
+          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _handleInactiveUser() async {
+    if (!mounted) return;
+
+    // Show message first
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Tài khoản của bạn đã bị vô hiệu hóa bởi quản trị viên.'),
+        duration: Duration(seconds: 3),
+      ),
+    );
+
+    // Wait for message to be shown
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Sign out
+    await FirebaseAuth.instance.signOut();
+
+    // Wait for sign out to complete
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (!mounted) return;
+
+    // Navigate to login screen
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRouter.login,
+      (route) => false,
+    );
   }
 
   void _loadMentor() {
@@ -64,8 +128,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   @override
   void didPopNext() {
-    // Khi quay lại từ trang khác, reload lại courses
+    // Khi quay lại từ trang khác, reload lại courses và kiểm tra active status
     _loadCourses();
+    _checkUserActive();
     super.didPopNext();
   }
 
@@ -90,7 +155,39 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SearchBarWidget(),
+                SearchBarWidget(
+                  onChanged: (value) {
+                    // Tìm kiếm trong danh sách khóa học
+                    final courseState = context.read<CourseCubit>().state;
+                    if (courseState is CourseLoaded) {
+                      var filteredCourses = courseState.randomCourses;
+                      if (value.isNotEmpty) {
+                        filteredCourses =
+                            filteredCourses.where((course) {
+                              final title = course.title.toLowerCase();
+                              final description =
+                                  course.description.toLowerCase();
+                              final searchTerm = value.toLowerCase();
+                              return title.contains(searchTerm) ||
+                                  description.contains(searchTerm);
+                            }).toList();
+                      }
+                      // Cập nhật danh sách khóa học đã lọc
+                      context.read<CourseCubit>().updateFilteredCourses(
+                        filteredCourses,
+                      );
+                    }
+                  },
+                  onFilter: () {
+                    // TODO: Thêm chức năng lọc nâng cao
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Tính năng đang được phát triển'),
+                      ),
+                    );
+                  },
+                  hintText: 'Tìm kiếm khóa học...',
+                ),
                 DiscountSlider(),
                 _buildSection(
                   title: 'Danh sách giảng viên',

@@ -17,14 +17,17 @@ import 'package:lms/cubits/category/category_cubit.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/cubits/lessons/lesson_detail_cubit.dart';
 import 'package:lms/cubits/lessons/lessons_cubit.dart';
-import 'package:lms/cubits/notification/notification_cubit.dart';
+import 'package:lms/cubits/notifications/notification_cubit.dart';
 import 'package:lms/cubits/question/question_cubit.dart';
+import 'package:lms/cubits/reviews/review_cubit.dart';
 import 'package:lms/repositories/admin_user_repository.dart';
 import 'package:lms/repositories/category_repository.dart';
 import 'package:lms/repositories/course_repository.dart';
 import 'package:lms/repositories/lesson_repository.dart';
 import 'package:lms/repositories/mentor_repository.dart';
+import 'package:lms/repositories/notification_repository.dart';
 import 'package:lms/repositories/question_repository.dart';
+import 'package:lms/repositories/review_repository.dart';
 import 'package:lms/repositories/user_repository.dart';
 import 'package:lms/screens/Introduction/cubit/intro_cubit.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
@@ -36,6 +39,7 @@ import 'package:lms/services/lesson_service.dart';
 import 'package:lms/services/mentor_service.dart';
 import 'package:lms/services/notification_service.dart';
 import 'package:lms/services/question_service.dart';
+import 'package:lms/services/review_service.dart';
 import 'package:lms/services/user_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -70,6 +74,7 @@ Future<void> main() async {
   final notificationService = NotificationService();
   final adminUserService = AdminUserService();
   final questionService = QuestionService();
+  final reviewService = ReviewService();
 
   // 2. Tạo Repositories
   final userRepository = UserRepository(userService);
@@ -78,6 +83,10 @@ Future<void> main() async {
   final courseRepository = CourseRepository(courseService);
   final adminUserRepository = AdminUserRepository(adminUserService);
   final questionRepository = QuestionRepository(questionService);
+  final reviewRepository = ReviewRepository();
+  final notificationRepository = NotificationRepository(
+    notificationService: notificationService,
+  );
 
   // 3. Các Cubit/Bloc không phụ thuộc vào BuildContext
   final themeBloc = ThemeBloc()..add(ThemeStarted());
@@ -86,9 +95,12 @@ Future<void> main() async {
   final userBloc = UserBloc(userRepository);
   final mentorBloc = MentorsBloc(mentorRepository);
   final mentorDetailBloc = MentorDetailBloc(mentorRepository);
-  final notifCubit = NotificationCubit(notificationService);
+  final notificationCubit = NotificationCubit(
+    notificationRepository: notificationRepository,
+  );
   final adminUserCubit = AdminUserCubit(adminUserRepository);
   final courseCubit = CourseCubit(courseRepository);
+  final reviewCubit = ReviewCubit();
 
   // 4. Khởi động các service cần await trước khi chạy UI
   await notificationService.initialize();
@@ -111,10 +123,8 @@ Future<void> main() async {
                 lessonService: context.read<LessonService>(),
               ),
         ),
-        BlocProvider<LessonsCubit>(
-          create:
-              (context) =>
-                  LessonsCubit(repository: context.read<LessonRepository>()),
+        RepositoryProvider<NotificationRepository>(
+          create: (_) => notificationRepository,
         ),
       ],
       child: MultiBlocProvider(
@@ -123,7 +133,7 @@ Future<void> main() async {
           BlocProvider<IntroCubit>(create: (_) => introCubit),
           BlocProvider<AuthCubit>(create: (_) => authCubit),
           BlocProvider<UserBloc>(create: (_) => userBloc),
-          BlocProvider<NotificationCubit>(create: (_) => notifCubit),
+          BlocProvider<NotificationCubit>(create: (_) => notificationCubit),
           BlocProvider<MentorsBloc>(create: (_) => mentorBloc),
           BlocProvider<MentorDetailBloc>(create: (_) => mentorDetailBloc),
           BlocProvider<CategoryCubit>(
@@ -134,6 +144,12 @@ Future<void> main() async {
           BlocProvider<AdminUserCubit>(create: (_) => adminUserCubit),
           BlocProvider<QuestionCubit>(
             create: (_) => QuestionCubit(questionRepository),
+          ),
+          BlocProvider<ReviewCubit>(create: (_) => reviewCubit),
+          BlocProvider<LessonsCubit>(
+            create:
+                (context) =>
+                    LessonsCubit(repository: context.read<LessonRepository>()),
           ),
         ],
         child: MyApp(notificationService: notificationService),

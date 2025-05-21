@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
 import 'package:lms/cubits/bookmark/bookmark_state.dart';
 import 'package:lms/models/courses/courses_model.dart';
@@ -15,12 +16,14 @@ class ListCoursesWidget extends StatefulWidget {
   final List<Course> courses;
   final String userUid;
   final String? token;
+  final BookmarkCubit? bookmarkCubit;
 
   const ListCoursesWidget({
     super.key,
     required this.courses,
     required this.userUid,
     this.token,
+    this.bookmarkCubit,
   });
 
   @override
@@ -34,7 +37,13 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
   @override
   void initState() {
     super.initState();
-    _initBookmarks();
+    if (widget.bookmarkCubit != null) {
+      _bookmarkCubit = widget.bookmarkCubit!;
+      _updateCoursesBookmarkStatus();
+      _isLoading = false;
+    } else {
+      _initBookmarks();
+    }
   }
 
   Future<void> _initBookmarks() async {
@@ -45,28 +54,28 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
       return;
     }
 
-    // Khởi tạo bookmark service và cubit
     final bookmarkService = BookmarkService(token: widget.token);
     final bookmarkRepository = BookmarkRepository(bookmarkService);
     _bookmarkCubit = BookmarkCubit(bookmarkRepository);
 
     try {
-      // Tải danh sách bookmark
       await _bookmarkCubit.getBookmarks(widget.userUid);
 
-      // Cập nhật trạng thái bookmark cho các khóa học
       _updateCoursesBookmarkStatus();
     } catch (e) {
       print('Không thể tải bookmarks: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   void _updateCoursesBookmarkStatus() {
-    if (widget.courses.isEmpty) return;
+    if (widget.courses.isEmpty ||
+        _bookmarkCubit.state.status != BookmarkStatus.loaded) {
+      return;
+    }
 
     bool hasChanges = false;
 
@@ -88,21 +97,23 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
 
   @override
   void dispose() {
-    _bookmarkCubit.close();
+    if (widget.bookmarkCubit == null) {
+      _bookmarkCubit.close();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: LoadingIndicator());
     }
 
     final theme = Theme.of(context);
     final priceFmt = NumberFormat('#,###');
 
     return BlocProvider.value(
-      value: _bookmarkCubit,
+      value: widget.bookmarkCubit ?? _bookmarkCubit,
       child: BlocConsumer<BookmarkCubit, BookmarkState>(
         listener: (context, state) {
           if (!state.isBookmarking &&
@@ -112,15 +123,28 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
           }
         },
         builder: (context, bookmarkState) {
+          if (bookmarkState.status == BookmarkStatus.loading &&
+              widget.bookmarkCubit == null) {
+            return const Center(child: LoadingIndicator());
+          }
+
+          final List<Course> coursesToDisplay = widget.courses;
+
+          if (coursesToDisplay.isEmpty) {
+            return const SizedBox.shrink();
+          }
+
           return ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: widget.courses.length,
+            itemCount: coursesToDisplay.length,
             separatorBuilder: (_, __) => const SizedBox(height: 16),
             itemBuilder: (context, i) {
-              final c = widget.courses[i];
+              final c = coursesToDisplay[i];
               final actualPrice =
                   c.discountPrice > 0 ? c.discountPrice : c.price;
+
+              final bool isBookmarked = _bookmarkCubit.isBookmarked(c.courseId);
 
               return InkWell(
                 borderRadius: BorderRadius.circular(16),
@@ -148,25 +172,20 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              ApiConfig.getImageUrl(c.thumbnailUrl) ?? '',
-                              width: 120,
-                              height: 120,
-                              fit: BoxFit.cover,
-                              errorBuilder:
-                                  (_, __, ___) => Container(
-                                    width: 120,
-                                    height: 120,
-                                    color:
-                                        theme
-                                            .colorScheme
-                                            .surfaceContainerHighest,
-                                    child: Icon(
-                                      Icons.broken_image,
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                            ),
+                            child:
+                                c.thumbnailUrl != null &&
+                                        c.thumbnailUrl!.isNotEmpty
+                                    ? Image.network(
+                                      ApiConfig.getImageUrl(c.thumbnailUrl) ??
+                                          '',
+                                      width: 120,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (_, __, ___) =>
+                                              _buildPlaceholderImage(context),
+                                    )
+                                    : _buildPlaceholderImage(context),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -288,9 +307,7 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                             size: 20,
                             bookmarkCubit: _bookmarkCubit,
                             onToggle: (isBookmarked) {
-                              setState(() {
-                                widget.courses[i].isBookmarked = isBookmarked;
-                              });
+                              // Không cần setState ở đây nữa nếu logic cập nhật nằm ở BookmarkCubit
                             },
                           ),
                         ),
@@ -302,6 +319,27 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
             },
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderImage(BuildContext context) {
+    return Container(
+      width: 120,
+      height: 120,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.menu_book_rounded,
+          size: 48,
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+        ),
       ),
     );
   }

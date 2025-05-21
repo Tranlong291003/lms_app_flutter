@@ -109,8 +109,6 @@ class _QuickActionsList extends StatelessWidget {
         ),
 
         const SizedBox(height: 12),
-
-        const SizedBox(height: 12),
         _QuickActionCard(
           icon: Icons.category,
           title: 'Quản lý danh mục',

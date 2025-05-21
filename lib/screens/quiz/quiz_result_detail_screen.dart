@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/quiz/quiz_cubit.dart';
 import 'package:lms/models/quiz/quiz_result_model.dart';
 import 'package:lms/repositories/question_repository.dart';
@@ -40,7 +41,7 @@ class _QuizResultDetailView extends StatelessWidget {
       body: BlocBuilder<QuizResultCubit, QuizResultState>(
         builder: (context, state) {
           if (state is QuizResultLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LoadingIndicator());
           }
           if (state is QuizResultError) {
             return Center(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/models/courses/courses_model.dart';
@@ -90,7 +91,7 @@ class _CourseManagementAdminScreenState
               child: BlocBuilder<CourseCubit, CourseState>(
                 builder: (context, state) {
                   if (state is CourseLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: LoadingIndicator());
                   }
 
                   if (state is CourseError) {

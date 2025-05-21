@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/quiz/quiz_cubit.dart';
 import 'package:lms/cubits/quiz/quiz_state.dart';
 import 'package:lms/models/quiz/quiz_course_model.dart';
@@ -101,7 +102,7 @@ class _QuizListScreenState extends State<QuizListScreen>
   @override
   Widget build(BuildContext context) {
     if (!_isInitialized) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: LoadingIndicator()));
     }
 
     if (_userUid == null) {
@@ -157,7 +158,7 @@ class _QuizListScreenState extends State<QuizListScreen>
           builder: (context, state) {
             if (state.status == QuizStatus.loading &&
                 state.enrolledCourses.isEmpty) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: LoadingIndicator());
             }
 
             if (state.status == QuizStatus.error) {

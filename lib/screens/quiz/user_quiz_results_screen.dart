@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/quiz/quiz_cubit.dart';
 import 'package:lms/repositories/quiz_repository.dart';
 import 'package:lms/services/quiz_service.dart';
@@ -11,6 +12,9 @@ class UserQuizResultsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return BlocProvider(
       create:
           (_) =>
@@ -20,21 +24,24 @@ class UserQuizResultsScreen extends StatelessWidget {
         body: BlocBuilder<QuizResultListCubit, QuizResultListState>(
           builder: (context, state) {
             if (state is QuizResultListLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: LoadingIndicator());
             }
             if (state is QuizResultListError) {
               return Center(
                 child: Text(
                   state.message,
-                  style: const TextStyle(color: Colors.red),
+                  style: TextStyle(color: colorScheme.error),
                 ),
               );
             }
             if (state is QuizResultListLoaded) {
               final results = state.results;
               if (results.isEmpty) {
-                return const Center(
-                  child: Text('Bạn chưa làm bài kiểm tra nào.'),
+                return Center(
+                  child: Text(
+                    'Bạn chưa làm bài kiểm tra nào.',
+                    style: TextStyle(color: colorScheme.onSurface),
+                  ),
                 );
               }
               return ListView.separated(
@@ -52,6 +59,7 @@ class UserQuizResultsScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 2,
+                    color: theme.cardColor,
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(
                         vertical: 16,
@@ -71,10 +79,7 @@ class UserQuizResultsScreen extends StatelessWidget {
                       ),
                       title: Text(
                         title,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                        style: theme.textTheme.titleMedium,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -86,9 +91,9 @@ class UserQuizResultsScreen extends StatelessWidget {
                               padding: const EdgeInsets.only(top: 2, bottom: 2),
                               child: Text(
                                 'Ngày làm: ${_formatDateTime(submittedAt)}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
-                                  color: Colors.black54,
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ),

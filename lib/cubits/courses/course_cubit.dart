@@ -196,6 +196,24 @@ class CourseCubit extends Cubit<CourseState> {
     updateBookmarkStatus([courseId], isBookmarked);
   }
 
+  /// Cập nhật danh sách khóa học đã lọc
+  ///
+  /// [filteredCourses] - Danh sách khóa học đã được lọc
+  void updateFilteredCourses(List<Course> filteredCourses) {
+    if (state is CourseLoaded) {
+      final loaded = state as CourseLoaded;
+      emit(
+        CourseLoaded(
+          loaded.courses,
+          filteredCourses,
+          approvedCourses: loaded.approvedCourses,
+          pendingCourses: loaded.pendingCourses,
+          rejectedCourses: loaded.rejectedCourses,
+        ),
+      );
+    }
+  }
+
   /// Lấy danh sách khóa học của giảng viên (mentor)
   ///
   /// [instructorUid] - ID của giảng viên cần lấy khóa học

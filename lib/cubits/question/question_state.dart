@@ -108,8 +108,9 @@ class QuestionState {
   }
 
   bool get allQuestionsAnswered {
-    if (userAnswers.isEmpty || userAnswers.length != questions.length)
+    if (userAnswers.isEmpty || userAnswers.length != questions.length) {
       return false;
+    }
     return !userAnswers.contains(-1);
   }
 }

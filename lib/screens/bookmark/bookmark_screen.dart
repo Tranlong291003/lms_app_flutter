@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
 import 'package:lms/cubits/bookmark/bookmark_state.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
@@ -28,11 +30,31 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   late CourseCubit _courseCubit;
   bool _isLoading = true;
   List<Course> _bookmarkedCourses = [];
+  List<Course> _filteredCourses = [];
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     _initCubits();
+  }
+
+  void _filterCourses(String query) {
+    setState(() {
+      _searchQuery = query;
+      if (query.isEmpty) {
+        _filteredCourses = _bookmarkedCourses;
+      } else {
+        _filteredCourses =
+            _bookmarkedCourses.where((course) {
+              final title = course.title.toLowerCase();
+              final description = course.description.toLowerCase();
+              final searchLower = query.toLowerCase();
+              return title.contains(searchLower) ||
+                  description.contains(searchLower);
+            }).toList();
+      }
+    });
   }
 
   Future<void> _initCubits() async {
@@ -74,6 +96,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   void _fetchBookmarkedCourses() {
     if (_bookmarkCubit.state.bookmarks.isEmpty) {
       _bookmarkedCourses = [];
+      _filteredCourses = [];
       return;
     }
 
@@ -97,6 +120,9 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
         course.isBookmarked = true;
       }
 
+      // Khởi tạo danh sách đã lọc
+      _filteredCourses = _bookmarkedCourses;
+
       print('Tìm thấy ${_bookmarkedCourses.length} khóa học đã bookmark');
     }
   }
@@ -111,8 +137,12 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Bookmark')),
-        body: const Center(child: CircularProgressIndicator()),
+        appBar: CustomAppBar(
+          title: "Danh sách khoá học yêu thich",
+          showBack: true,
+          showSearch: true,
+        ),
+        body: const Center(child: LoadingIndicator()),
       );
     }
 
@@ -141,23 +171,16 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
           ),
         ],
         child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Khóa học đã lưu'),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: () {
-                  _bookmarkCubit.refreshBookmarks(widget.userUid);
-                  _courseCubit.refreshCourses();
-                },
-                tooltip: 'Làm mới',
-              ),
-            ],
+          appBar: CustomAppBar(
+            title: "Danh sách khoá học yêu thich",
+            showBack: true,
+            showSearch: true,
+            onSearchChanged: _filterCourses,
           ),
           body: BlocBuilder<BookmarkCubit, BookmarkState>(
             builder: (context, bookmarkState) {
               if (bookmarkState.status == BookmarkStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: LoadingIndicator());
               }
 
               if (bookmarkState.status == BookmarkStatus.error) {
@@ -222,7 +245,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   Widget _buildBookmarkedCoursesList() {
     final priceFmt = NumberFormat('#,###');
 
-    if (_bookmarkedCourses.isEmpty) {
+    if (_filteredCourses.isEmpty) {
       return RefreshIndicator(
         onRefresh: () async {
           await _bookmarkCubit.refreshBookmarks(widget.userUid);
@@ -245,209 +268,14 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
       },
       child: ListView.separated(
         padding: const EdgeInsets.all(16),
-        itemCount: _bookmarkedCourses.length,
+        itemCount: _filteredCourses.length,
         separatorBuilder: (_, __) => const SizedBox(height: 16),
         itemBuilder: (context, index) {
-          final course = _bookmarkedCourses[index];
+          final course = _filteredCourses[index];
           final bookmark = _bookmarkCubit.getBookmarkByCourseId(
             course.courseId,
           );
-          final actualPrice =
-              course.discountPrice > 0 ? course.discountPrice : course.price;
-
-          return InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                AppRouter.courseDetail,
-                arguments: course.courseId,
-              );
-            },
-            child: Container(
-              height: 140,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child:
-                            course.thumbnailUrl != null &&
-                                    course.thumbnailUrl!.isNotEmpty
-                                ? Image.network(
-                                  ApiConfig.getImageUrl(course.thumbnailUrl),
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (_, __, ___) =>
-                                          _buildPlaceholderImage(context),
-                                )
-                                : _buildPlaceholderImage(context),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Tags
-                            Row(
-                              children: [
-                                _tag(
-                                  context,
-                                  course.categoryName,
-                                  Theme.of(
-                                    context,
-                                  ).colorScheme.primaryContainer,
-                                  Theme.of(
-                                    context,
-                                  ).colorScheme.onPrimaryContainer,
-                                ),
-                                const SizedBox(width: 8),
-                                _tag(
-                                  context,
-                                  course.level,
-                                  _getLevelColor(context, course.level),
-                                  Theme.of(context).colorScheme.onPrimary,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-
-                            // Title
-                            Text(
-                              course.title,
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 6),
-
-                            // Price
-                            Row(
-                              children: [
-                                Text(
-                                  course.displayPrice,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodyLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ),
-                                if (course.discountPrice > 0 &&
-                                    course.price > 0) ...[
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    course.price == 0
-                                        ? ''
-                                        : '${course.price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} VND',
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodySmall?.copyWith(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface.withOpacity(0.6),
-                                      decoration: TextDecoration.lineThrough,
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-
-                            // Rating & Enroll
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.star,
-                                  size: 16,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  course.rating.toStringAsFixed(1),
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                                const SizedBox(width: 16),
-                                Icon(
-                                  Icons.person,
-                                  size: 16,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface.withOpacity(0.6),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${course.enrollCount} người học',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  // Bookmark button
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.surface.withOpacity(0.8),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.outline.withOpacity(0.1),
-                            ),
-                          ),
-                          child: BookmarkButton(
-                            courseId: course.courseId,
-                            userUid: widget.userUid,
-                            token: widget.token,
-                            size: 20,
-                            bookmarkCubit: _bookmarkCubit,
-                            onToggle: (isBookmarked) {
-                              if (!isBookmarked) {
-                                setState(() {
-                                  _bookmarkedCourses.removeWhere(
-                                    (c) => c.courseId == course.courseId,
-                                  );
-                                });
-                              }
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
+          return _buildBookmarkItem(course, bookmark);
         },
       ),
     );
@@ -516,32 +344,199 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
     }
   }
 
-  Widget _tag(BuildContext context, String text, Color bg, Color fg) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: fg),
+  Widget _buildBookmarkItem(Course course, BookmarkModel? bookmark) {
+    final priceFmt = NumberFormat('#,###');
+    final actualPrice =
+        course.discountPrice > 0 ? course.discountPrice : course.price;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          AppRouter.courseDetail,
+          arguments: course.courseId,
+        );
+      },
+      child: Container(
+        height: 140,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          ),
+        ),
+        child: Stack(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child:
+                      course.thumbnailUrl != null &&
+                              course.thumbnailUrl!.isNotEmpty
+                          ? Image.network(
+                            ApiConfig.getImageUrl(course.thumbnailUrl),
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (_, __, ___) => _buildPlaceholderImage(context),
+                          )
+                          : _buildPlaceholderImage(context),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Tags
+                      Row(
+                        children: [
+                          _tag(
+                            context,
+                            course.categoryName,
+                            Theme.of(context).colorScheme.primaryContainer,
+                            Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                          const SizedBox(width: 8),
+                          _tag(
+                            context,
+                            course.level,
+                            _getLevelColor(context, course.level),
+                            Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+
+                      // Title
+                      Text(
+                        course.title,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+
+                      // Price
+                      Row(
+                        children: [
+                          Text(
+                            course.displayPrice,
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                          if (course.discountPrice > 0 && course.price > 0) ...[
+                            const SizedBox(width: 8),
+                            Text(
+                              course.price == 0
+                                  ? ''
+                                  : '${course.price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} VND',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.6),
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+
+                      // Rating & Enroll
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.star,
+                            size: 16,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            course.rating.toStringAsFixed(1),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          const SizedBox(width: 16),
+                          Icon(
+                            Icons.person,
+                            size: 16,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.6),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${course.enrollCount} người học',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            // Bookmark button
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surface.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.outline.withOpacity(0.1),
+                      ),
+                    ),
+                    child: BookmarkButton(
+                      courseId: course.courseId,
+                      userUid: widget.userUid,
+                      token: widget.token,
+                      size: 20,
+                      bookmarkCubit: _bookmarkCubit,
+                      onToggle: (isBookmarked) {
+                        if (!isBookmarked) {
+                          setState(() {
+                            _bookmarkedCourses.removeWhere(
+                              (c) => c.courseId == course.courseId,
+                            );
+                            _filteredCourses.removeWhere(
+                              (c) => c.courseId == course.courseId,
+                            );
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
-  }
-
-  static Color _getLevelColor(BuildContext context, String level) {
-    final theme = Theme.of(context);
-    switch (level.toLowerCase()) {
-      case 'cơ bản':
-        return theme.colorScheme.tertiary;
-      case 'trung cấp':
-        return theme.colorScheme.secondary;
-      case 'nâng cao':
-        return theme.colorScheme.error;
-      default:
-        return theme.colorScheme.surfaceContainerHighest;
-    }
   }
 
   Widget _buildPlaceholderImage(BuildContext context) {
@@ -550,10 +545,45 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
       height: 120,
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Icon(
-        Icons.broken_image,
+        Icons.image_not_supported_outlined,
+        size: 32,
         color: Theme.of(context).colorScheme.onSurfaceVariant,
-        size: 48,
       ),
     );
+  }
+
+  Widget _tag(
+    BuildContext context,
+    String text,
+    Color backgroundColor,
+    Color textColor,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: textColor,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Color _getLevelColor(BuildContext context, String level) {
+    switch (level.toLowerCase()) {
+      case 'beginner':
+        return Colors.green;
+      case 'intermediate':
+        return Colors.orange;
+      case 'advanced':
+        return Colors.red;
+      default:
+        return Theme.of(context).colorScheme.primary;
+    }
   }
 }

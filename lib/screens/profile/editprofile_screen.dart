@@ -13,7 +13,7 @@ import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/blocs/user/user_state.dart';
-import 'package:lms/cubits/notification/notification_cubit.dart';
+import 'package:lms/cubits/notifications/notification_cubit.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -167,23 +167,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             }
 
             if (state is! UserLoaded) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: colorScheme.error,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Không có dữ liệu người dùng',
-                      style: theme.textTheme.titleMedium,
-                    ),
-                  ],
-                ),
-              );
+              return const Center(child: LoadingIndicator());
             }
 
             final user = state.user;
@@ -454,10 +438,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                           SizedBox(
                                             width: 20,
                                             height: 20,
-                                            child: CircularProgressIndicator(
-                                              color: colorScheme.onPrimary,
-                                              strokeWidth: 2,
-                                            ),
+                                            child: LoadingIndicator(),
                                           ),
                                           const SizedBox(width: 12),
                                           const Text('Đang lưu...'),

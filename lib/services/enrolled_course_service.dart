@@ -13,13 +13,7 @@ class EnrolledCourseService extends BaseService {
     String userUid,
   ) async {
     try {
-      // print(
-      //   '[EnrolledCourseService] Đang gọi API: ${ApiConfig.getEnrolledCoursesByUser(userUid)}',
-      // );
       final response = await get(ApiConfig.getEnrolledCoursesByUser(userUid));
-
-      // print('[EnrolledCourseService] Kết quả trả về: ${response.statusCode}');
-      // _debugPrintResponse(response.data);
 
       // Khởi tạo kết quả mặc định
       final result = {
@@ -27,80 +21,44 @@ class EnrolledCourseService extends BaseService {
         'completed': <EnrolledCourse>[],
       };
 
-      if (response.statusCode == 200) {
-        // Kiểm tra xem response.data có phải là Map hay không
-        if (response.data is Map<String, dynamic>) {
-          // print('[EnrolledCourseService] Dữ liệu trả về là Map');
+      if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
+        final responseData = response.data as Map<String, dynamic>;
 
-          // Kiểm tra xem có trường 'data' trong Map không
-          if (response.data.containsKey('data')) {
-            final data = response.data['data'];
+        if (responseData.containsKey('data') &&
+            responseData['data'] is Map<String, dynamic>) {
+          final data = responseData['data'] as Map<String, dynamic>;
 
-            // Kiểm tra xem trường 'data' có phải là Map không
-            if (data is Map<String, dynamic>) {
-              print(
-                '[EnrolledCourseService] Trường data là Map với các key: ${data.keys.toList()}',
-              );
-
-              // Xử lý khóa học đang học (in_progress)
-              if (data.containsKey('in_progress') &&
-                  data['in_progress'] is List) {
-                final inProgressList = data['in_progress'] as List;
-                print(
-                  '[EnrolledCourseService] Có ${inProgressList.length} khóa học đang học',
-                );
-
-                result['in_progress'] =
-                    inProgressList
-                        .map((item) => EnrolledCourse.fromJson(item))
-                        .toList();
-              }
-
-              // Xử lý khóa học đã hoàn thành (completed)
-              if (data.containsKey('completed') && data['completed'] is List) {
-                final completedList = data['completed'] as List;
-                print(
-                  '[EnrolledCourseService] Có ${completedList.length} khóa học đã hoàn thành',
-                );
-
-                result['completed'] =
-                    completedList
-                        .map((item) => EnrolledCourse.fromJson(item))
-                        .toList();
-              }
-
-              return result;
-            } else {
-              print(
-                '[EnrolledCourseService] Trường data không phải là Map: ${data.runtimeType}',
-              );
-            }
-          } else {
-            print(
-              '[EnrolledCourseService] Không tìm thấy trường data trong response',
-            );
+          // Xử lý khóa học đang học (in_progress)
+          if (data.containsKey('in_progress') && data['in_progress'] is List) {
+            result['in_progress'] =
+                (data['in_progress'] as List)
+                    .map((item) => EnrolledCourse.fromJson(item))
+                    .toList();
           }
-        } else {
-          print(
-            '[EnrolledCourseService] Dữ liệu trả về không phải là Map: ${response.data.runtimeType}',
-          );
+
+          // Xử lý khóa học đã hoàn thành (completed)
+          if (data.containsKey('completed') && data['completed'] is List) {
+            result['completed'] =
+                (data['completed'] as List)
+                    .map((item) => EnrolledCourse.fromJson(item))
+                    .toList();
+          }
         }
-      } else {
-        print(
-          '[EnrolledCourseService] Mã trạng thái không phải 200: ${response.statusCode}',
-        );
       }
 
-      return result; // Trả về kết quả mặc định nếu có lỗi
+      print('[EnrolledCourseService] Đã xử lý dữ liệu đăng ký thành công');
+      return result; // Trả về kết quả (có thể rỗng nếu lỗi hoặc không có dữ liệu)
     } on DioException catch (e) {
       print('[EnrolledCourseService] Lỗi DioException: ${e.message}');
       print('[EnrolledCourseService] Response: ${e.response?.data}');
+      // Trả về danh sách rỗng trong trường hợp lỗi
       return {
         'in_progress': <EnrolledCourse>[],
         'completed': <EnrolledCourse>[],
       };
     } catch (e) {
       print('[EnrolledCourseService] Lỗi không xác định: $e');
+      // Trả về danh sách rỗng trong trường hợp lỗi
       return {
         'in_progress': <EnrolledCourse>[],
         'completed': <EnrolledCourse>[],

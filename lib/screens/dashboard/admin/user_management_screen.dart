@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/mentors/mentor_detail_bloc.dart';
 import 'package:lms/blocs/mentors/mentors_event.dart';
 import 'package:lms/cubits/admin/admin_user_cubit.dart';
@@ -522,7 +523,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         builder: (context, state) {
           if (state is AdminUserLoading || _isLoading) {
             // Chỉ hiển thị loading indicator ở giữa
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LoadingIndicator());
           }
           if (state is AdminUserError) {
             return _buildErrorState(state.message, colorScheme, theme);

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_state.dart';
 import 'package:lms/cubits/question/question_cubit.dart';
@@ -378,7 +379,11 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () {
+                            // Đóng dialog kết quả
                             Navigator.of(context).pop();
+                            // Lùi về màn hình trước đó
+                            Navigator.of(context).pop();
+                            // Lùi thêm 1 màn hình nữa
                             Navigator.of(context).pop();
                           },
                           style: OutlinedButton.styleFrom(
@@ -692,11 +697,11 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
           ),
           body:
               _isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(child: LoadingIndicator())
                   : BlocBuilder<QuestionCubit, QuestionState>(
                     builder: (context, state) {
                       if (state.status == QuestionStatus.loading) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: LoadingIndicator());
                       }
 
                       if (state.status == QuestionStatus.error) {

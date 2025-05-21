@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/category/category_cubit.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/models/category_model.dart';
@@ -178,8 +179,7 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder:
-              (context) => const Center(child: CircularProgressIndicator()),
+          builder: (context) => const Center(child: LoadingIndicator()),
         );
 
         if (widget.isEdit && widget.initialData != null) {
@@ -325,7 +325,7 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
               BlocBuilder<CategoryCubit, CategoryState>(
                 builder: (context, state) {
                   if (state is CategoryLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: LoadingIndicator());
                   }
                   if (state is CategoryLoaded) {
                     _categories = state.categories;

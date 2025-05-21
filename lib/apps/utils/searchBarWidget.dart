@@ -8,6 +8,7 @@ class SearchBarWidget extends StatefulWidget {
   final TextEditingController? controller;
   final VoidCallback? onClear;
   final EdgeInsetsGeometry? margin;
+  final ValueChanged<String>? onSubmitted;
 
   const SearchBarWidget({
     super.key,
@@ -18,6 +19,7 @@ class SearchBarWidget extends StatefulWidget {
     this.controller,
     this.onClear,
     this.margin,
+    this.onSubmitted,
   });
 
   @override
@@ -134,6 +136,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget>
             child: TextField(
               controller: _controller,
               onChanged: widget.onChanged,
+              onSubmitted: widget.onSubmitted,
               autofocus: widget.autofocus,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: colorScheme.onSurface,

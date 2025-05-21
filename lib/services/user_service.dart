@@ -80,4 +80,13 @@ class UserService extends BaseService {
       throw Exception('Lỗi khi tải danh sách người dùng: $e');
     }
   }
+
+  Future<bool> checkUserActive(String uid) async {
+    try {
+      final response = await get(ApiConfig.checkUserActive(uid));
+      return response.data['is_active'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/apps/config/app_theme.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 
 class ForgotpasswordScreen extends StatefulWidget {
   const ForgotpasswordScreen({super.key});
@@ -216,13 +217,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen>
                                       ? const SizedBox(
                                         width: 24,
                                         height: 24,
-                                        child: CircularProgressIndicator(
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
-                                              ),
-                                          strokeWidth: 3,
-                                        ),
+                                        child: LoadingIndicator(),
                                       )
                                       : const Text(
                                         'Gửi yêu cầu',

@@ -241,25 +241,46 @@ class AppRouter {
     return PageRouteBuilder(
       settings: settings,
       pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionDuration: const Duration(milliseconds: 500),
+      transitionDuration: const Duration(milliseconds: 400),
+      reverseTransitionDuration: const Duration(milliseconds: 300),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        // Slide từ phải sang trái, biên độ lớn hơn, curve mượt
+        // Slide animation with custom curve
         final slideAnim = Tween<Offset>(
-          begin: const Offset(1.0, 0),
+          begin: const Offset(0.3, 0),
           end: Offset.zero,
         ).animate(
-          CurvedAnimation(parent: animation, curve: Curves.easeInOutQuart),
+          CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          ),
         );
 
-        // Fade in đồng thời
-        final fadeAnim = Tween<double>(
-          begin: 0.0,
-          end: 1.0,
-        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+        // Scale animation for a subtle zoom effect
+        final scaleAnim = Tween<double>(begin: 0.95, end: 1.0).animate(
+          CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          ),
+        );
 
-        return SlideTransition(
-          position: slideAnim,
-          child: FadeTransition(opacity: fadeAnim, child: child),
+        // Fade animation with custom curve
+        final fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(
+            parent: animation,
+            curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+            reverseCurve: const Interval(0.5, 1.0, curve: Curves.easeIn),
+          ),
+        );
+
+        // Combine all animations
+        return FadeTransition(
+          opacity: fadeAnim,
+          child: SlideTransition(
+            position: slideAnim,
+            child: ScaleTransition(scale: scaleAnim, child: child),
+          ),
         );
       },
     );

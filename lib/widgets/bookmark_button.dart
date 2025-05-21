@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
 import 'package:lms/cubits/bookmark/bookmark_state.dart';
 import 'package:lms/models/bookmark_model.dart';
@@ -135,7 +136,7 @@ class _BookmarkButtonState extends State<BookmarkButton>
       return SizedBox(
         width: widget.size,
         height: widget.size,
-        child: const CircularProgressIndicator(strokeWidth: 2),
+        child: const LoadingIndicator(),
       );
     }
 

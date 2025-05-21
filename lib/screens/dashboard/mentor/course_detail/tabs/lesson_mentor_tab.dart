@@ -794,7 +794,7 @@ class _LessonFormDialogState extends State<LessonFormDialog> {
                           ? const SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            child: LoadingIndicator(),
                           )
                           : Text(isEditing ? 'Cập nhật' : 'Tạo bài học'),
                 ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/widgets/custom_snackbar.dart';
@@ -265,7 +266,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
       ),
       body:
           _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: LoadingIndicator())
               : _errorMessage != null
               ? _buildErrorWidget(theme, colors)
               : TabBarView(

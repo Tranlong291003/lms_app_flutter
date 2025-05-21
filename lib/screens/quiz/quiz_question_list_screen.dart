@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/question/question_cubit.dart';
 import 'package:lms/models/quiz/question_model.dart';
 import 'package:lms/repositories/question_repository.dart';
@@ -40,7 +41,7 @@ class _QuizQuestionListView extends StatelessWidget {
       body: BlocBuilder<QuestionCubit, QuestionState>(
         builder: (context, state) {
           if (state.status == QuestionStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LoadingIndicator());
           }
           if (state.status == QuestionStatus.error) {
             return Center(child: Text('Lỗi: \\${state.errorMessage}'));
@@ -509,10 +510,7 @@ class _CreateQuestionManualDialogState
                   ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
+                    child: LoadingIndicator(),
                   )
                   : const Text('Tạo'),
         ),
@@ -591,7 +589,7 @@ class _CreateQuestionAIDialogState extends State<_CreateQuestionAIDialog> {
                         : (v) => setState(() => difficulty = v ?? 'trung_binh'),
               ),
               const SizedBox(height: 12),
-              if (isLoading) const Center(child: CircularProgressIndicator()),
+              if (isLoading) const Center(child: LoadingIndicator()),
             ],
           ),
         ),
@@ -637,10 +635,7 @@ class _CreateQuestionAIDialogState extends State<_CreateQuestionAIDialog> {
                   ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
+                    child: LoadingIndicator(),
                   )
                   : const Text('Tạo'),
         ),

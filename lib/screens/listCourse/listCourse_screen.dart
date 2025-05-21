@@ -11,8 +11,18 @@ class ListCoursescreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Always load approved courses on build
-    context.read<CourseCubit>().loadCourses(status: 'approved');
+    // Nhận từ khóa tìm kiếm từ arguments, nếu có
+    final String? searchTerm =
+        ModalRoute.of(context)?.settings.arguments as String?;
+
+    // Luôn tải khóa học khi màn hình được build
+    // Nếu có từ khóa tìm kiếm, sử dụng nó. Ngược lại, chỉ tải các khóa học đã duyệt.
+    context.read<CourseCubit>().loadCourses(
+      status:
+          'approved', // Vẫn chỉ hiển thị khóa học đã duyệt trên màn hình này
+      search: searchTerm, // Sử dụng từ khóa tìm kiếm nếu có
+    );
+
     return Scaffold(
       appBar: CustomAppBar(
         showBack: true,
@@ -20,7 +30,8 @@ class ListCoursescreen extends StatelessWidget {
         showMenu: true,
         title: 'Danh sách khoá học',
         onSearchChanged: (value) {
-          // Gọi API tìm kiếm ở đây
+          // Gọi API tìm kiếm ở đây khi người dùng gõ trong SearchBar của ListCoursescreen
+          // (Giữ nguyên chức năng tìm kiếm trên AppBar của ListCoursescreen)
           context.read<CourseCubit>().loadCourses(
             status: 'approved',
             search: value,
