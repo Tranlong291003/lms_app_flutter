@@ -668,60 +668,130 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
 
     return showDialog<void>(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Xác nhận xóa'),
-          content: RichText(
-            text: TextSpan(
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurface,
-              ),
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 32,
+            vertical: 24,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const TextSpan(text: 'Bạn có chắc chắn muốn xóa danh mục '),
-                TextSpan(
-                  text: name,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.primary,
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.error.withOpacity(0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.warning_amber_rounded,
+                    color: colorScheme.error,
+                    size: 48,
                   ),
                 ),
-                const TextSpan(text: '?'),
+                const SizedBox(height: 18),
+                Text(
+                  'Xác nhận xoá danh mục',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: colorScheme.error,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text.rich(
+                  TextSpan(
+                    text: 'Bạn có chắc chắn muốn xoá danh mục ',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                      const TextSpan(text: ' ?'),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 28),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: colorScheme.onSurface,
+                        side: BorderSide(color: colorScheme.outline),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Hủy'),
+                    ),
+                    const SizedBox(width: 12),
+                    FilledButton.icon(
+                      onPressed: () async {
+                        try {
+                          final uid =
+                              FirebaseAuth.instance.currentUser?.uid ?? '';
+                          await context.read<CategoryCubit>().deleteCategory(
+                            id,
+                            uid,
+                          );
+                          if (mounted) {
+                            CustomSnackBar.showSuccess(
+                              context: context,
+                              message: 'Đã xóa danh mục "$name" thành công',
+                            );
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            CustomSnackBar.showError(
+                              context: context,
+                              message: 'Xóa danh mục thất bại: ${e.toString()}',
+                            );
+                          }
+                        }
+                        Navigator.of(context).pop();
+                      },
+                      icon: const Icon(Icons.delete_outline_rounded),
+                      label: const Text('Xoá'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.error,
+                        foregroundColor: colorScheme.onError,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 22,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'Hủy',
-                style: TextStyle(color: colorScheme.onSurface),
-              ),
-            ),
-            FilledButton(
-              onPressed: () async {
-                try {
-                  final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-                  await context.read<CategoryCubit>().deleteCategory(id, uid);
-                  if (mounted) {
-                    CustomSnackBar.showSuccess(
-                      context: context,
-                      message: 'Đã xóa danh mục "$name" thành công',
-                    );
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    CustomSnackBar.showError(
-                      context: context,
-                      message: 'Xóa danh mục thất bại: ${e.toString()}',
-                    );
-                  }
-                }
-                Navigator.of(context).pop();
-              },
-              style: FilledButton.styleFrom(backgroundColor: colorScheme.error),
-              child: const Text('Xóa'),
-            ),
-          ],
         );
       },
     );

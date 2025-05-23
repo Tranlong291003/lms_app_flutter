@@ -18,6 +18,7 @@ import 'package:lms/cubits/category/category_cubit.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/cubits/lessons/lesson_detail_cubit.dart';
 import 'package:lms/cubits/lessons/lessons_cubit.dart';
+import 'package:lms/cubits/mentor_request_cubit.dart';
 import 'package:lms/cubits/notifications/notification_cubit.dart';
 import 'package:lms/cubits/question/question_cubit.dart';
 import 'package:lms/cubits/reviews/review_cubit.dart';
@@ -26,6 +27,7 @@ import 'package:lms/repositories/category_repository.dart';
 import 'package:lms/repositories/course_repository.dart';
 import 'package:lms/repositories/lesson_repository.dart';
 import 'package:lms/repositories/mentor_repository.dart';
+import 'package:lms/repositories/mentor_request_repository.dart';
 import 'package:lms/repositories/notification_repository.dart';
 import 'package:lms/repositories/question_repository.dart';
 import 'package:lms/repositories/review_repository.dart';
@@ -38,6 +40,7 @@ import 'package:lms/services/auth_service.dart';
 import 'package:lms/services/category_service.dart';
 import 'package:lms/services/course_service.dart';
 import 'package:lms/services/lesson_service.dart';
+import 'package:lms/services/mentor_request_service.dart';
 import 'package:lms/services/mentor_service.dart';
 import 'package:lms/services/notification_service.dart';
 import 'package:lms/services/question_service.dart';
@@ -110,6 +113,12 @@ Future<void> main() async {
   await notificationService.initialize();
   await introCubit.checkIntroStatus();
 
+  // 1. Tạo instance
+  final mentorRequestRepository = MentorRequestRepository(
+    MentorRequestService(),
+  );
+  final mentorRequestCubit = MentorRequestCubit(mentorRequestRepository);
+
   // 5. Chạy app, bọc MyApp trong RepositoryProvider và BlocProvider
   runApp(
     MultiProvider(
@@ -129,6 +138,9 @@ Future<void> main() async {
         ),
         RepositoryProvider<NotificationRepository>(
           create: (_) => notificationRepository,
+        ),
+        RepositoryProvider<MentorRequestRepository>(
+          create: (_) => mentorRequestRepository,
         ),
       ],
       child: MultiBlocProvider(
@@ -155,6 +167,7 @@ Future<void> main() async {
                 (context) =>
                     LessonsCubit(repository: context.read<LessonRepository>()),
           ),
+          BlocProvider<MentorRequestCubit>(create: (_) => mentorRequestCubit),
         ],
         child: MyApp(notificationService: notificationService),
       ),

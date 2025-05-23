@@ -139,4 +139,6 @@ class ApiConfig {
 
   static String getQuizResultDetails(int resultId) =>
       '/api/quiz-results/$resultId';
+
+  static String get mentorRequest => "$baseUrl/api/mentor-requests";
 }

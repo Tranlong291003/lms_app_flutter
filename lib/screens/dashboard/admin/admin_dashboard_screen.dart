@@ -9,6 +9,7 @@ import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/admin/app_stats_cubit.dart';
 import 'package:lms/repositories/app_stats_repository.dart';
 import 'package:lms/screens/login/login_screen.dart';
+import 'package:lms/screens/mentor_request/mentor_request_admin_screen.dart';
 import 'package:lms/services/app_stats_service.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
@@ -198,6 +199,13 @@ class _QuickActionsList extends StatelessWidget {
     Navigator.pushNamed(context, AppRouter.adminCategories);
   }
 
+  void _navigateToMentorRequest(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const MentorRequestAdminScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -217,7 +225,6 @@ class _QuickActionsList extends StatelessWidget {
           color: Colors.teal,
           onTap: () => _navigateToCourseManagement(context),
         ),
-
         const SizedBox(height: 12),
         _QuickActionCard(
           icon: Icons.category,
@@ -225,6 +232,14 @@ class _QuickActionsList extends StatelessWidget {
           subtitle: 'Thêm, sửa, xóa danh mục và bộ lọc',
           color: Colors.amber.shade700,
           onTap: () => _navigateToCategoryManagement(context),
+        ),
+        const SizedBox(height: 12),
+        _QuickActionCard(
+          icon: Icons.verified_user,
+          title: 'Duyệt Mentor',
+          subtitle: 'Xem và duyệt các yêu cầu nâng cấp mentor',
+          color: Colors.deepPurple,
+          onTap: () => _navigateToMentorRequest(context),
         ),
         const SizedBox(height: 12),
         _QuickActionCard(

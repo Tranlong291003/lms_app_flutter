@@ -5,6 +5,7 @@ import 'package:lms/blocs/user/user_state.dart';
 import 'package:lms/screens/dashboard/admin/admin_dashboard_screen.dart';
 import 'package:lms/screens/dashboard/mentor/mentor_dashboard_screen.dart';
 import 'package:lms/screens/home/home_screen.dart';
+import 'package:lms/screens/mentor_request/mentor_request_screen.dart';
 import 'package:lms/screens/myCourse/my_course_screen.dart';
 import 'package:lms/screens/profile/profile_screen.dart';
 import 'package:lms/screens/quiz/quiz_list_screen.dart';
@@ -55,6 +56,10 @@ class _BottomNavigationBarExampleState
       if (dashboardScreen != null) dashboardScreen,
       const ProfileScreen(),
     ];
+    // Thêm màn hình đăng ký mentor nếu là user
+    if (userRole == 'user') {
+      screens.insert(3, const MentorRequestScreen());
+    }
 
     // Build danh sách item
     final items = <BottomNavigationBarItem>[
@@ -91,6 +96,12 @@ class _BottomNavigationBarExampleState
         ),
         label: 'Quiz',
       ),
+      if (userRole == 'user')
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.school_outlined),
+          activeIcon: const Icon(Icons.school),
+          label: 'Đăng ký Mentor',
+        ),
       if (dashboardScreen != null)
         BottomNavigationBarItem(
           icon: Icon(
@@ -115,6 +126,9 @@ class _BottomNavigationBarExampleState
 
     // Clamp index để tránh out-of-bounds khi số tab thay đổi
     final safeIndex = _selectedIndex.clamp(0, screens.length - 1);
+
+    // Nếu là user thì thêm nút tiện ích đăng ký mentor
+    final isUser = userRole == 'user';
 
     return Scaffold(
       body: IndexedStack(index: safeIndex, children: screens),
