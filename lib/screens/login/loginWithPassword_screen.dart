@@ -6,6 +6,7 @@ import 'package:lms/apps/utils/ElevatedButtonsocial.dart';
 import 'package:lms/apps/utils/botton.dart';
 import 'package:lms/apps/utils/customTextField.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
+import 'package:lms/screens/login/cubit/auth_state.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoginWithPasswordScreen extends StatelessWidget {
@@ -26,12 +27,12 @@ class LoginWithPasswordScreen extends StatelessWidget {
     final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
-        if (state is AuthSuccess) {
+        if (state.status == AuthStatus.authenticated) {
           Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-        } else if (state is AuthFailure) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
+        } else if (state.status == AuthStatus.error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errorMessage ?? 'Đăng nhập thất bại')),
+          );
         }
       },
       builder: (context, state) {
@@ -124,7 +125,7 @@ class LoginWithPasswordScreen extends StatelessWidget {
                                 prefixAsset: 'assets/icons/padlock.png',
                               ),
                               const SizedBox(height: 24),
-                              if (state is AuthLoading)
+                              if (state.status == AuthStatus.loading)
                                 Center(
                                   child:
                                       LoadingAnimationWidget.fourRotatingDots(
@@ -141,12 +142,10 @@ class LoginWithPasswordScreen extends StatelessWidget {
                                     final password = _passwordController.text;
                                     if (email.isNotEmpty &&
                                         password.isNotEmpty) {
-                                      context
-                                          .read<AuthCubit>()
-                                          .loginWithEmailPassword(
-                                            email,
-                                            password,
-                                          );
+                                      context.read<AuthCubit>().login(
+                                        email,
+                                        password,
+                                      );
                                     } else {
                                       ScaffoldMessenger.of(
                                         context,

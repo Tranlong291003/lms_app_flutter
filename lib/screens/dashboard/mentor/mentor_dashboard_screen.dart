@@ -1,62 +1,185 @@
+import 'dart:developer' as developer;
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
+import 'package:lms/cubits/admin/app_stats_cubit.dart';
+import 'package:lms/repositories/app_stats_repository.dart';
+import 'package:lms/screens/login/login_screen.dart';
+import 'package:lms/services/app_stats_service.dart';
 
 import 'course_management_screen.dart';
 
 class MentorDashboardScreen extends StatelessWidget {
-  final String userName;
-  const MentorDashboardScreen({super.key, required this.userName});
+  const MentorDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    developer.log('Building MentorDashboardScreen', name: 'MentorDashboard');
+
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: CustomAppBar(title: 'Trang chủ'),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ---------- DASHBOARD STATS ----------
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _SectionTitle('Thống kê tổng quan'),
-                  const SizedBox(height: 16),
-                  const _StatsGrid(),
-                ],
-              ),
-            ),
+    // Get current user and handle null case
+    final user = FirebaseAuth.instance.currentUser;
+    developer.log('Current user: ${user?.uid}', name: 'MentorDashboard');
 
-            // ---------- QUICK ACTIONS ----------
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _SectionTitle('Thao tác nhanh'),
-                  const SizedBox(height: 16),
-                  _QuickActionsList(
-                    onCourseManagement:
-                        () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const CourseManagementScreen(),
+    if (user == null) {
+      developer.log(
+        'No user found, redirecting to login',
+        name: 'MentorDashboard',
+      );
+      // Redirect to login screen if not authenticated
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (route) => false,
+        );
+      });
+      return const Scaffold(body: Center(child: LoadingIndicator()));
+    }
+
+    return BlocProvider(
+      create: (context) {
+        developer.log(
+          'Creating AppStatsCubit with uid: ${user.uid}',
+          name: 'MentorDashboard',
+        );
+        return AppStatsCubit(AppStatsRepository(AppStatsService()))
+          ..fetchStats(user.uid);
+      },
+      child: Scaffold(
+        appBar: CustomAppBar(title: 'Trang chủ'),
+        body: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ---------- DASHBOARD STATS ----------
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SectionTitle('Thống kê tổng quan'),
+                    const SizedBox(height: 16),
+                    BlocBuilder<AppStatsCubit, AppStatsState>(
+                      builder: (context, state) {
+                        developer.log(
+                          'Building stats with state: ${state.runtimeType}',
+                          name: 'MentorDashboard',
+                        );
+
+                        if (state is AppStatsLoading) {
+                          developer.log(
+                            'Loading stats...',
+                            name: 'MentorDashboard',
+                          );
+                          return const Center(child: LoadingIndicator());
+                        }
+
+                        if (state is AppStatsError) {
+                          developer.log(
+                            'Error loading stats: ${state.message}',
+                            name: 'MentorDashboard',
+                          );
+                          return Center(
+                            child: Column(
+                              children: [
+                                Text('Lỗi: ${state.message}'),
+                                const SizedBox(height: 8),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    developer.log(
+                                      'Retrying stats fetch...',
+                                      name: 'MentorDashboard',
+                                    );
+                                    context.read<AppStatsCubit>().fetchStats(
+                                      user.uid,
+                                    );
+                                  },
+                                  child: const Text('Thử lại'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        if (state is AppStatsLoaded) {
+                          final stats = state.stats;
+                          developer.log(
+                            'Stats loaded successfully: ${stats.toString()}',
+                            name: 'MentorDashboard',
+                          );
+                          return _StatsGrid(
+                            stats: [
+                              _Stat(
+                                'Khóa học đang dạy',
+                                stats.totalCourses.toString(),
+                                Icons.school,
+                                Colors.indigo,
+                              ),
+                              _Stat(
+                                'Học viên',
+                                stats.totalStudents?.toString() ?? '-',
+                                Icons.people,
+                                Colors.teal,
+                              ),
+                              _Stat(
+                                'Bài giảng',
+                                stats.totalLessons?.toString() ?? '-',
+                                Icons.menu_book,
+                                Colors.amber.shade700,
+                              ),
+                              _Stat(
+                                'Đánh giá TB',
+                                stats.avgRating?.toStringAsFixed(1) ?? '-',
+                                Icons.star,
+                                Colors.purple,
+                              ),
+                            ],
+                          );
+                        }
+
+                        developer.log(
+                          'Unknown state: ${state.runtimeType}',
+                          name: 'MentorDashboard',
+                        );
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // ---------- QUICK ACTIONS ----------
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SectionTitle('Thao tác nhanh'),
+                    const SizedBox(height: 16),
+                    _QuickActionsList(
+                      onCourseManagement:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CourseManagementScreen(),
+                            ),
                           ),
-                        ),
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            // Bottom space for better UX
-            const SizedBox(height: 40),
-          ],
+              // Bottom space for better UX
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
@@ -233,20 +356,15 @@ class _SectionTitle extends StatelessWidget {
 }
 
 class _StatsGrid extends StatelessWidget {
-  const _StatsGrid();
+  final List<_Stat> stats;
+
+  const _StatsGrid({required this.stats});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
-    final List<_Stat> stats = [
-      _Stat('Khóa học đang dạy', '5', Icons.school, Colors.indigo),
-      _Stat('Học viên', '156', Icons.people, Colors.teal),
-      _Stat('Bài giảng', '32', Icons.menu_book, Colors.amber.shade700),
-      _Stat('Đánh giá TB', '4.8', Icons.star, Colors.purple),
-    ];
 
     return GridView.builder(
       shrinkWrap: true,

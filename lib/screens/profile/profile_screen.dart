@@ -9,6 +9,7 @@ import 'package:lms/blocs/theme/theme_event.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/blocs/user/user_state.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -371,7 +372,7 @@ class ProfileScreen extends StatelessWidget {
                     );
 
                     if (confirm == true) {
-                      await FirebaseAuth.instance.signOut();
+                      await context.read<AuthCubit>().logout();
                       if (parentContext.mounted) {
                         Navigator.pushReplacementNamed(
                           parentContext,

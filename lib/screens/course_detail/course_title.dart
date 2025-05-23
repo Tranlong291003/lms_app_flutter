@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
 import 'package:lms/widgets/bookmark_button.dart';
 
 class CourseTitle extends StatelessWidget {
@@ -14,6 +16,7 @@ class CourseTitle extends StatelessWidget {
     final theme = Theme.of(context);
     final currentUser = FirebaseAuth.instance.currentUser;
     final userUid = currentUser?.uid ?? '';
+    final bookmarkCubit = context.read<BookmarkCubit>();
 
     // Kích thước cố định cho nút bookmark
     const double buttonSize = 24;
@@ -43,6 +46,7 @@ class CourseTitle extends StatelessWidget {
                       courseId: courseId,
                       userUid: userUid,
                       size: buttonSize,
+                      bookmarkCubit: bookmarkCubit,
                     )
                     : IconButton(
                       icon: Icon(

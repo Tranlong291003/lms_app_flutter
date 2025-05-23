@@ -42,9 +42,9 @@ class _BottomNavigationBarExampleState
     // Xác định dashboardScreen phù hợp
     Widget? dashboardScreen;
     if (userRole == 'admin') {
-      dashboardScreen = AdminDashboardScreen(userName: userName);
+      dashboardScreen = const AdminDashboardScreen();
     } else if (userRole == 'mentor') {
-      dashboardScreen = MentorDashboardScreen(userName: userName);
+      dashboardScreen = const MentorDashboardScreen();
     }
 
     // Build danh sách màn hình
@@ -132,7 +132,10 @@ class _BottomNavigationBarExampleState
         unselectedLabelStyle: theme.textTheme.labelMedium?.copyWith(
           fontWeight: FontWeight.w400,
         ),
-        backgroundColor: theme.colorScheme.surface,
+        backgroundColor:
+            theme.brightness == Brightness.dark
+                ? const Color(0xFF181A20)
+                : const Color(0xFFF8FAFC),
         elevation: 8,
         items: items,
       ),

@@ -1,105 +1,106 @@
-import 'package:bloc/bloc.dart';
-import 'package:dio/dio.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:lms/apps/config/api_config.dart';
-import 'package:meta/meta.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
-
-part 'auth_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/screens/login/cubit/auth_state.dart';
+import 'package:lms/services/auth_service.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  final FirebaseAuth _firebaseAuth;
-  final Dio _dio;
+  final AuthService _authService;
 
-  AuthCubit(this._firebaseAuth, this._dio) : super(AuthInitial());
+  AuthCubit(this._authService) : super(const AuthState());
 
-  // Hàm đăng nhập
-  Future<void> loginWithEmailPassword(String email, String password) async {
+  Future<void> login(String email, String password) async {
     try {
-      emit(AuthLoading());
+      emit(state.copyWith(status: AuthStatus.loading));
 
-      // Đăng nhập Firebase
-      UserCredential userCredential = await _firebaseAuth
-          .signInWithEmailAndPassword(email: email, password: password);
+      final response = await _authService.login(email, password);
 
-      // Lấy UID và token
-      User? user = userCredential.user;
-      String? uid = user?.uid;
-      String? idToken = await user?.getIdToken();
+      if (response['success'] == true) {
+        // Lưu token từ response
+        final token = response['token'] as String;
+        await _authService.setToken(token);
 
-      if (uid != null && idToken != null) {
-        // Lấy FCM Token
-        String? fcmToken = await FirebaseMessaging.instance.getToken();
+        // Lưu thông tin user
+        final userId = response['user_id'] as String;
+        final userEmail = response['email'] as String;
+        final userRole = response['role'] as String;
 
-        // Gửi UID, idToken và fcmToken lên API dưới dạng JSON
-        Response response = await _dio.post(
-          ApiConfig.login, // Địa chỉ API của bạn
-          data: {
-            'uid': uid,
-            'idToken': idToken,
-            'fcmToken': fcmToken, // Gửi FCM Token
-          },
-          options: Options(
-            headers: {
-              'Content-Type': 'application/json', // Đảm bảo là JSON
-            },
+        emit(
+          state.copyWith(
+            status: AuthStatus.authenticated,
+            userId: userId,
+            email: userEmail,
+            role: userRole,
           ),
         );
-
-        // Xử lý response từ API
-        if (response.statusCode == 200) {
-          bool success = response.data['success'] ?? false;
-          if (!success) {
-            await _firebaseAuth.signOut(); // Gọi hàm đăng xuất khi có lỗi
-            emit(
-              AuthFailure(
-                'Tài khoản đã bị khoá, vui lòng liên hệ admin để được xử lý',
-              ),
-            );
-          } else {
-            String role = response.data['role'] ?? 'Unknown';
-
-            // Lưu role và fcmToken vào SharedPreferences
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setString('role', role); // Lưu role
-            prefs.setString('fcmToken', fcmToken ?? ''); // Lưu fcmToken
-
-            print('Role: $role');
-            emit(AuthSuccess(user!)); // Đăng nhập thành công
-          }
-        } else {
-          await _firebaseAuth.signOut(); // Gọi hàm đăng xuất khi có lỗi
-          emit(AuthFailure('Đăng nhập thất bại, vui lòng thử lại'));
-        }
       } else {
-        await _firebaseAuth.signOut(); // Gọi hàm đăng xuất khi có lỗi
-        emit(AuthFailure('Đăng nhập thất bại, vui lòng thử lại'));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage:
+                response['message'] as String? ?? 'Đăng nhập thất bại',
+          ),
+        );
       }
-    } on FirebaseAuthException catch (e) {
-      // Lỗi Firebase
-      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
-        emit(AuthFailure('Tài khoản hoặc mật khẩu không đúng'));
-      } else {
-        emit(AuthFailure('Đăng nhập thất bại, vui lòng thử lại sau'));
-      }
-      await _firebaseAuth.signOut(); // Gọi hàm đăng xuất khi có lỗi
     } catch (e) {
-      print('Lỗi không xác định: $e');
-      await _firebaseAuth.signOut(); // Gọi hàm đăng xuất khi có lỗi
-      emit(AuthFailure('Đăng nhập thất bại, vui lòng thử lại sau'));
+      emit(
+        state.copyWith(status: AuthStatus.error, errorMessage: e.toString()),
+      );
     }
   }
 
-  // Hàm lấy role từ SharedPreferences
-  Future<String?> getRoleFromPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('role');
+  Future<void> logout() async {
+    try {
+      emit(state.copyWith(status: AuthStatus.loading));
+
+      // Gọi logout từ service
+      await _authService.logout();
+
+      // Xóa token và thông tin user
+      await _authService.clearToken();
+
+      // Cập nhật state
+      emit(
+        state.copyWith(
+          status: AuthStatus.unauthenticated,
+          userId: null,
+          email: null,
+          role: null,
+        ),
+      );
+
+      print('[INFO] Logout completed successfully');
+    } catch (e) {
+      print('[ERR] Failed to logout: $e');
+      emit(
+        state.copyWith(status: AuthStatus.error, errorMessage: e.toString()),
+      );
+    }
   }
 
-  // Hàm lấy FCM Token từ SharedPreferences
-  Future<String?> getFcmTokenFromPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('fcmToken');
+  Future<void> checkAuthStatus() async {
+    try {
+      emit(state.copyWith(status: AuthStatus.loading));
+
+      // Kiểm tra token
+      final token = await _authService.getToken();
+
+      if (token != null) {
+        // Token tồn tại, lấy thông tin user
+        final userInfo = await _authService.getUserInfo();
+        emit(
+          state.copyWith(
+            status: AuthStatus.authenticated,
+            userId: userInfo['user_id'],
+            email: userInfo['email'],
+            role: userInfo['role'],
+          ),
+        );
+      } else {
+        emit(state.copyWith(status: AuthStatus.unauthenticated));
+      }
+    } catch (e) {
+      emit(
+        state.copyWith(status: AuthStatus.error, errorMessage: e.toString()),
+      );
+    }
   }
 }

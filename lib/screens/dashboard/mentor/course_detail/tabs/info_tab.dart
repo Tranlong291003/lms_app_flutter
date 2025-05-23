@@ -91,7 +91,7 @@ class InfoTab extends StatelessWidget {
                   _Stars(rating: (course['rating'] ?? 0).toDouble()),
                   const SizedBox(width: 6),
                   Text(
-                    (course['rating'] ?? 0).toString(),
+                    (course['rating'] ?? 0).toStringAsFixed(1),
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,

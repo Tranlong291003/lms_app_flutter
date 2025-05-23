@@ -1,15 +1,16 @@
 import 'package:bloc/bloc.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/screens/login/loginWithPassword_screen.dart';
+import 'package:lms/services/auth_service.dart';
 import 'package:page_transition/page_transition.dart';
 
 part 'sign_up_state.dart';
 
 class SignUpCubit extends Cubit<SignUpState> {
-  SignUpCubit() : super(SignUpInitial());
+  final AuthService _authService;
+
+  SignUpCubit(this._authService) : super(SignUpInitial());
 
   // Kiểm tra số điện thoại hợp lệ
   bool _isPhoneNumberValid(String phone) {
@@ -52,41 +53,30 @@ class SignUpCubit extends Cubit<SignUpState> {
       return;
     }
 
-    final dio = Dio();
-
     try {
       emit(SignUpLoading());
 
-      final response = await dio.post(
-        ApiConfig.signUp,
-        data: {
-          'name': name,
-          'email': email,
-          'password': password,
-          'phone': phone,
-        },
+      await _authService.signUp(
+        name: name,
+        email: email,
+        password: password,
+        phone: phone,
       );
 
-      if (response.statusCode == 200) {
-        // Nếu đăng ký thành công, chuyển sang trạng thái thành công
-        emit(SignUpSuccess());
+      // Nếu đăng ký thành công, chuyển sang trạng thái thành công
+      emit(SignUpSuccess());
 
-        // Điều hướng về trang đăng nhập
-
-        Navigator.pushReplacement(
-          context,
-          PageTransition(
-            type: PageTransitionType.fade, // Chọn hiệu ứng chuyển trang
-            child: LoginWithPasswordScreen(), // Màn hình đích
-          ),
-        );
-      } else {
-        // Nếu API trả về lỗi, emit trạng thái thất bại
-        emit(SignUpFailure(message: "Đã có lỗi xảy ra. Vui lòng thử lại"));
-      }
+      // Điều hướng về trang đăng nhập
+      Navigator.pushReplacement(
+        context,
+        PageTransition(
+          type: PageTransitionType.fade,
+          child: LoginWithPasswordScreen(),
+        ),
+      );
     } catch (e) {
       // Xử lý lỗi khi gọi API
-      emit(SignUpFailure(message: "Lỗi API"));
+      emit(SignUpFailure(message: e.toString()));
     }
   }
 }

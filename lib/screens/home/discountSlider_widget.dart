@@ -40,7 +40,8 @@ class _DiscountSliderState extends State<DiscountSlider> {
       headline: 'Giới thiệu bạn',
       subhead: 'Cả đôi cùng giảm',
       description: 'Mời bạn bè, cả hai nhận ngay 30% cho mọi khóa học.',
-      colors: [const Color(0xFF11998E), const Color(0xFF38EF7D)],
+      colors: [const Color(0xFF2C3E50), const Color(0xFF4CA1AF)],
+
       icon: Icons.people_alt,
       buttonText: 'Giới thiệu ngay',
     ),
@@ -50,7 +51,8 @@ class _DiscountSliderState extends State<DiscountSlider> {
       subhead: 'Ưu đãi nửa giá',
       description:
           'Giảm ngay 50% tất cả khóa học lập trình web & mobile trong tuần này!',
-      colors: [const Color(0xFF2C3E50), const Color(0xFF4CA1AF)],
+      colors: [const Color(0xFF614385), const Color(0xFF516395)],
+
       icon: Icons.laptop_mac,
       buttonText: 'Đăng ký ngay',
     ),
@@ -60,7 +62,7 @@ class _DiscountSliderState extends State<DiscountSlider> {
       subhead: 'Tiết kiệm đến 45%',
       description:
           'Đăng ký combo 3 khóa học chỉ với giá của 2 khóa. Thời gian có hạn!',
-      colors: [const Color(0xFF614385), const Color(0xFF516395)],
+      colors: [const Color(0xFF11998E), const Color(0xFF38EF7D)],
       icon: Icons.library_books,
       buttonText: 'Xem combo',
     ),

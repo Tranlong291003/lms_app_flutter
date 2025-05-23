@@ -517,7 +517,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
                               ),
                               _IconStat(
                                 icon: Icons.star,
-                                text: course.rating.toString(),
+                                text: course.rating.toStringAsFixed(1),
                               ),
                             ],
                           ),

@@ -18,7 +18,8 @@ class AppTheme {
 
   // Dark
   static const Color backgroundDark = Color(0xFF181A20);
-  static const Color surfaceDark = Color(0xFF23272F);
+  static const Color surfaceDark = Color(0xFF1f222a);
+
   static const Color textPrimaryDark = Color(0xFFF1F5F9); // Trắng nhạt
   static const Color textSecondaryDark = Color(0xFF94A3B8); // Xám nhạt
 
@@ -172,7 +173,8 @@ class AppTheme {
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      backgroundColor: surfaceDark,
+      backgroundColor: backgroundDark,
+
       selectedItemColor: primary,
       unselectedItemColor: textSecondaryDark,
       showUnselectedLabels: true,

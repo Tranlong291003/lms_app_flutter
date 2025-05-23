@@ -8,6 +8,7 @@ import 'package:lms/apps/utils/route_observer.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
 import 'package:lms/blocs/theme/theme_state.dart';
 import 'package:lms/screens/app_entry_gate.dart';
+import 'package:lms/services/base_service.dart';
 import 'package:lms/services/notification_service.dart';
 
 class MyApp extends StatelessWidget {
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
           duration: const Duration(milliseconds: 1000),
           curve: Curves.easeInOut,
           child: MaterialApp(
+            navigatorKey: BaseService.navigatorKey,
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,

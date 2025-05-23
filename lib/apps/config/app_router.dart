@@ -215,7 +215,7 @@ class AppRouter {
         }
         break;
       case adminDashboard:
-        page = const AdminDashboardScreen(userName: 'Admin');
+        page = const AdminDashboardScreen();
         break;
       case adminCourses:
         page = const CourseManagementAdminScreen();
@@ -241,32 +241,23 @@ class AppRouter {
     return PageRouteBuilder(
       settings: settings,
       pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionDuration: const Duration(milliseconds: 400),
+      transitionDuration: const Duration(milliseconds: 300),
       reverseTransitionDuration: const Duration(milliseconds: 300),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        // Slide animation with custom curve
-        final slideAnim = Tween<Offset>(
-          begin: const Offset(0.3, 0),
+        // Slide animation từ dưới lên
+        final slideAnimation = Tween<Offset>(
+          begin: const Offset(0.0, 0.1), // Slide nhẹ từ dưới lên
           end: Offset.zero,
         ).animate(
           CurvedAnimation(
             parent: animation,
-            curve: Curves.easeOutCubic,
+            curve: Curves.easeOutCubic, // Curve mượt mà hơn
             reverseCurve: Curves.easeInCubic,
           ),
         );
 
-        // Scale animation for a subtle zoom effect
-        final scaleAnim = Tween<double>(begin: 0.95, end: 1.0).animate(
-          CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeOutCubic,
-            reverseCurve: Curves.easeInCubic,
-          ),
-        );
-
-        // Fade animation with custom curve
-        final fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+        // Fade animation với timing tối ưu
+        final fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
           CurvedAnimation(
             parent: animation,
             curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
@@ -274,13 +265,9 @@ class AppRouter {
           ),
         );
 
-        // Combine all animations
         return FadeTransition(
-          opacity: fadeAnim,
-          child: SlideTransition(
-            position: slideAnim,
-            child: ScaleTransition(scale: scaleAnim, child: child),
-          ),
+          opacity: fadeAnimation,
+          child: SlideTransition(position: slideAnimation, child: child),
         );
       },
     );

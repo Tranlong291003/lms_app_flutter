@@ -1,71 +1,181 @@
+import 'dart:developer' as developer;
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/loading_animation_widget.dart';
+import 'package:lms/cubits/admin/app_stats_cubit.dart';
+import 'package:lms/repositories/app_stats_repository.dart';
+import 'package:lms/screens/login/login_screen.dart';
+import 'package:lms/services/app_stats_service.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
-  final String userName;
-  const AdminDashboardScreen({super.key, required this.userName});
-
-  void _navigateToUserManagement(BuildContext context) {
-    Navigator.pushNamed(context, AppRouter.adminUsers);
-  }
-
-  void _navigateToCourseManagement(BuildContext context) {
-    Navigator.pushNamed(context, AppRouter.adminCourses);
-  }
-
-  void _navigateToCategoryManagement(BuildContext context) {
-    Navigator.pushNamed(context, AppRouter.adminCategories);
-  }
+  const AdminDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    developer.log('Building AdminDashboardScreen', name: 'AdminDashboard');
+
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: CustomAppBar(
-        title: 'Trang điều khiển',
+    // Get current user and handle null case
+    final user = FirebaseAuth.instance.currentUser;
+    developer.log('Current user: ${user?.uid}', name: 'AdminDashboard');
 
-        showMenu: true,
-        menuItems: [],
-        onMenuSelected: (value) {},
-      ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ---------- DASHBOARD STATS ----------
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _SectionTitle('Thống kê hệ thống'),
-                  const SizedBox(height: 16),
-                  const _StatsGrid(),
-                ],
+    if (user == null) {
+      developer.log(
+        'No user found, redirecting to login',
+        name: 'AdminDashboard',
+      );
+      // Redirect to login screen if not authenticated
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (route) => false,
+        );
+      });
+      return const Scaffold(body: Center(child: LoadingIndicator()));
+    }
+
+    return BlocProvider(
+      create: (context) {
+        developer.log(
+          'Creating AppStatsCubit with uid: ${user.uid}',
+          name: 'AdminDashboard',
+        );
+        return AppStatsCubit(AppStatsRepository(AppStatsService()))
+          ..fetchStats(user.uid);
+      },
+      child: Scaffold(
+        appBar: CustomAppBar(
+          title: 'Trang điều khiển',
+          showMenu: true,
+          menuItems: [],
+          onMenuSelected: (value) {},
+        ),
+        body: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ---------- DASHBOARD STATS ----------
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SectionTitle('Thống kê hệ thống'),
+                    const SizedBox(height: 16),
+                    BlocBuilder<AppStatsCubit, AppStatsState>(
+                      builder: (context, state) {
+                        developer.log(
+                          'Building stats with state: ${state.runtimeType}',
+                          name: 'AdminDashboard',
+                        );
+
+                        if (state is AppStatsLoading) {
+                          developer.log(
+                            'Loading stats...',
+                            name: 'AdminDashboard',
+                          );
+                          return const Center(child: LoadingIndicator());
+                        }
+
+                        if (state is AppStatsError) {
+                          developer.log(
+                            'Error loading stats: ${state.message}',
+                            name: 'AdminDashboard',
+                          );
+                          return Center(
+                            child: Column(
+                              children: [
+                                Text('Lỗi: ${state.message}'),
+                                const SizedBox(height: 8),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    developer.log(
+                                      'Retrying stats fetch...',
+                                      name: 'AdminDashboard',
+                                    );
+                                    context.read<AppStatsCubit>().fetchStats(
+                                      user.uid,
+                                    );
+                                  },
+                                  child: const Text('Thử lại'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        if (state is AppStatsLoaded) {
+                          final stats = state.stats;
+                          developer.log(
+                            'Stats loaded successfully: ${stats.toString()}',
+                            name: 'AdminDashboard',
+                          );
+                          return _StatsGrid(
+                            stats: [
+                              _Stat(
+                                'Tổng khóa học',
+                                stats.totalCourses.toString(),
+                                Icons.school,
+                                Colors.indigo,
+                              ),
+                              _Stat(
+                                'Tổng người dùng',
+                                stats.totalUsers?.toString() ?? '-',
+                                Icons.people,
+                                Colors.teal,
+                              ),
+                              _Stat(
+                                'Số bài kiểm tra',
+                                stats.totalQuizzes?.toString() ?? '-',
+                                Icons.quiz,
+                                Colors.red,
+                              ),
+                              _Stat(
+                                'Lượt đánh giá',
+                                stats.totalReviews?.toString() ?? '-',
+                                Icons.star_rate,
+                                Colors.amber,
+                              ),
+                            ],
+                          );
+                        }
+
+                        developer.log(
+                          'Unknown state: ${state.runtimeType}',
+                          name: 'AdminDashboard',
+                        );
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            // ---------- QUICK ACTIONS ----------
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _SectionTitle('Quản lý hệ thống'),
-                  const SizedBox(height: 16),
-                  const _QuickActionsList(),
-                ],
+              // ---------- QUICK ACTIONS ----------
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SectionTitle('Quản lý hệ thống'),
+                    const SizedBox(height: 16),
+                    const _QuickActionsList(),
+                  ],
+                ),
               ),
-            ),
 
-            // Bottom space for better UX
-            const SizedBox(height: 40),
-          ],
+              // Bottom space for better UX
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
@@ -267,20 +377,14 @@ class _SectionTitle extends StatelessWidget {
 }
 
 class _StatsGrid extends StatelessWidget {
-  const _StatsGrid();
+  final List<_Stat> stats;
+  const _StatsGrid({required this.stats});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
-    final List<_Stat> stats = [
-      _Stat('Tổng khóa học', '125', Icons.school, Colors.indigo),
-      _Stat('Tổng người dùng', '1,458', Icons.people, Colors.teal),
-      _Stat('Số bài kiểm tra', '432', Icons.quiz, Colors.red),
-      _Stat('Lượt đánh giá', '758', Icons.star_rate, Colors.amber),
-    ];
 
     return GridView.builder(
       shrinkWrap: true,

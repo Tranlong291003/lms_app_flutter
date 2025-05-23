@@ -2,6 +2,9 @@ class ApiConfig {
   // static const String baseUrl = "http://172.20.10.5:3000";
   static const String baseUrl = "http://192.168.10.203:3000";
 
+  // App Stats
+  static String get appStats => "$baseUrl/api/app-stats";
+
   // users
   static String get getAllUsers => "$baseUrl/api/users";
   static String get login => "$baseUrl/api/users/login";

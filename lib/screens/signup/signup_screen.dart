@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_theme.dart';
@@ -6,17 +8,34 @@ import 'package:lms/apps/utils/botton.dart';
 import 'package:lms/apps/utils/customTextField.dart';
 import 'package:lms/screens/login/loginWithPassword_screen.dart';
 import 'package:lms/screens/signup/cubit/sign_up_cubit.dart';
+import 'package:lms/services/auth_service.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:page_transition/page_transition.dart';
 
-class SignUpScreen extends StatelessWidget {
-  SignUpScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _phoneController.dispose();
+    _nameController.dispose();
+    super.dispose();
+  }
 
   void _showSuccessDialog(BuildContext context) {
     showGeneralDialog(
@@ -77,8 +96,12 @@ class SignUpScreen extends StatelessWidget {
     final textSecondary =
         isDark ? AppTheme.textSecondaryDark : AppTheme.textSecondaryLight;
     final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
-    return BlocProvider(
-      create: (_) => SignUpCubit(),
+
+    return BlocProvider<SignUpCubit>(
+      create:
+          (_) => SignUpCubit(
+            AuthService(FirebaseAuth.instance, FirebaseMessaging.instance),
+          ),
       child: BlocListener<SignUpCubit, SignUpState>(
         listener: (context, state) {
           if (state is SignUpSuccess) {

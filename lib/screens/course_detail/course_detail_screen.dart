@@ -3,30 +3,51 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
+import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/models/courses/course_detail_model.dart';
+import 'package:lms/repositories/bookmark_repository.dart';
 import 'package:lms/screens/course_detail/course_stats_section.dart';
 import 'package:lms/screens/course_detail/course_tab_view.dart';
 import 'package:lms/screens/course_detail/course_title.dart';
 import 'package:lms/screens/course_detail/enroll_button.dart';
+import 'package:lms/services/bookmark_service.dart';
 import 'package:lms/services/course_service.dart';
 
-class CourseDetailScreen extends StatelessWidget {
+class CourseDetailScreen extends StatefulWidget {
   final int courseId;
   const CourseDetailScreen({super.key, required this.courseId});
+
+  @override
+  State<CourseDetailScreen> createState() => _CourseDetailScreenState();
+}
+
+class _CourseDetailScreenState extends State<CourseDetailScreen> {
+  late BookmarkCubit _bookmarkCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final bookmarkService = BookmarkService();
+      final bookmarkRepository = BookmarkRepository(bookmarkService);
+      _bookmarkCubit = BookmarkCubit(bookmarkRepository);
+      _bookmarkCubit.getBookmarks(user.uid);
+    }
+  }
+
+  @override
+  void dispose() {
+    _bookmarkCubit.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return BlocBuilder<CourseDetailCubit, CourseDetailState>(
       builder: (context, state) {
-        if (state is CourseDetailLoading) {
-          return Scaffold(
-            backgroundColor: theme.scaffoldBackgroundColor,
-            body: const Center(child: LoadingIndicator()),
-          );
-        }
-
         if (state is CourseDetailError) {
           return Scaffold(
             backgroundColor: theme.scaffoldBackgroundColor,
@@ -49,7 +70,7 @@ class CourseDetailScreen extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () {
                       context.read<CourseDetailCubit>().fetchCourseDetail(
-                        courseId,
+                        widget.courseId,
                       );
                     },
                     icon: const Icon(Icons.refresh),
@@ -71,23 +92,48 @@ class CourseDetailScreen extends StatelessWidget {
           final detail = state.detail;
           final user = FirebaseAuth.instance.currentUser;
           final userUid = user?.uid ?? '';
-          return Scaffold(
-            backgroundColor: theme.scaffoldBackgroundColor,
-            body: CustomScrollView(
-              slivers: [
-                CourseAppBarDynamic(
-                  imageUrl: ApiConfig.getImageUrl(detail.thumbnailUrl),
-                ),
-                SliverToBoxAdapter(child: _CourseBody(detail: detail)),
-              ],
-            ),
-            bottomNavigationBar: FutureBuilder<bool>(
-              future: CourseService().checkEnrollment(
-                userUid: userUid,
-                courseId: detail.courseId,
+          return BlocProvider.value(
+            value: _bookmarkCubit,
+            child: Scaffold(
+              backgroundColor: theme.scaffoldBackgroundColor,
+              body: CustomScrollView(
+                slivers: [
+                  CourseAppBarDynamic(
+                    imageUrl: ApiConfig.getImageUrl(detail.thumbnailUrl),
+                  ),
+                  SliverToBoxAdapter(child: _CourseBody(detail: detail)),
+                ],
               ),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+              bottomNavigationBar: FutureBuilder<bool>(
+                future: CourseService().checkEnrollment(
+                  userUid: userUid,
+                  courseId: detail.courseId,
+                ),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: theme.scaffoldBackgroundColor,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, -5),
+                          ),
+                        ],
+                      ),
+                      child: SafeArea(
+                        minimum: const EdgeInsets.all(20),
+                        child: SizedBox(
+                          height: 48,
+                          child: Center(child: LoadingIndicator()),
+                        ),
+                      ),
+                    );
+                  }
+                  if (snapshot.hasData && snapshot.data == true) {
+                    return const SizedBox.shrink();
+                  }
                   return Container(
                     decoration: BoxDecoration(
                       color: theme.scaffoldBackgroundColor,
@@ -101,44 +147,22 @@ class CourseDetailScreen extends StatelessWidget {
                     ),
                     child: SafeArea(
                       minimum: const EdgeInsets.all(20),
-                      child: SizedBox(
-                        height: 48,
-                        child: Center(child: LoadingIndicator()),
+                      child: EnrollButton(
+                        userUid: userUid,
+                        courseId: detail.courseId,
                       ),
                     ),
                   );
-                }
-                if (snapshot.hasData && snapshot.data == true) {
-                  return const SizedBox.shrink();
-                }
-                return Container(
-                  decoration: BoxDecoration(
-                    color: theme.scaffoldBackgroundColor,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, -5),
-                      ),
-                    ],
-                  ),
-                  child: SafeArea(
-                    minimum: const EdgeInsets.all(20),
-                    child: EnrollButton(
-                      userUid: userUid,
-                      courseId: detail.courseId,
-                    ),
-                  ),
-                );
-              },
+                },
+              ),
             ),
           );
         }
 
-        // Default loading state
+        // Default state - show empty scaffold while loading
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          body: const Center(child: LoadingIndicator()),
+          body: const SizedBox.shrink(),
         );
       },
     );
@@ -249,6 +273,9 @@ class _CourseBody extends StatelessWidget {
                 instructorName: detail.instructorName,
                 instructorAvatarUrl: detail.instructorAvatarUrl,
                 instructorBio: detail.instructorBio,
+                language: detail.language,
+                tags: detail.tags,
+                level: detail.level,
               ),
             ],
           ),

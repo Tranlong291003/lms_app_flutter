@@ -17,6 +17,7 @@ import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/screens/home/appBar_widget.dart';
 import 'package:lms/screens/home/discountSlider_widget.dart';
 import 'package:lms/screens/home/topMentors_widget.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/services/user_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -83,20 +84,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     // Wait for message to be shown
     await Future.delayed(const Duration(seconds: 1));
 
-    // Sign out
-    await FirebaseAuth.instance.signOut();
-
-    // Wait for sign out to complete
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    if (!mounted) return;
-
-    // Navigate to login screen
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      AppRouter.login,
-      (route) => false,
-    );
+    // Gọi logoutWithContext để xử lý đăng xuất
+    await context.read<AuthCubit>().logout();
   }
 
   void _loadMentor() {
@@ -156,25 +145,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SearchBarWidget(
-                  onChanged: (value) {
-                    // Tìm kiếm trong danh sách khóa học
-                    final courseState = context.read<CourseCubit>().state;
-                    if (courseState is CourseLoaded) {
-                      var filteredCourses = courseState.randomCourses;
-                      if (value.isNotEmpty) {
-                        filteredCourses =
-                            filteredCourses.where((course) {
-                              final title = course.title.toLowerCase();
-                              final description =
-                                  course.description.toLowerCase();
-                              final searchTerm = value.toLowerCase();
-                              return title.contains(searchTerm) ||
-                                  description.contains(searchTerm);
-                            }).toList();
-                      }
-                      // Cập nhật danh sách khóa học đã lọc
-                      context.read<CourseCubit>().updateFilteredCourses(
-                        filteredCourses,
+                  onSubmitted: (value) {
+                    if (value.trim().isNotEmpty) {
+                      Navigator.pushNamed(
+                        context,
+                        '/listcourse',
+                        arguments: value.trim(),
                       );
                     }
                   },

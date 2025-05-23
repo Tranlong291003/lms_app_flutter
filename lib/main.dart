@@ -2,6 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,6 +34,7 @@ import 'package:lms/screens/Introduction/cubit/intro_cubit.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/my_app.dart';
 import 'package:lms/services/admin_user_service.dart';
+import 'package:lms/services/auth_service.dart';
 import 'package:lms/services/category_service.dart';
 import 'package:lms/services/course_service.dart';
 import 'package:lms/services/lesson_service.dart';
@@ -91,7 +93,9 @@ Future<void> main() async {
   // 3. Các Cubit/Bloc không phụ thuộc vào BuildContext
   final themeBloc = ThemeBloc()..add(ThemeStarted());
   final introCubit = IntroCubit();
-  final authCubit = AuthCubit(FirebaseAuth.instance, dio);
+  final authCubit = AuthCubit(
+    AuthService(FirebaseAuth.instance, FirebaseMessaging.instance),
+  );
   final userBloc = UserBloc(userRepository);
   final mentorBloc = MentorsBloc(mentorRepository);
   final mentorDetailBloc = MentorDetailBloc(mentorRepository);

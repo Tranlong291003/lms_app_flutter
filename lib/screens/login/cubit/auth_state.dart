@@ -1,18 +1,38 @@
-part of 'auth_cubit.dart';
+import 'package:equatable/equatable.dart';
 
-@immutable
-abstract class AuthState {}
+enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
 
-class AuthInitial extends AuthState {}
+class AuthState extends Equatable {
+  final AuthStatus status;
+  final String? userId;
+  final String? email;
+  final String? role;
+  final String? errorMessage;
 
-class AuthLoading extends AuthState {}
+  const AuthState({
+    this.status = AuthStatus.initial,
+    this.userId,
+    this.email,
+    this.role,
+    this.errorMessage,
+  });
 
-class AuthSuccess extends AuthState {
-  final User user;
-  AuthSuccess(this.user);
-}
+  AuthState copyWith({
+    AuthStatus? status,
+    String? userId,
+    String? email,
+    String? role,
+    String? errorMessage,
+  }) {
+    return AuthState(
+      status: status ?? this.status,
+      userId: userId ?? this.userId,
+      email: email ?? this.email,
+      role: role ?? this.role,
+      errorMessage: errorMessage ?? this.errorMessage,
+    );
+  }
 
-class AuthFailure extends AuthState {
-  final String message;
-  AuthFailure(this.message);
+  @override
+  List<Object?> get props => [status, userId, email, role, errorMessage];
 }

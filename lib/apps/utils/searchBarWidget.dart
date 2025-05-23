@@ -124,14 +124,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget>
       ),
       child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 16, right: 8),
-            child: Icon(
-              Icons.search_rounded,
-              color: colorScheme.primary.withOpacity(0.8),
-              size: 24,
-            ),
-          ),
           Expanded(
             child: TextField(
               controller: _controller,
@@ -143,7 +135,13 @@ class _SearchBarWidgetState extends State<SearchBarWidget>
                 fontSize: 16,
               ),
               cursorColor: colorScheme.primary,
+              textAlign: TextAlign.start,
               decoration: InputDecoration(
+                prefixIcon: Icon(
+                  Icons.search_rounded,
+                  color: colorScheme.primary.withOpacity(0.8),
+                  size: 24,
+                ),
                 hintText: widget.hintText ?? 'Tìm kiếm khoá học, chủ đề...',
                 hintStyle: theme.textTheme.bodyLarge?.copyWith(
                   color: colorScheme.onSurfaceVariant.withOpacity(0.7),
@@ -155,66 +153,28 @@ class _SearchBarWidgetState extends State<SearchBarWidget>
                   horizontal: 8,
                 ),
                 isDense: true,
+                suffixIcon:
+                    _showClearButton
+                        ? IconButton(
+                          icon: Icon(
+                            Icons.clear,
+                            color: colorScheme.onSurfaceVariant,
+                            size: 20,
+                          ),
+                          onPressed: _clearSearch,
+                          splashRadius: 20,
+                          visualDensity: VisualDensity.compact,
+                          tooltip: 'Xóa tìm kiếm',
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 36,
+                          ),
+                        )
+                        : null,
               ),
             ),
           ),
-          // Nút xóa với hiệu ứng fade
-          SizeTransition(
-            sizeFactor: _animation,
-            axis: Axis.horizontal,
-            axisAlignment: -1,
-            child: FadeTransition(
-              opacity: _animation,
-              child: IconButton(
-                icon: Icon(
-                  Icons.clear,
-                  color: colorScheme.onSurfaceVariant,
-                  size: 20,
-                ),
-                onPressed: _clearSearch,
-                splashRadius: 20,
-                visualDensity: VisualDensity.compact,
-                tooltip: 'Xóa tìm kiếm',
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-              ),
-            ),
-          ),
-          // Đường phân cách
-          if (widget.onFilter != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: VerticalDivider(
-                color: colorScheme.outline.withOpacity(0.2),
-                width: 1,
-                thickness: 1,
-              ),
-            ),
-          // Nút lọc
-          if (widget.onFilter != null)
-            Container(
-              margin: const EdgeInsets.only(left: 4, right: 8),
-              child: Material(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: widget.onFilter,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.tune_rounded,
-                      color: colorScheme.primary,
-                      size: 22,
-                    ),
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );
