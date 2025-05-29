@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:lms/apps/config/api_config.dart';
-import 'package:lms/apps/utils/FeInDevMessaage.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/mentors/mentor_detail_bloc.dart';
 import 'package:lms/blocs/mentors/mentors_event.dart';
@@ -378,6 +378,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                               height: 1.6,
                               letterSpacing: 0.2,
                             ),
+                            textAlign: TextAlign.justify,
                           ),
                         ],
                       ),
@@ -480,9 +481,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                       onPressed:
                           mentor.isActive
                               ? () {
-                                showFeatureInDevelopmentMessage(
-                                  context,
-                                  'Liên hệ giảng viên',
+                                CustomSnackBar.showInfo(
+                                  context: context,
+                                  message: 'Chức năng đang được phát triền',
                                 );
                               }
                               : null,

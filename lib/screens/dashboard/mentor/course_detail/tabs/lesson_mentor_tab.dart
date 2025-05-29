@@ -5,12 +5,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/lessons/lessons_cubit.dart';
 import 'package:lms/cubits/lessons/lessons_state.dart';
 import 'package:lms/models/lesson_model.dart';
 import 'package:lms/screens/course_detail/lesson_detail_screen.dart';
-import 'package:lms/widgets/custom_snackbar.dart';
 
 class LessonMentorTab extends StatelessWidget {
   final int courseId;
@@ -589,219 +589,407 @@ class _LessonFormDialogState extends State<LessonFormDialog> {
     final theme = Theme.of(context);
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (isEditing) ...[
-                Card(
-                  color: Colors.grey[100],
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 600),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header với gradient background
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    theme.primaryColor,
+                    theme.primaryColor.withOpacity(0.8),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+              ),
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                children: [
+                  Icon(
+                    isEditing ? Icons.edit_note : Icons.add_circle_outline,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Thông tin hiện tại:',
-                          style: theme.textTheme.titleSmall,
+                          isEditing ? 'Chỉnh sửa bài học' : 'Thêm bài học mới',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Tiêu đề: ${widget.lesson?.title.isNotEmpty == true ? widget.lesson!.title : "(Chưa có)"}',
-                        ),
-                        Row(
-                          children: [
-                            Text('Nội dung: '),
-                            Text(
-                              widget.lesson?.content?.isNotEmpty == true
-                                  ? widget.lesson!.content!
-                                  : "(Chưa có)",
-                              style: TextStyle(
-                                color:
-                                    widget.lesson?.content?.isEmpty == true
-                                        ? Colors.red[300]
-                                        : null,
-                                fontStyle:
-                                    widget.lesson?.content?.isEmpty == true
-                                        ? FontStyle.italic
-                                        : null,
-                              ),
+                        if (isEditing && widget.lesson != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            'ID: ${widget.lesson!.lessonId}',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white.withOpacity(0.8),
                             ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text('Video URL: '),
-                            Text(
-                              widget.lesson?.videoUrl.isNotEmpty == true
-                                  ? widget.lesson!.videoUrl
-                                  : "(Chưa có)",
-                              style: TextStyle(
-                                color:
-                                    widget.lesson?.videoUrl.isEmpty == true
-                                        ? Colors.red[300]
-                                        : null,
-                                fontStyle:
-                                    widget.lesson?.videoUrl.isEmpty == true
-                                        ? FontStyle.italic
-                                        : null,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text('Thứ tự: ${widget.lesson?.order ?? 0}'),
-                        Row(
-                          children: [
-                            Text('PDF: '),
-                            Text(
-                              '${(widget.lesson?.pdfUrl != null && widget.lesson!.pdfUrl!.isNotEmpty) ? widget.lesson!.pdfUrl : "(Chưa có)"}',
-                              style: TextStyle(
-                                color:
-                                    (widget.lesson?.pdfUrl == null ||
-                                            widget.lesson!.pdfUrl!.isEmpty)
-                                        ? Colors.red[300]
-                                        : null,
-                                fontStyle:
-                                    (widget.lesson?.pdfUrl == null ||
-                                            widget.lesson!.pdfUrl!.isEmpty)
-                                        ? FontStyle.italic
-                                        : null,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text('Slide: '),
-                            Text(
-                              '${(widget.lesson?.slideUrl != null && widget.lesson!.slideUrl!.isNotEmpty) ? widget.lesson!.slideUrl : "(Chưa có)"}',
-                              style: TextStyle(
-                                color:
-                                    (widget.lesson?.slideUrl == null ||
-                                            widget.lesson!.slideUrl!.isEmpty)
-                                        ? Colors.red[300]
-                                        : null,
-                                fontStyle:
-                                    (widget.lesson?.slideUrl == null ||
-                                            widget.lesson!.slideUrl!.isEmpty)
-                                        ? FontStyle.italic
-                                        : null,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
-                ),
-              ],
-              Text(
-                isEditing ? 'Sửa bài học' : 'Thêm bài học mới',
-                style: theme.textTheme.titleLarge,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Tiêu đề',
-                  hintText: 'Nhập tiêu đề bài học',
-                ),
-                validator:
-                    (v) => v?.isEmpty ?? true ? 'Vui lòng nhập tiêu đề' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _videoUrlController,
-                decoration: InputDecoration(
-                  labelText: 'Video URL',
-                  hintText:
-                      (widget.lesson?.videoUrl.isEmpty ?? true)
-                          ? 'Chưa có video, nhập URL mới nếu muốn'
-                          : 'Nhập URL video bài học',
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _contentController,
-                decoration: InputDecoration(
-                  labelText: 'Nội dung',
-                  hintText:
-                      (widget.lesson?.content?.isEmpty ?? true)
-                          ? 'Chưa có nội dung, nhập nội dung mới nếu muốn'
-                          : 'Nhập nội dung bài học',
-                ),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _orderController,
-                decoration: const InputDecoration(
-                  labelText: 'Thứ tự',
-                  hintText: 'Nhập thứ tự bài học',
-                ),
-                keyboardType: TextInputType.number,
-                validator: (v) {
-                  if (v?.isEmpty ?? true) return 'Vui lòng nhập thứ tự';
-                  if (int.tryParse(v!) == null) return 'Thứ tự phải là số';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _pickFile(true),
-                      icon: const Icon(Icons.picture_as_pdf),
-                      label: Text(
-                        _pdfFile != null
-                            ? _pdfFile!.path.split('/').last
-                            : isEditing && _currentPdfName != null
-                            ? 'Giữ nguyên PDF'
-                            : 'Chọn PDF (bỏ trống nếu chưa có)',
-                      ),
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _pickFile(false),
-                      icon: const Icon(Icons.slideshow),
-                      label: Text(
-                        _slideFile != null
-                            ? _slideFile!.path.split('/').last
-                            : isEditing && _currentSlideName != null
-                            ? 'Giữ nguyên Slide'
-                            : 'Chọn Slide (bỏ trống nếu chưa có)',
+                ],
+              ),
+            ),
+
+            // Form content
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Thông tin hiện tại (chỉ hiển thị khi đang chỉnh sửa)
+                      if (isEditing && widget.lesson != null) ...[
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest
+                                .withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: theme.colorScheme.outline.withOpacity(0.2),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.info_outline,
+                                    size: 20,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Thông tin hiện tại',
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      color: theme.colorScheme.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              _buildInfoRow(
+                                'Tiêu đề',
+                                widget.lesson!.title,
+                                theme,
+                              ),
+                              if (widget.lesson!.content?.isNotEmpty == true)
+                                _buildInfoRow(
+                                  'Nội dung',
+                                  widget.lesson!.content!,
+                                  theme,
+                                  isMultiline: true,
+                                ),
+                              if (widget.lesson!.videoUrl.isNotEmpty)
+                                _buildInfoRow(
+                                  'Video URL',
+                                  widget.lesson!.videoUrl,
+                                  theme,
+                                ),
+                              _buildInfoRow(
+                                'Thứ tự',
+                                widget.lesson!.order.toString(),
+                                theme,
+                              ),
+                              if (widget.lesson!.pdfUrl?.isNotEmpty == true)
+                                _buildInfoRow(
+                                  'PDF',
+                                  widget.lesson!.pdfUrl!,
+                                  theme,
+                                ),
+                              if (widget.lesson!.slideUrl?.isNotEmpty == true)
+                                _buildInfoRow(
+                                  'Slide',
+                                  widget.lesson!.slideUrl!,
+                                  theme,
+                                ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+
+                      // Form fields
+                      TextFormField(
+                        controller: _titleController,
+                        decoration: InputDecoration(
+                          labelText: 'Tiêu đề bài học',
+                          hintText: 'Nhập tiêu đề bài học',
+                          prefixIcon: const Icon(Icons.title),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        validator:
+                            (v) =>
+                                v?.isEmpty ?? true
+                                    ? 'Vui lòng nhập tiêu đề'
+                                    : null,
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _videoUrlController,
+                        decoration: InputDecoration(
+                          labelText: 'Video URL',
+                          hintText:
+                              (widget.lesson?.videoUrl.isEmpty ?? true)
+                                  ? 'Chưa có video, nhập URL mới nếu muốn'
+                                  : 'Nhập URL video bài học',
+                          prefixIcon: const Icon(Icons.video_library),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _contentController,
+                        decoration: InputDecoration(
+                          labelText: 'Nội dung bài học',
+                          hintText:
+                              (widget.lesson?.content?.isEmpty ?? true)
+                                  ? 'Chưa có nội dung, nhập nội dung mới nếu muốn'
+                                  : 'Nhập nội dung bài học',
+                          hintStyle: TextStyle(
+                            color: theme.colorScheme.onSurfaceVariant
+                                .withOpacity(0.7),
+                          ),
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.only(left: 16, right: 12),
+                            child: Icon(
+                              Icons.description_outlined,
+                              color: theme.colorScheme.primary.withOpacity(0.8),
+                              size: 22,
+                            ),
+                          ),
+                          prefixIconConstraints: const BoxConstraints(
+                            minWidth: 50,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.outline.withOpacity(0.5),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.outline.withOpacity(0.5),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.primary,
+                              width: 2,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: theme.colorScheme.surfaceContainerLowest,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
+                          alignLabelWithHint: true,
+                        ),
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface,
+                          fontSize: 16,
+                          height: 1.5,
+                        ),
+                        maxLines: 8,
+                        minLines: 5,
+                        keyboardType: TextInputType.multiline,
+                        textAlignVertical: TextAlignVertical.top,
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _orderController,
+                        decoration: InputDecoration(
+                          labelText: 'Thứ tự bài học',
+                          hintText: 'Nhập thứ tự bài học',
+                          prefixIcon: const Icon(Icons.sort),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        keyboardType: TextInputType.number,
+                        validator: (v) {
+                          if (v?.isEmpty ?? true) return 'Vui lòng nhập thứ tự';
+                          if (int.tryParse(v!) == null)
+                            return 'Thứ tự phải là số';
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () => _pickFile(true),
+                              icon: const Icon(Icons.picture_as_pdf),
+                              label: Text(
+                                _pdfFile != null
+                                    ? _pdfFile!.path.split('/').last
+                                    : isEditing && _currentPdfName != null
+                                    ? 'Giữ nguyên PDF'
+                                    : 'Chọn PDF',
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () => _pickFile(false),
+                              icon: const Icon(Icons.slideshow),
+                              label: Text(
+                                _slideFile != null
+                                    ? _slideFile!.path.split('/').last
+                                    : isEditing && _currentSlideName != null
+                                    ? 'Giữ nguyên Slide'
+                                    : 'Chọn Slide',
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Footer với nút hành động
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Hủy'),
+                  ),
+                  const SizedBox(width: 12),
+                  FilledButton.icon(
+                    onPressed: _isLoading ? null : _submit,
+                    icon:
+                        _isLoading
+                            ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
+                              ),
+                            )
+                            : Icon(isEditing ? Icons.save : Icons.add),
+                    label: Text(isEditing ? 'Cập nhật' : 'Tạo bài học'),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _submit,
-                  child:
-                      _isLoading
-                          ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: LoadingIndicator(),
-                          )
-                          : Text(isEditing ? 'Cập nhật' : 'Tạo bài học'),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(
+    String label,
+    String value,
+    ThemeData theme, {
+    bool isMultiline = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment:
+            isMultiline ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$label:',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface,
+              ),
+              maxLines: isMultiline ? 3 : 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       ),
     );
   }

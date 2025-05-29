@@ -20,7 +20,11 @@ class ProfileScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: CustomAppBar(title: 'Hồ sơ cá nhân', showMenu: true),
+      appBar: CustomAppBar(
+        title: 'Hồ sơ cá nhân',
+        showMenu: true,
+        showBack: true,
+      ),
       body: Column(
         children: [
           const SizedBox(height: 16),

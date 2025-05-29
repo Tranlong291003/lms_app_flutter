@@ -7,7 +7,7 @@ import 'package:lms/cubits/quiz/quiz_cubit.dart';
 import 'package:lms/cubits/quiz/quiz_state.dart';
 import 'package:lms/models/quiz/quiz_model.dart';
 import 'package:lms/screens/quiz/quiz_question_list_screen.dart';
-import 'package:lms/widgets/custom_snackbar.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 
 class QuizTab extends StatelessWidget {
   final int courseId;

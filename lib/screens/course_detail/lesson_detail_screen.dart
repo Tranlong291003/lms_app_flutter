@@ -5,9 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
+import 'package:lms/apps/utils/youtube_video_player.dart';
 import 'package:lms/cubits/lessons/lesson_detail_cubit.dart';
 import 'package:lms/cubits/lessons/lesson_detail_state.dart';
-import 'package:lms/widgets/youtube_video_player.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -183,6 +183,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
           isFullScreen
               ? null
               : AppBar(
+                automaticallyImplyLeading: false, // ẩn nút back
                 title: Text(
                   'Chi tiết bài học',
                   style: theme.textTheme.titleLarge?.copyWith(
@@ -497,6 +498,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                                     color: colorScheme.onSurface,
                                     height: 1.6,
                                   ),
+                                  textAlign: TextAlign.justify,
                                 ),
 
                                 // Tài liệu đính kèm (nếu có)

@@ -38,9 +38,39 @@ class UserQuizResultsScreen extends StatelessWidget {
               final results = state.results;
               if (results.isEmpty) {
                 return Center(
-                  child: Text(
-                    'Bạn chưa làm bài kiểm tra nào.',
-                    style: TextStyle(color: colorScheme.onSurface),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.assignment_turned_in_outlined,
+                          size: 64,
+                          color: colorScheme.primary.withOpacity(0.3),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Bạn chưa làm bài kiểm tra nào',
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface.withOpacity(0.8),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Hãy thử sức với các bài kiểm tra để đánh giá kiến thức của bạn!',
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface.withOpacity(0.6),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }

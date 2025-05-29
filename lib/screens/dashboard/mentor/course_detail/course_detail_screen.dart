@@ -23,6 +23,7 @@ class CourseDetailScreen extends StatelessWidget {
         appBar: AppBar(
           elevation: 0,
           centerTitle: true,
+          automaticallyImplyLeading: false, // ẩn nút back
           title: Text(
             'Chi tiết khóa học',
             style: theme.textTheme.titleLarge?.copyWith(
@@ -30,13 +31,7 @@ class CourseDetailScreen extends StatelessWidget {
               fontSize: 20,
             ),
           ),
-          actions: [
-            IconButton(
-              tooltip: 'Chỉnh sửa',
-              icon: const Icon(Icons.edit_outlined),
-              onPressed: () {},
-            ),
-          ],
+
           bottom: TabBar(
             dividerColor: Colors.transparent,
             labelColor: cs.primary,

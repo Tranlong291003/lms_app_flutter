@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lms/apps/utils/FeInDevMessaage.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 
 class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key});
@@ -24,7 +24,10 @@ class PaymentScreen extends StatelessWidget {
             title: 'Thẻ tín dụng/Ghi nợ',
             icon: Icons.credit_card,
             onTap: () {
-              showFeatureInDevelopmentMessage(context, 'Thanh toán bằng thẻ');
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
+              );
             },
           ),
 
@@ -33,9 +36,9 @@ class PaymentScreen extends StatelessWidget {
             title: 'Ví điện tử',
             icon: Icons.account_balance_wallet,
             onTap: () {
-              showFeatureInDevelopmentMessage(
-                context,
-                'Thanh toán bằng ví điện tử',
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
               );
             },
           ),
@@ -45,9 +48,9 @@ class PaymentScreen extends StatelessWidget {
             title: 'Chuyển khoản ngân hàng',
             icon: Icons.account_balance,
             onTap: () {
-              showFeatureInDevelopmentMessage(
-                context,
-                'Chuyển khoản ngân hàng',
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
               );
             },
           ),
@@ -131,9 +134,9 @@ class PaymentScreen extends StatelessWidget {
                       const SizedBox(width: 12),
                       ElevatedButton(
                         onPressed: () {
-                          showFeatureInDevelopmentMessage(
-                            context,
-                            'Áp dụng mã giảm giá',
+                          CustomSnackBar.showInfo(
+                            context: context,
+                            message: 'Chức năng đang được phát triền',
                           );
                         },
                         style: ElevatedButton.styleFrom(

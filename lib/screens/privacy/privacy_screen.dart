@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lms/apps/utils/FeInDevMessaage.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 
 class PrivacyScreen extends StatelessWidget {
   const PrivacyScreen({super.key});
@@ -53,9 +53,9 @@ class PrivacyScreen extends StatelessWidget {
             icon: Icons.person_outline,
             title: 'Thông tin cá nhân',
             onTap: () {
-              showFeatureInDevelopmentMessage(
-                context,
-                'Chính sách thông tin cá nhân',
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
               );
             },
           ),
@@ -65,9 +65,9 @@ class PrivacyScreen extends StatelessWidget {
             icon: Icons.cookie_outlined,
             title: 'Cookie và dữ liệu',
             onTap: () {
-              showFeatureInDevelopmentMessage(
-                context,
-                'Chính sách cookie và dữ liệu',
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
               );
             },
           ),
@@ -77,9 +77,9 @@ class PrivacyScreen extends StatelessWidget {
             icon: Icons.security_outlined,
             title: 'Bảo mật dữ liệu',
             onTap: () {
-              showFeatureInDevelopmentMessage(
-                context,
-                'Chính sách bảo mật dữ liệu',
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
               );
             },
           ),
@@ -89,9 +89,9 @@ class PrivacyScreen extends StatelessWidget {
             icon: Icons.share_outlined,
             title: 'Chia sẻ thông tin',
             onTap: () {
-              showFeatureInDevelopmentMessage(
-                context,
-                'Chính sách chia sẻ thông tin',
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
               );
             },
           ),
@@ -101,9 +101,9 @@ class PrivacyScreen extends StatelessWidget {
             icon: Icons.child_care_outlined,
             title: 'Bảo vệ trẻ em',
             onTap: () {
-              showFeatureInDevelopmentMessage(
-                context,
-                'Chính sách bảo vệ trẻ em',
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
               );
             },
           ),
@@ -135,9 +135,9 @@ class PrivacyScreen extends StatelessWidget {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: () {
-                            showFeatureInDevelopmentMessage(
-                              context,
-                              'Gửi phản hồi',
+                            CustomSnackBar.showInfo(
+                              context: context,
+                              message: 'Chức năng đang được phát triền',
                             );
                           },
                           icon: const Icon(Icons.feedback_outlined),
@@ -154,9 +154,9 @@ class PrivacyScreen extends StatelessWidget {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            showFeatureInDevelopmentMessage(
-                              context,
-                              'Liên hệ hỗ trợ',
+                            CustomSnackBar.showInfo(
+                              context: context,
+                              message: 'Chức năng đang được phát triền',
                             );
                           },
                           icon: const Icon(Icons.support_agent),

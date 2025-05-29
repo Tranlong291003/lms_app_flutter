@@ -151,6 +151,7 @@ class InfoTab extends StatelessWidget {
               child: Text(
                 course['description'] ?? 'Không có mô tả',
                 style: textTheme.bodyMedium,
+                textAlign: TextAlign.justify,
               ),
             ),
           ),

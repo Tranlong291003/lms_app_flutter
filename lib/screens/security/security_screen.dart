@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/config/app_router.dart';
-import 'package:lms/apps/utils/FeInDevMessaage.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 
 class SecurityScreen extends StatelessWidget {
   const SecurityScreen({super.key});
@@ -34,7 +34,10 @@ class SecurityScreen extends StatelessWidget {
             title: 'Xác thực hai yếu tố',
             subtitle: 'Bảo mật tài khoản với xác thực 2 lớp',
             onTap: () {
-              showFeatureInDevelopmentMessage(context, 'Xác thực hai yếu tố');
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
+              );
             },
           ),
 
@@ -45,7 +48,10 @@ class SecurityScreen extends StatelessWidget {
             title: 'Câu hỏi bảo mật',
             subtitle: 'Thiết lập câu hỏi bảo mật để khôi phục tài khoản',
             onTap: () {
-              showFeatureInDevelopmentMessage(context, 'Câu hỏi bảo mật');
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
+              );
             },
           ),
 
@@ -59,7 +65,10 @@ class SecurityScreen extends StatelessWidget {
             title: 'Thiết bị đã đăng nhập',
             subtitle: 'Xem và quản lý các thiết bị đã đăng nhập',
             onTap: () {
-              showFeatureInDevelopmentMessage(context, 'Thiết bị đã đăng nhập');
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
+              );
             },
           ),
 
@@ -70,7 +79,10 @@ class SecurityScreen extends StatelessWidget {
             title: 'Lịch sử đăng nhập',
             subtitle: 'Xem lịch sử đăng nhập gần đây',
             onTap: () {
-              showFeatureInDevelopmentMessage(context, 'Lịch sử đăng nhập');
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
+              );
             },
           ),
 
@@ -84,9 +96,9 @@ class SecurityScreen extends StatelessWidget {
             title: 'Quyền truy cập dữ liệu',
             subtitle: 'Kiểm soát quyền truy cập vào dữ liệu của bạn',
             onTap: () {
-              showFeatureInDevelopmentMessage(
-                context,
-                'Quyền truy cập dữ liệu',
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
               );
             },
           ),
@@ -99,7 +111,10 @@ class SecurityScreen extends StatelessWidget {
             subtitle: 'Xóa vĩnh viễn tài khoản và dữ liệu của bạn',
             isDestructive: true,
             onTap: () {
-              showFeatureInDevelopmentMessage(context, 'Xóa tài khoản');
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triền',
+              );
             },
           ),
         ],

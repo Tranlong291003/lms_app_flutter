@@ -2,14 +2,15 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
-import 'package:lms/apps/utils/searchBarWidget.dart';
 import 'package:lms/cubits/category/category_cubit.dart';
-import 'package:lms/widgets/custom_snackbar.dart';
 
 class CategoryManagementScreen extends StatefulWidget {
   const CategoryManagementScreen({super.key});
@@ -21,6 +22,7 @@ class CategoryManagementScreen extends StatefulWidget {
 
 class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -55,10 +57,15 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Quản lý danh mục'),
-        backgroundColor: isDark ? colorScheme.surface : colorScheme.primary,
-        foregroundColor: isDark ? colorScheme.onSurface : colorScheme.onPrimary,
+      appBar: CustomAppBar(
+        title: 'Quản lý danh mục',
+        showBack: true,
+        showSearch: true,
+        onSearchChanged: (value) {
+          setState(() {
+            _searchQuery = value.trim().toLowerCase();
+          });
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCategoryDialog(context),
@@ -68,13 +75,6 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
       ),
       body: Column(
         children: [
-          SearchBarWidget(
-            controller: _searchController,
-            hintText: 'Tìm kiếm danh mục...',
-            onChanged: (value) {
-              // TODO: Thực hiện tìm kiếm
-            },
-          ),
           Expanded(
             child: BlocBuilder<CategoryCubit, CategoryState>(
               builder: (context, state) {
@@ -86,14 +86,21 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                 }
                 if (state is CategoryLoaded) {
                   final categories = state.categories;
-                  if (categories.isEmpty) {
+                  final filteredCategories =
+                      categories
+                          .where(
+                            (cat) =>
+                                cat.name.toLowerCase().contains(_searchQuery),
+                          )
+                          .toList();
+                  if (filteredCategories.isEmpty) {
                     return const Center(child: Text('Không có danh mục nào'));
                   }
                   return ListView.builder(
                     padding: const EdgeInsets.all(16),
-                    itemCount: categories.length,
+                    itemCount: filteredCategories.length,
                     itemBuilder: (context, index) {
-                      final cat = categories[index];
+                      final cat = filteredCategories[index];
                       return _buildCategoryCard(
                         context,
                         id: cat.categoryId,
@@ -235,16 +242,16 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
             final isDark = theme.brightness == Brightness.dark;
 
             return Dialog(
-              insetPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 24,
-              ),
+              backgroundColor: colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
-              child: Container(
-                padding: const EdgeInsets.all(0),
-                constraints: const BoxConstraints(maxWidth: 500),
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 24,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -262,328 +269,334 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                           topRight: Radius.circular(24),
                         ),
                       ),
-                      child: Row(
+                      child: Stack(
+                        alignment: Alignment.center,
                         children: [
-                          Icon(
-                            isEdit
-                                ? Icons.edit_rounded
-                                : Icons.add_circle_outline_rounded,
-                            color: colorScheme.onPrimary,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              isEdit
-                                  ? 'Cập nhật danh mục'
-                                  : 'Thêm danh mục mới',
-                              style: theme.textTheme.titleLarge?.copyWith(
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                isEdit
+                                    ? Icons.edit_rounded
+                                    : Icons.add_circle_outline_rounded,
                                 color: colorScheme.onPrimary,
-                                fontWeight: FontWeight.bold,
+                                size: 26,
                               ),
-                            ),
+                              const SizedBox(width: 10),
+                              Text(
+                                isEdit
+                                    ? 'Cập nhật danh mục'
+                                    : 'Thêm danh mục mới',
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  color: colorScheme.onPrimary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                          IconButton(
-                            onPressed: () => Navigator.of(dialogContext).pop(),
-                            icon: const Icon(Icons.close_rounded),
-                            color: colorScheme.onPrimary.withOpacity(0.8),
-                            style: IconButton.styleFrom(
-                              backgroundColor: colorScheme.onPrimary
-                                  .withOpacity(0.1),
+                          Positioned(
+                            right: 0,
+                            child: IconButton(
+                              onPressed:
+                                  () => Navigator.of(dialogContext).pop(),
+                              icon: const Icon(Icons.close_rounded),
+                              color: colorScheme.onPrimary.withOpacity(0.8),
+                              style: IconButton.styleFrom(
+                                backgroundColor: colorScheme.onPrimary
+                                    .withOpacity(0.12),
+                                padding: const EdgeInsets.all(8),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-
-                    Flexible(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Icon picker
-                            Center(
-                              child: Stack(
-                                children: [
-                                  AnimatedContainer(
-                                    duration: const Duration(milliseconds: 300),
-                                    width: 120,
-                                    height: 120,
-                                    decoration: BoxDecoration(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 0,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 24),
+                          // Icon picker
+                          Center(
+                            child: Stack(
+                              children: [
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  width: 100,
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        selectedIcon != null
+                                            ? Colors.transparent
+                                            : colorScheme.primary.withOpacity(
+                                              0.07,
+                                            ),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
                                       color:
                                           selectedIcon != null
-                                              ? Colors.transparent
+                                              ? colorScheme.primary
                                               : colorScheme.primary.withOpacity(
-                                                0.08,
+                                                0.18,
                                               ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color:
-                                            selectedIcon != null
-                                                ? Colors.transparent
-                                                : colorScheme.primary
-                                                    .withOpacity(0.2),
-                                        width: 2,
+                                      width: 2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: colorScheme.shadow.withOpacity(
+                                          0.08,
+                                        ),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
                                       ),
-                                      boxShadow:
-                                          selectedIcon != null
-                                              ? [
-                                                BoxShadow(
-                                                  color: colorScheme.shadow
-                                                      .withOpacity(0.1),
-                                                  blurRadius: 10,
-                                                  spreadRadius: 0,
-                                                  offset: const Offset(0, 4),
-                                                ),
-                                              ]
-                                              : null,
-                                    ),
-                                    child: Builder(
-                                      builder: (context) {
-                                        if (selectedIcon != null) {
-                                          return ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            child: Image.file(
-                                              selectedIcon!,
-                                              width: 120,
-                                              height: 120,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          );
-                                        } else if (iconPath != null &&
-                                            _getIconUrl(iconPath) != null) {
-                                          return ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            child: Image.network(
-                                              _getIconUrl(iconPath)!,
-                                              width: 120,
-                                              height: 120,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          );
-                                        } else {
-                                          return Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                Icons.image_rounded,
-                                                size: 48,
-                                                color: colorScheme.primary
-                                                    .withOpacity(0.8),
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Text(
-                                                'Chọn icon',
-                                                style: theme
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                      color:
-                                                          colorScheme.primary,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                              ),
-                                            ],
-                                          );
-                                        }
-                                      },
-                                    ),
+                                    ],
                                   ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: InkWell(
-                                      onTap: () async {
-                                        final ImagePicker picker =
-                                            ImagePicker();
-                                        final XFile? image = await picker
-                                            .pickImage(
-                                              source: ImageSource.gallery,
-                                              imageQuality: 80,
-                                            );
-
-                                        if (image != null) {
-                                          setState(() {
-                                            selectedIcon = File(image.path);
-                                          });
-                                        }
-                                      },
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: colorScheme.primary,
-                                          shape: BoxShape.circle,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: colorScheme.shadow
-                                                  .withOpacity(0.2),
-                                              blurRadius: 8,
-                                              offset: const Offset(0, 2),
+                                  child: Builder(
+                                    builder: (context) {
+                                      if (selectedIcon != null) {
+                                        return ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          child: Image.file(
+                                            selectedIcon!,
+                                            width: 100,
+                                            height: 100,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        );
+                                      } else if (iconPath != null &&
+                                          _getIconUrl(iconPath) != null) {
+                                        return ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          child: Image.network(
+                                            _getIconUrl(iconPath)!,
+                                            width: 100,
+                                            height: 100,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        );
+                                      } else {
+                                        return Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.image_rounded,
+                                              size: 40,
+                                              color: colorScheme.primary
+                                                  .withOpacity(0.7),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Chọn icon',
+                                              style: theme.textTheme.bodyMedium
+                                                  ?.copyWith(
+                                                    color: colorScheme.primary,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
                                             ),
                                           ],
-                                        ),
-                                        child:
-                                            selectedIcon != null
-                                                ? Icon(
-                                                  Icons.edit_rounded,
-                                                  color: colorScheme.onPrimary,
-                                                  size: 20,
-                                                )
-                                                : Icon(
-                                                  Icons
-                                                      .add_photo_alternate_rounded,
-                                                  color: colorScheme.onPrimary,
-                                                  size: 20,
-                                                ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: InkWell(
+                                    onTap: () async {
+                                      final ImagePicker picker = ImagePicker();
+                                      final XFile? image = await picker
+                                          .pickImage(
+                                            source: ImageSource.gallery,
+                                            imageQuality: 80,
+                                          );
+                                      if (image != null) {
+                                        setState(() {
+                                          selectedIcon = File(image.path);
+                                        });
+                                      }
+                                    },
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(7),
+                                      decoration: BoxDecoration(
+                                        color: colorScheme.primary,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: colorScheme.shadow
+                                                .withOpacity(0.18),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Icon(
+                                        selectedIcon != null
+                                            ? Icons.edit_rounded
+                                            : Icons.add_photo_alternate_rounded,
+                                        color: colorScheme.onPrimary,
+                                        size: 18,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-
-                            const SizedBox(height: 32),
-
-                            // Tên danh mục
-                            Text(
+                          ),
+                          const SizedBox(height: 28),
+                          // Tên danh mục
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
                               'Tên danh mục',
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: colorScheme.onSurface,
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            _buildTextField(
-                              controller: nameController,
-                              hintText: 'Nhập tên danh mục',
-                              maxLength: 20,
-                              colorScheme: colorScheme,
-                              prefixIcon: Icons.label_outline_rounded,
-                              isDark: isDark,
-                            ),
-
-                            const SizedBox(height: 24),
-
-                            // Mô tả
-                            Text(
+                          ),
+                          const SizedBox(height: 10),
+                          DescriptionTextField(
+                            controller: nameController,
+                            hintText: 'Nhập tên danh mục',
+                            maxLength: 20,
+                            maxLines: 1,
+                            prefixIcon: Icons.label_outline_rounded,
+                            colorScheme: colorScheme,
+                          ),
+                          const SizedBox(height: 22),
+                          // Mô tả
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
                               'Mô tả',
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: colorScheme.onSurface,
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            _buildTextField(
-                              controller: descriptionController,
-                              hintText: 'Nhập mô tả danh mục',
-                              maxLines: 4,
-                              colorScheme: colorScheme,
-                              prefixIcon: Icons.description_outlined,
-                              isDark: isDark,
-                            ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 10),
+                          DescriptionTextField(
+                            controller: descriptionController,
+                            hintText: 'Nhập mô tả danh mục...',
+                            maxLength: 500,
+                            maxLines: 5,
+                            prefixIcon: Icons.description_outlined,
+                            colorScheme: colorScheme,
+                          ),
+                          const SizedBox(height: 28),
+                        ],
                       ),
                     ),
-
                     // Actions
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            isDark
-                                ? colorScheme.surfaceContainerHighest
-                                : colorScheme.surfaceContainer,
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(24),
-                          bottomRight: Radius.circular(24),
-                        ),
-                      ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          OutlinedButton.icon(
-                            onPressed: () => Navigator.of(dialogContext).pop(),
-                            icon: const Icon(Icons.close),
-                            label: const Text('Hủy'),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed:
+                                  () => Navigator.of(dialogContext).pop(),
+                              icon: const Icon(Icons.close, size: 18),
+                              label: const Text('Hủy'),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 0,
+                                  vertical: 14,
+                                ),
+                                side: BorderSide(color: colorScheme.outline),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                textStyle: theme.textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.w600),
                               ),
-                              side: BorderSide(color: colorScheme.outline),
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          FilledButton.icon(
-                            onPressed: () async {
-                              final uid =
-                                  FirebaseAuth.instance.currentUser?.uid ?? '';
-                              try {
-                                if (isEdit) {
-                                  await context
-                                      .read<CategoryCubit>()
-                                      .updateCategory(
-                                        categoryId: id!,
-                                        name: nameController.text,
-                                        description: descriptionController.text,
-                                        uid: uid,
-                                        icon: selectedIcon,
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: FilledButton.icon(
+                              onPressed: () async {
+                                final uid =
+                                    FirebaseAuth.instance.currentUser?.uid ??
+                                    '';
+                                try {
+                                  if (isEdit) {
+                                    await context
+                                        .read<CategoryCubit>()
+                                        .updateCategory(
+                                          categoryId: id!,
+                                          name: nameController.text,
+                                          description:
+                                              descriptionController.text,
+                                          uid: uid,
+                                          icon: selectedIcon,
+                                        );
+                                    if (mounted) {
+                                      CustomSnackBar.showSuccess(
+                                        context: context,
+                                        message: 'Cập nhật danh mục thành công',
                                       );
-                                  if (mounted) {
-                                    CustomSnackBar.showSuccess(
-                                      context: context,
-                                      message: 'Cập nhật danh mục thành công',
-                                    );
+                                    }
+                                  } else {
+                                    await context
+                                        .read<CategoryCubit>()
+                                        .createCategory(
+                                          name: nameController.text,
+                                          description:
+                                              descriptionController.text,
+                                          uid: uid,
+                                          icon: selectedIcon,
+                                        );
+                                    if (mounted) {
+                                      CustomSnackBar.showSuccess(
+                                        context: context,
+                                        message: 'Thêm danh mục mới thành công',
+                                      );
+                                    }
                                   }
-                                } else {
-                                  await context
-                                      .read<CategoryCubit>()
-                                      .createCategory(
-                                        name: nameController.text,
-                                        description: descriptionController.text,
-                                        uid: uid,
-                                        icon: selectedIcon,
-                                      );
+                                  Navigator.of(dialogContext).pop();
+                                } catch (e) {
                                   if (mounted) {
-                                    CustomSnackBar.showSuccess(
+                                    CustomSnackBar.showError(
                                       context: context,
-                                      message: 'Thêm danh mục mới thành công',
+                                      message:
+                                          isEdit
+                                              ? 'Cập nhật danh mục thất bại: \\${e.toString()}'
+                                              : 'Thêm danh mục mới thất bại: \\${e.toString()}',
                                     );
                                   }
                                 }
-                                Navigator.of(dialogContext).pop();
-                              } catch (e) {
-                                if (mounted) {
-                                  CustomSnackBar.showError(
-                                    context: context,
-                                    message:
-                                        isEdit
-                                            ? 'Cập nhật danh mục thất bại: ${e.toString()}'
-                                            : 'Thêm danh mục mới thất bại: ${e.toString()}',
-                                  );
-                                }
-                              }
-                            },
-                            icon: Icon(isEdit ? Icons.save : Icons.add),
-                            label: Text(isEdit ? 'Cập nhật' : 'Thêm mới'),
-                            style: FilledButton.styleFrom(
-                              backgroundColor: colorScheme.primary,
-                              foregroundColor: colorScheme.onPrimary,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
+                              },
+                              icon: Icon(
+                                isEdit ? Icons.save : Icons.add,
+                                size: 18,
+                              ),
+                              label: Text(isEdit ? 'Cập nhật' : 'Thêm mới'),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: colorScheme.primary,
+                                foregroundColor: colorScheme.onPrimary,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 0,
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                textStyle: theme.textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.w600),
                               ),
                             ),
                           ),
@@ -790,6 +803,153 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                   ],
                 ),
               ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class DescriptionTextField extends StatefulWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final int maxLength;
+  final int maxLines;
+  final IconData prefixIcon;
+  final ColorScheme colorScheme;
+
+  const DescriptionTextField({
+    super.key,
+    required this.controller,
+    required this.hintText,
+    this.maxLength = 500,
+    this.maxLines = 5,
+    required this.prefixIcon,
+    required this.colorScheme,
+  });
+
+  @override
+  State<DescriptionTextField> createState() => _DescriptionTextFieldState();
+}
+
+class _DescriptionTextFieldState extends State<DescriptionTextField>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+  bool _isFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _handleFocusChange(bool hasFocus) {
+    setState(() {
+      _isFocused = hasFocus;
+      if (hasFocus) {
+        HapticFeedback.lightImpact();
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Color.lerp(
+              widget.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+              widget.colorScheme.primaryContainer.withOpacity(0.1),
+              _animation.value,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color:
+                  Color.lerp(
+                    widget.colorScheme.outline.withOpacity(0.5),
+                    widget.colorScheme.primary.withOpacity(0.5),
+                    _animation.value,
+                  )!,
+              width: 1 + (_animation.value * 0.5),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: widget.colorScheme.shadow.withOpacity(
+                  0.05 * _animation.value,
+                ),
+                blurRadius: 8 * _animation.value,
+                offset: Offset(0, 2 * _animation.value),
+              ),
+            ],
+          ),
+          child: Focus(
+            onFocusChange: _handleFocusChange,
+            child: TextField(
+              controller: widget.controller,
+              minLines: 1,
+              maxLines: widget.maxLines,
+              maxLength: widget.maxLength,
+              style: TextStyle(
+                color: widget.colorScheme.onSurface,
+                fontSize: 16,
+                height: 1.5,
+              ),
+              decoration: InputDecoration(
+                hintText: widget.hintText,
+                hintStyle: TextStyle(
+                  color: widget.colorScheme.onSurfaceVariant.withOpacity(0.7),
+                  fontSize: 16,
+                ),
+                prefixIcon: AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 16, right: 12),
+                      child: Icon(
+                        widget.prefixIcon,
+                        color: Color.lerp(
+                          widget.colorScheme.primary,
+                          widget.colorScheme.primary.withOpacity(0.8),
+                          _animation.value,
+                        ),
+                        size: 22 + (_animation.value * 2),
+                      ),
+                    );
+                  },
+                ),
+                prefixIconConstraints: const BoxConstraints(minWidth: 50),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                counterText: '',
+                filled: true,
+                fillColor: Colors.transparent,
+              ),
+              onChanged: (value) {
+                setState(() {}); // Trigger rebuild to update counter
+              },
             ),
           ),
         );

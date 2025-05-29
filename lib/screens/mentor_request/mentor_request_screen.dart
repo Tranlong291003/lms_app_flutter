@@ -7,7 +7,7 @@ import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_state.dart';
 import 'package:lms/cubits/mentor_request_cubit.dart';
-import 'package:lms/widgets/custom_snackbar.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 
 class MentorRequestScreen extends StatefulWidget {
   const MentorRequestScreen({super.key});

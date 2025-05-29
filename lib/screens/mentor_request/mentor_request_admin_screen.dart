@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/mentor_request_cubit.dart';
-import 'package:lms/widgets/custom_snackbar.dart';
 
 class MentorRequestAdminScreen extends StatefulWidget {
   const MentorRequestAdminScreen({super.key});
@@ -85,10 +86,13 @@ class _MentorRequestAdminScreenState extends State<MentorRequestAdminScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Duyệt yêu cầu Mentor'),
-        centerTitle: true,
-        elevation: 1,
+      appBar: CustomAppBar(
+        title: 'Duyệt yêu cầu Mentor',
+        showBack: true,
+        showSearch: true,
+        onSearchChanged: (value) {
+          // TODO: Thực hiện tìm kiếm
+        },
       ),
       body: BlocBuilder<MentorRequestCubit, MentorRequestState>(
         builder: (context, state) {

@@ -10,8 +10,9 @@ import 'package:lms/screens/course_detail/course_detail_screen.dart';
 import 'package:lms/screens/course_detail/lesson_detail_screen.dart';
 import 'package:lms/screens/dashboard/admin/admin_dashboard_screen.dart';
 import 'package:lms/screens/dashboard/admin/category_management_screen.dart';
-import 'package:lms/screens/dashboard/admin/course_management_screen.dart';
+import 'package:lms/screens/dashboard/admin/course_management_admin_screen.dart';
 import 'package:lms/screens/dashboard/admin/user_management_screen.dart';
+import 'package:lms/screens/dashboard/mentor/course_management_screen.dart';
 import 'package:lms/screens/forgotpassword/forgotpassword_screen.dart';
 import 'package:lms/screens/help/help_screen.dart';
 import 'package:lms/screens/invite/invite_screen.dart';
@@ -71,6 +72,7 @@ class AppRouter {
   static const String adminDashboard = '/admin/dashboard';
   static const String adminCourses = '/admin/courses';
   static const String adminCategories = '/admin/categories';
+  static const String mentorCourseManagement = '/mentor/courses';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     Widget page;
@@ -223,7 +225,9 @@ class AppRouter {
       case adminCategories:
         page = const CategoryManagementScreen();
         break;
-
+      case mentorCourseManagement:
+        page = const CourseManagementScreen();
+        break;
       default:
         page = const Scaffold(
           body: Center(child: Text('Không tìm thấy trang')),

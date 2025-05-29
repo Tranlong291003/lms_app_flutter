@@ -101,9 +101,43 @@ class _MyCompletedCoursesScreenState extends State<MyCompletedCoursesScreen> {
           } else if (state is EnrolledCourseLoaded) {
             if (state.completedCourses.isEmpty) {
               return Center(
-                child: Text(
-                  'Bạn chưa hoàn thành khóa học nào',
-                  style: Theme.of(context).textTheme.titleMedium,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.menu_book_outlined,
+                        size: 64,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.3),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Bạn chưa hoàn thành khóa học nào',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.8),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Hãy tiếp tục học tập và hoàn thành các khóa học để nhận chứng chỉ!',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.6),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
@@ -122,13 +156,8 @@ class _MyCompletedCoursesScreenState extends State<MyCompletedCoursesScreen> {
                     thumbnail: course.thumbnailUrl ?? "",
                     title: course.title,
                     duration: course.totalDuration,
-                    progressValue: percent,
-                    progressColor: const Color(
-                      0xFF2F56DD,
-                    ), // màu xanh dương mặc định
-                    progressText:
-                        "${course.completedLessons}/${course.totalLessons} bài",
-                    showCircular: widget.showCircular,
+                    completedLessons: course.completedLessons,
+                    totalLessons: course.totalLessons,
                     onTap:
                         () => _navigateToCourseDetail(context, course.courseId),
                   );

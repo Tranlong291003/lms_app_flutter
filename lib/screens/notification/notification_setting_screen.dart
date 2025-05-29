@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:lms/apps/utils/FeInDevMessaage.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 
 class NotificationSettingScreen extends StatelessWidget {
   const NotificationSettingScreen({super.key});
@@ -24,7 +24,10 @@ class NotificationSettingScreen extends StatelessWidget {
             isEnabled: true,
             onChanged: (value) {
               // Đây là chức năng chưa phát triển
-              showFeatureInDevelopmentMessage(context, 'Thông báo khóa học');
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triển',
+              );
             },
           ),
           _buildNotificationOption(
@@ -33,7 +36,10 @@ class NotificationSettingScreen extends StatelessWidget {
             subtitle: 'Nhận thông báo khi có tin nhắn mới từ giảng viên',
             isEnabled: false,
             onChanged: (value) {
-              showFeatureInDevelopmentMessage(context, 'Thông báo tin nhắn');
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triển',
+              );
             },
           ),
           _buildNotificationOption(
@@ -42,7 +48,10 @@ class NotificationSettingScreen extends StatelessWidget {
             subtitle: 'Nhận thông báo về các chương trình khuyến mãi, ưu đãi',
             isEnabled: true,
             onChanged: (value) {
-              showFeatureInDevelopmentMessage(context, 'Thông báo khuyến mãi');
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triển',
+              );
             },
           ),
 
@@ -78,9 +87,9 @@ class NotificationSettingScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
-                      showFeatureInDevelopmentMessage(
-                        context,
-                        'Làm mới thông báo',
+                      CustomSnackBar.showInfo(
+                        context: context,
+                        message: 'Chức năng đang được phát triển',
                       );
                     },
                     style: ElevatedButton.styleFrom(

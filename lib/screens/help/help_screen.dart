@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lms/apps/utils/FeInDevMessaage.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 
 class HelpScreen extends StatelessWidget {
   const HelpScreen({super.key});
@@ -20,7 +20,10 @@ class HelpScreen extends StatelessWidget {
           TextField(
             onChanged: (value) {
               if (value.isNotEmpty) {
-                showFeatureInDevelopmentMessage(context, 'Tìm kiếm câu hỏi');
+                CustomSnackBar.showInfo(
+                  context: context,
+                  message: 'Chức năng đang được phát triển',
+                );
               }
             },
             decoration: InputDecoration(
@@ -44,9 +47,9 @@ class HelpScreen extends StatelessWidget {
             context: context,
             question: 'Làm thế nào để đăng ký khóa học?',
             onTap: () {
-              showFeatureInDevelopmentMessage(
-                context,
-                'Hướng dẫn đăng ký khóa học',
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triển',
               );
             },
           ),
@@ -55,7 +58,10 @@ class HelpScreen extends StatelessWidget {
             context: context,
             question: 'Làm thế nào để thanh toán khóa học?',
             onTap: () {
-              showFeatureInDevelopmentMessage(context, 'Hướng dẫn thanh toán');
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triển',
+              );
             },
           ),
 
@@ -63,9 +69,9 @@ class HelpScreen extends StatelessWidget {
             context: context,
             question: 'Tôi có thể học trên thiết bị nào?',
             onTap: () {
-              showFeatureInDevelopmentMessage(
-                context,
-                'Thông tin thiết bị hỗ trợ',
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triển',
               );
             },
           ),
@@ -74,9 +80,9 @@ class HelpScreen extends StatelessWidget {
             context: context,
             question: 'Làm thế nào để nhận chứng chỉ?',
             onTap: () {
-              showFeatureInDevelopmentMessage(
-                context,
-                'Hướng dẫn nhận chứng chỉ',
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triển',
               );
             },
           ),
@@ -85,7 +91,10 @@ class HelpScreen extends StatelessWidget {
             context: context,
             question: 'Chính sách hoàn tiền như thế nào?',
             onTap: () {
-              showFeatureInDevelopmentMessage(context, 'Chính sách hoàn tiền');
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Chức năng đang được phát triển',
+              );
             },
           ),
 
@@ -117,9 +126,9 @@ class HelpScreen extends StatelessWidget {
                     title: 'Chat trực tuyến',
                     subtitle: 'Chat với đội ngũ hỗ trợ',
                     onTap: () {
-                      showFeatureInDevelopmentMessage(
-                        context,
-                        'Chat trực tuyến',
+                      CustomSnackBar.showInfo(
+                        context: context,
+                        message: 'Chức năng đang được phát triển',
                       );
                     },
                   ),
@@ -132,9 +141,9 @@ class HelpScreen extends StatelessWidget {
                     title: 'Email',
                     subtitle: 'tranlong291003@example.com',
                     onTap: () {
-                      showFeatureInDevelopmentMessage(
-                        context,
-                        'Gửi email hỗ trợ',
+                      CustomSnackBar.showInfo(
+                        context: context,
+                        message: 'Chức năng đang được phát triển',
                       );
                     },
                   ),
@@ -147,9 +156,9 @@ class HelpScreen extends StatelessWidget {
                     title: 'Điện thoại',
                     subtitle: '0889112490',
                     onTap: () {
-                      showFeatureInDevelopmentMessage(
-                        context,
-                        'Gọi điện hỗ trợ',
+                      CustomSnackBar.showInfo(
+                        context: context,
+                        message: 'Chức năng đang được phát triển',
                       );
                     },
                   ),
@@ -163,7 +172,10 @@ class HelpScreen extends StatelessWidget {
             margin: const EdgeInsets.only(top: 12),
             child: ElevatedButton.icon(
               onPressed: () {
-                showFeatureInDevelopmentMessage(context, 'Gửi phản hồi');
+                CustomSnackBar.showInfo(
+                  context: context,
+                  message: 'Chức năng đang được phát triển',
+                );
               },
               icon: const Icon(Icons.feedback_outlined),
               label: const Text('Gửi phản hồi'),

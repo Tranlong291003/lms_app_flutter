@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lms/apps/utils/bookmark_button.dart';
 import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
-import 'package:lms/widgets/bookmark_button.dart';
 
 class CourseTitle extends StatelessWidget {
   final String title;

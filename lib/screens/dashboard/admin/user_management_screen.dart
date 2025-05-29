@@ -9,7 +9,7 @@ import 'package:lms/blocs/mentors/mentors_event.dart';
 import 'package:lms/cubits/admin/admin_user_cubit.dart';
 import 'package:lms/models/role_model.dart';
 import 'package:lms/models/user_model.dart';
-import 'package:lms/widgets/custom_snackbar.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});

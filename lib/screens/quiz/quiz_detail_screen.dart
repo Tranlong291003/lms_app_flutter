@@ -323,11 +323,6 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    quiz['description'] as String? ?? 'Không có mô tả',
-                    style: GoogleFonts.poppins(fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
                 ],
               ),
             ),
@@ -346,10 +341,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                           : 'Không đủ câu hỏi theo yêu cầu thời gian',
                     ),
                     _buildInfoItem(Icons.timer_outlined, '$timeLimit phút'),
-                    _buildInfoItem(
-                      Icons.star_outline,
-                      'Độ khó: ${quiz['difficulty'] ?? 'Trung bình'}',
-                    ),
+
                     _buildInfoItem(
                       Icons.refresh_outlined,
                       'Số lần làm: $attemptsUsed/$attemptLimit',
@@ -412,6 +404,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                         const SizedBox(height: 8),
                         Text(
                           'Với thời gian $timeLimit phút, bài kiểm tra này yêu cầu ${getQuestionCountByTime(timeLimit)} câu hỏi. Hiện tại có $_loadedQuestionsCount câu hỏi trong ngân hàng đề.',
+                          textAlign: TextAlign.justify,
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.blue.shade700,

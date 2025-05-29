@@ -59,34 +59,91 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           if (state is NotificationLoaded) {
             final notifications = state.notifications;
             if (notifications.isEmpty) {
-              return const Center(
-                child: Text(
-                  'Không có thông báo nào',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontStyle: FontStyle.italic,
-                  ),
+              return RefreshIndicator(
+                onRefresh: () async {
+                  await context.read<NotificationCubit>().loadNotifications();
+                },
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height - 200,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHighest
+                                    .withOpacity(0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.notifications_none_rounded,
+                                size: 64,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withOpacity(0.5),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Text(
+                              'Chưa có thông báo nào',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleLarge?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Chúng tôi sẽ thông báo cho bạn khi có tin tức mới',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.copyWith(
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               );
             }
 
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: notifications.length,
-              itemBuilder: (context, index) {
-                final notification = notifications[index];
-                return _NotificationCard(
-                  notification: notification,
-                  onMarkAsRead: () {
-                    context.read<NotificationCubit>().markAsRead(
-                      notification.notiId,
-                    );
-                  },
-                  onDelete: () {
-                    _showDeleteConfirmation(context, notification);
-                  },
-                );
+            return RefreshIndicator(
+              onRefresh: () async {
+                await context.read<NotificationCubit>().loadNotifications();
               },
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                itemCount: notifications.length,
+                itemBuilder: (context, index) {
+                  final notification = notifications[index];
+                  return _NotificationCard(
+                    notification: notification,
+                    onMarkAsRead: () {
+                      context.read<NotificationCubit>().markAsRead(
+                        notification.notiId,
+                      );
+                    },
+                    onDelete: () {
+                      _showDeleteConfirmation(context, notification);
+                    },
+                  );
+                },
+              ),
             );
           }
 

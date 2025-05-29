@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lms/apps/utils/FeInDevMessaage.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 
 class LanguageScreen extends StatefulWidget {
   const LanguageScreen({super.key});
@@ -48,7 +48,10 @@ class _LanguageScreenState extends State<LanguageScreen> {
 
   void _onLanguageSelected(String code) {
     if (code != _selectedLanguage) {
-      showFeatureInDevelopmentMessage(context, 'Đổi ngôn ngữ');
+      CustomSnackBar.showInfo(
+        context: context,
+        message: 'Chức năng đang được phát triển',
+      );
       // Nếu muốn update ngay khi chọn:
       // setState(() {
       //   _selectedLanguage = code;
@@ -122,7 +125,10 @@ class _LanguageScreenState extends State<LanguageScreen> {
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         child: ElevatedButton(
           onPressed: () {
-            showFeatureInDevelopmentMessage(context, 'Áp dụng ngôn ngữ');
+            CustomSnackBar.showInfo(
+              context: context,
+              message: 'Chức năng đang được phát triển',
+            );
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: colorScheme.primary,

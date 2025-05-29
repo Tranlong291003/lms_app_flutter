@@ -64,36 +64,18 @@ class _BottomNavigationBarExampleState
     // Build danh sách item
     final items = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
-        icon: Image.asset(
-          'assets/icons/home.png',
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
-        ),
-        activeIcon: Image.asset(
-          'assets/icons/home.png',
-          color: theme.colorScheme.primary,
-        ),
+        icon: const Icon(Icons.home_outlined),
+        activeIcon: const Icon(Icons.home),
         label: 'Trang chủ',
       ),
       BottomNavigationBarItem(
-        icon: Image.asset(
-          'assets/icons/course.png',
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
-        ),
-        activeIcon: Image.asset(
-          'assets/icons/course.png',
-          color: theme.colorScheme.primary,
-        ),
+        icon: const Icon(Icons.menu_book_outlined),
+        activeIcon: const Icon(Icons.menu_book),
         label: 'Khoá học',
       ),
       BottomNavigationBarItem(
-        icon: Image.asset(
-          'assets/icons/quiz.png',
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
-        ),
-        activeIcon: Image.asset(
-          'assets/icons/quiz.png',
-          color: theme.colorScheme.primary,
-        ),
+        icon: const Icon(Icons.quiz_outlined),
+        activeIcon: const Icon(Icons.quiz),
         label: 'Quiz',
       ),
       if (userRole == 'user')
@@ -104,24 +86,10 @@ class _BottomNavigationBarExampleState
         ),
       if (dashboardScreen != null)
         BottomNavigationBarItem(
-          icon: Icon(
-            Icons.dashboard,
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
-          ),
-          activeIcon: Icon(Icons.dashboard, color: theme.colorScheme.primary),
+          icon: const Icon(Icons.dashboard_outlined),
+          activeIcon: const Icon(Icons.dashboard),
           label: 'Dashboard',
         ),
-      BottomNavigationBarItem(
-        icon: Image.asset(
-          'assets/icons/profile.png',
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
-        ),
-        activeIcon: Image.asset(
-          'assets/icons/profile.png',
-          color: theme.colorScheme.primary,
-        ),
-        label: 'Cá nhân',
-      ),
     ];
 
     // Clamp index để tránh out-of-bounds khi số tab thay đổi

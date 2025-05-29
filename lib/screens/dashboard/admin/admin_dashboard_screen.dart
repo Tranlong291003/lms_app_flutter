@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/admin/app_stats_cubit.dart';
 import 'package:lms/repositories/app_stats_repository.dart';
@@ -23,7 +24,6 @@ class AdminDashboardScreen extends StatelessWidget {
     final colors = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    // Get current user and handle null case
     final user = FirebaseAuth.instance.currentUser;
     developer.log('Current user: ${user?.uid}', name: 'AdminDashboard');
 
@@ -52,12 +52,7 @@ class AdminDashboardScreen extends StatelessWidget {
           ..fetchStats(user.uid);
       },
       child: Scaffold(
-        appBar: CustomAppBar(
-          title: 'Trang điều khiển',
-          showMenu: true,
-          menuItems: [],
-          onMenuSelected: (value) {},
-        ),
+        appBar: CustomAppBar(title: 'Trang điều khiển', centerTitle: true),
         body: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Column(
@@ -247,7 +242,12 @@ class _QuickActionsList extends StatelessWidget {
           title: 'Quản lý thanh toán',
           subtitle: 'Xem và quản lý các giao dịch thanh toán',
           color: Colors.green,
-          onTap: () {},
+          onTap: () {
+            CustomSnackBar.showInfo(
+              context: context,
+              message: 'Chức năng đang được phát triền',
+            );
+          },
         ),
         const SizedBox(height: 12),
         _QuickActionCard(
@@ -255,7 +255,12 @@ class _QuickActionsList extends StatelessWidget {
           title: 'Cài đặt hệ thống',
           subtitle: 'Cấu hình chung và tùy chỉnh giao diện người dùng',
           color: Colors.purple,
-          onTap: () {},
+          onTap: () {
+            CustomSnackBar.showInfo(
+              context: context,
+              message: 'Chức năng đang được phát triền',
+            );
+          },
         ),
       ],
     );

@@ -145,14 +145,6 @@ class _QuizListScreenState extends State<QuizListScreen>
               Tab(text: 'Bài đã làm'),
             ],
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () async {
-                await _quizCubit.refreshQuizzes(_userUid!);
-              },
-            ),
-          ],
         ),
         body: BlocBuilder<QuizCubit, QuizState>(
           builder: (context, state) {
@@ -204,9 +196,40 @@ class _QuizListScreenState extends State<QuizListScreen>
 
   Widget _buildEnrolledQuizzes(List<QuizCourseModel> courses) {
     if (courses.isEmpty) {
-      return const Center(
-        child: Text(
-          'Bạn chưa có bài kiểm tra nào trong các khóa học đã đăng ký',
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.quiz_outlined,
+                size: 64,
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Bạn chưa có bài kiểm tra nào',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.8),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Hãy hoàn thành các bài học để mở khóa và làm bài kiểm tra!',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       );
     }

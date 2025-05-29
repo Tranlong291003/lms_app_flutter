@@ -2,12 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/question/question_cubit.dart';
 import 'package:lms/models/quiz/question_model.dart';
 import 'package:lms/repositories/question_repository.dart';
 import 'package:lms/services/question_service.dart';
-import 'package:lms/widgets/custom_snackbar.dart';
 
 class QuizQuestionListScreen extends StatelessWidget {
   final int quizId;
@@ -44,7 +44,9 @@ class _QuizQuestionListView extends StatelessWidget {
             return const Center(child: LoadingIndicator());
           }
           if (state.status == QuestionStatus.error) {
-            return Center(child: Text('Lỗi: \\${state.errorMessage}'));
+            return const Center(
+              child: Text('Chưa có câu hỏi nào cho quiz này.'),
+            );
           }
           final questions = state.questions;
           if (questions.isEmpty) {
@@ -192,7 +194,7 @@ class _QuizQuestionListView extends StatelessWidget {
                           }),
                           const SizedBox(height: 8),
                           Text(
-                            'Tạo lúc: \\${q.getFormattedCreatedDate()}',
+                            'Tạo lúc: ${q.getFormattedCreatedDate()}',
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.grey,
@@ -532,8 +534,14 @@ class _CreateQuestionAIDialogState extends State<_CreateQuestionAIDialog> {
   final formKey = GlobalKey<FormState>();
   final topicController = TextEditingController();
   int number = 5;
-  String difficulty = 'trung_binh';
+  String difficulty = 'medium';
   bool isLoading = false;
+
+  static const Map<String, String> difficultyMap = {
+    'easy': 'Dễ',
+    'medium': 'Trung Bình',
+    'hard': 'Khó',
+  };
 
   @override
   void dispose() {
@@ -557,36 +565,94 @@ class _CreateQuestionAIDialogState extends State<_CreateQuestionAIDialog> {
                 validator: (v) => v == null || v.isEmpty ? 'Nhập chủ đề' : null,
               ),
               const SizedBox(height: 12),
-              DropdownButtonFormField<int>(
-                value: number,
+              TextFormField(
+                initialValue: number.toString(),
+                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   labelText: 'Số lượng câu hỏi',
                 ),
-                items:
-                    [5, 10, 15, 20]
-                        .map(
-                          (num) =>
-                              DropdownMenuItem(value: num, child: Text('$num')),
-                        )
-                        .toList(),
-                onChanged:
-                    isLoading ? null : (v) => setState(() => number = v ?? 5),
+                validator: (v) {
+                  if (v == null || v.isEmpty) return 'Nhập số lượng câu hỏi';
+                  final n = int.tryParse(v);
+                  if (n == null) return 'Vui lòng nhập số hợp lệ';
+                  if (n <= 0) return 'Số lượng phải lớn hơn 0';
+                  if (n > 50) return 'Tối đa 50 câu hỏi';
+                  return null;
+                },
+                onChanged: (v) {
+                  final n = int.tryParse(v);
+                  if (n != null && n > 0 && n <= 50) {
+                    setState(() => number = n);
+                  }
+                },
+                enabled: !isLoading,
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: difficulty,
-                decoration: const InputDecoration(labelText: 'Độ khó'),
-                items:
-                    const ['dễ', 'trung_binh', 'khó']
-                        .map(
-                          (diff) =>
-                              DropdownMenuItem(value: diff, child: Text(diff)),
-                        )
-                        .toList(),
+                decoration: InputDecoration(
+                  labelText: 'Độ khó',
+                  prefixIcon: Icon(
+                    Icons.speed_rounded,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withOpacity(0.5),
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withOpacity(0.5),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 2,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surface,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+                items: [
+                  DropdownMenuItem(
+                    value: 'easy',
+                    child: Row(children: [Text(difficultyMap['easy']!)]),
+                  ),
+                  DropdownMenuItem(
+                    value: 'medium',
+                    child: Row(children: [Text(difficultyMap['medium']!)]),
+                  ),
+                  DropdownMenuItem(
+                    value: 'hard',
+                    child: Row(children: [Text(difficultyMap['hard']!)]),
+                  ),
+                ],
                 onChanged:
                     isLoading
                         ? null
-                        : (v) => setState(() => difficulty = v ?? 'trung_binh'),
+                        : (v) => setState(() => difficulty = v ?? 'medium'),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                dropdownColor: Theme.of(context).colorScheme.surface,
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                borderRadius: BorderRadius.circular(16),
               ),
               const SizedBox(height: 12),
               if (isLoading) const Center(child: LoadingIndicator()),

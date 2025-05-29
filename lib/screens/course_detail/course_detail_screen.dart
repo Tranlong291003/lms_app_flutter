@@ -271,6 +271,7 @@ class _CourseBody extends StatelessWidget {
                 courseId: detail.courseId,
                 description: detail.description,
                 instructorName: detail.instructorName,
+                instructorUid: detail.instructorUid,
                 instructorAvatarUrl: detail.instructorAvatarUrl,
                 instructorBio: detail.instructorBio,
                 language: detail.language,

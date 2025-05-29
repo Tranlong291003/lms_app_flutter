@@ -58,11 +58,7 @@ AppBar AppBarHome(BuildContext context, String title) {
                     return InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () {
-                        if (role == 'admin' || role == 'mentor') {
-                          // Navigator.pushNamed(context, AppRouter.dashBoard);
-                        } else {
-                          Navigator.pushNamed(context, AppRouter.profile);
-                        }
+                        Navigator.pushNamed(context, AppRouter.profile);
                       },
                       child: CircleAvatar(
                         radius: 18,

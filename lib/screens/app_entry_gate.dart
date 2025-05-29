@@ -12,9 +12,13 @@ class AppEntryGate extends StatelessWidget {
   Future<Widget> _getEntryWidget() async {
     final prefs = await SharedPreferences.getInstance();
     final isIntroViewed = prefs.getBool('isIntroViewed') ?? false;
+
+    // Luôn kiểm tra introduction trước
     if (!isIntroViewed) {
       return const IntroScreen();
     }
+
+    // Sau khi đã xem introduction, mới kiểm tra login
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       return BottomNavigationBarExample();

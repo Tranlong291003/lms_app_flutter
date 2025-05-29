@@ -29,16 +29,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with RouteAware {
   late final UserService _userService;
+  bool _isFirstLoad = true;
 
   @override
   void initState() {
     super.initState();
     _userService = UserService(token: FirebaseAuth.instance.currentUser?.uid);
-    _loadMentor();
-    _loadCurrentUser();
-    _loadCourses();
-    _checkUserActive();
-    context.read<CategoryCubit>().fetchAllCategory();
+    if (_isFirstLoad) {
+      _loadMentor();
+      _loadCurrentUser();
+      _loadCourses();
+      _checkUserActive();
+      context.read<CategoryCubit>().fetchAllCategory();
+      _isFirstLoad = false;
+    }
   }
 
   Future<void> _checkUserActive() async {
@@ -117,8 +121,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   @override
   void didPopNext() {
-    // Khi quay lại từ trang khác, reload lại courses và kiểm tra active status
-    _loadCourses();
+    // KHÔNG gọi lại load API ở đây nữa
     _checkUserActive();
     super.didPopNext();
   }
@@ -133,6 +136,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       body: RefreshIndicator(
         onRefresh: () async {
           _loadCourses();
+          _loadMentor();
+          _loadCurrentUser();
           context.read<MentorsBloc>().add(RefreshMentorsEvent());
           context.read<UserBloc>().add(RefreshUserEvent());
           context.read<CategoryCubit>().refreshCategories();

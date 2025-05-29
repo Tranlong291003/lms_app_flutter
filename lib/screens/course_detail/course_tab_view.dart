@@ -12,7 +12,7 @@ class CourseTabView extends StatelessWidget {
   final String language;
   final String tags;
   final String level;
-
+  final String instructorUid;
   const CourseTabView({
     super.key,
     required this.description,
@@ -23,6 +23,7 @@ class CourseTabView extends StatelessWidget {
     required this.level,
     this.instructorAvatarUrl,
     this.instructorBio,
+    required this.instructorUid,
   });
 
   @override
@@ -99,6 +100,7 @@ class CourseTabView extends StatelessWidget {
                   instructorName: instructorName,
                   instructorAvatarUrl: instructorAvatarUrl,
                   instructorBio: instructorBio,
+                  instructorUid: instructorUid,
                   language: language,
                   tags: tags,
                   level: level,

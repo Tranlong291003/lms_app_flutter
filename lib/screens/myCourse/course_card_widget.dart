@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/config/api_config.dart';
-import 'package:lms/apps/utils/loading_animation_widget.dart';
 
 class CourseCard extends StatelessWidget {
   final String thumbnail;
   final String title;
   final String duration;
-  final double progressValue;
-  final Color progressColor;
-  final String progressText;
-  final bool showCircular;
+  final int completedLessons;
+  final int totalLessons;
   final VoidCallback? onTap;
 
   const CourseCard({
@@ -17,10 +14,8 @@ class CourseCard extends StatelessWidget {
     required this.thumbnail,
     required this.title,
     required this.duration,
-    required this.progressValue,
-    required this.progressColor,
-    required this.progressText,
-    required this.showCircular,
+    required this.completedLessons,
+    required this.totalLessons,
     this.onTap,
   });
 
@@ -28,6 +23,11 @@ class CourseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final double percent =
+        (totalLessons > 0)
+            ? (completedLessons / totalLessons).clamp(0.0, 1.0)
+            : 0.0;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -59,7 +59,6 @@ class CourseCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // PHẦN ẢNH
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child:
@@ -76,7 +75,6 @@ class CourseCard extends StatelessWidget {
                         : _buildPlaceholderImage(context, theme),
               ),
               const SizedBox(width: 14),
-              // PHẦN TEXT
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,50 +95,24 @@ class CourseCard extends StatelessWidget {
                         color: theme.colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
-                    if (!showCircular) ...[
-                      const SizedBox(height: 10),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
-                        child: LinearProgressIndicator(
-                          value: progressValue,
-                          color: progressColor,
-                          backgroundColor: theme.dividerColor.withOpacity(0.12),
-                          minHeight: 7,
-                        ),
+                    const SizedBox(height: 8),
+                    LinearProgressIndicator(
+                      value: percent,
+                      minHeight: 8,
+                      backgroundColor: theme.dividerColor.withOpacity(0.12),
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '$completedLessons/$totalLessons bài học',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        fontWeight: FontWeight.w500,
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        progressText,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
-                        ),
-                      ),
-                    ],
+                    ),
                   ],
                 ),
               ),
-              // PHẦN BIỂU ĐỒ TRÒN TO
-              if (showCircular)
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: SizedBox(
-                    height: 64,
-                    width: 64,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        LoadingIndicator(),
-                        Text(
-                          "${(progressValue * 100).round()}%",
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
             ],
           ),
         ),

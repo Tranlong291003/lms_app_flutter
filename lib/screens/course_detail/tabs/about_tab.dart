@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/config/app_router.dart';
 
 class AboutTab extends StatelessWidget {
   final String description;
   final String instructorName;
   final String? instructorAvatarUrl;
   final String? instructorBio;
+  final String instructorUid;
   final String language;
   final String tags;
   final String level;
@@ -15,6 +17,7 @@ class AboutTab extends StatelessWidget {
     required this.instructorName,
     this.instructorAvatarUrl,
     this.instructorBio,
+    required this.instructorUid,
     required this.language,
     required this.tags,
     required this.level,
@@ -38,24 +41,33 @@ class AboutTab extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: theme.colorScheme.primary,
-                    width: 2,
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRouter.mentorDetail,
+                    arguments: instructorUid,
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: theme.colorScheme.primary,
+                      width: 2,
+                    ),
+                    shape: BoxShape.circle,
                   ),
-                  shape: BoxShape.circle,
-                ),
-                child: CircleAvatar(
-                  radius: 24,
-                  backgroundImage:
-                      (instructorAvatarUrl != null &&
-                              instructorAvatarUrl!.isNotEmpty)
-                          ? NetworkImage(
-                            ApiConfig.getImageUrl(instructorAvatarUrl),
-                          )
-                          : const AssetImage('assets/images/mentor.png')
-                              as ImageProvider,
+                  child: CircleAvatar(
+                    radius: 32,
+                    backgroundImage:
+                        (instructorAvatarUrl != null &&
+                                instructorAvatarUrl!.isNotEmpty)
+                            ? NetworkImage(
+                              ApiConfig.getImageUrl(instructorAvatarUrl),
+                            )
+                            : const AssetImage('assets/images/mentor.png')
+                                as ImageProvider,
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -74,15 +86,14 @@ class AboutTab extends StatelessWidget {
                     if (instructorBio != null && instructorBio!.isNotEmpty)
                       Text(
                         instructorBio!,
-                        maxLines: 2,
+                        maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodyMedium,
+                        textAlign: TextAlign.justify,
                       ),
                   ],
                 ),
               ),
-              const Spacer(),
-              Icon(Icons.chat_bubble_outline, color: theme.colorScheme.primary),
             ],
           ),
           const SizedBox(height: 24),
@@ -143,7 +154,11 @@ class AboutTab extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Text(description, style: theme.textTheme.bodyMedium),
+          Text(
+            description,
+            style: theme.textTheme.bodyMedium,
+            textAlign: TextAlign.justify,
+          ),
           const SizedBox(height: 16),
           // Tags
           Text(
@@ -209,7 +224,7 @@ class AboutTab extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'Lưu ý khi học khoá học Mindser',
+                      'Lưu ý khi học khoá học MindBridge',
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: theme.colorScheme.primary,
@@ -257,6 +272,7 @@ class AboutTab extends StatelessWidget {
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w500,
               ),
+              textAlign: TextAlign.justify,
             ),
           ),
         ],
