@@ -89,13 +89,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
-    final textPrimary =
-        isDark ? AppTheme.textPrimaryDark : AppTheme.textPrimaryLight;
-    final textSecondary =
-        isDark ? AppTheme.textSecondaryDark : AppTheme.textSecondaryLight;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
+    final colorScheme = theme.colorScheme;
 
     return BlocProvider<SignUpCubit>(
       create:
@@ -111,155 +105,184 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: BlocBuilder<SignUpCubit, SignUpState>(
           builder: (context, state) {
             return Scaffold(
-              backgroundColor: backgroundColor,
-              body: SafeArea(
-                child: Center(
-                  child: SingleChildScrollView(
-                    child: Padding(
+              body: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      colorScheme.secondary.withOpacity(isDark ? 0.18 : 0.10),
+                      theme.scaffoldBackgroundColor,
+                      colorScheme.primary.withOpacity(isDark ? 0.18 : 0.08),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: SafeArea(
+                  child: Center(
+                    child: SingleChildScrollView(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
-                        vertical: 24,
+                        vertical: 28,
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // Hình minh hoạ lớn phía trên
-                          Container(
-                            width: 160,
-                            height: 160,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppTheme.primary.withOpacity(0.08),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppTheme.primary.withOpacity(0.10),
-                                  blurRadius: 24,
-                                  offset: const Offset(0, 8),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 480),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 154,
+                              height: 154,
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    colorScheme.primary,
+                                    colorScheme.secondary,
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: ClipOval(
-                              child: Image.asset(
-                                isDark
-                                    ? 'assets/images/signup_dark.png'
-                                    : 'assets/images/signup_light.png',
-                                fit: BoxFit.cover,
-                                errorBuilder:
-                                    (context, error, stackTrace) => Icon(
-                                      Icons.person_add_alt_1,
-                                      size: 90,
-                                      color: AppTheme.primary,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: colorScheme.secondary.withOpacity(
+                                      0.22,
                                     ),
+                                    blurRadius: 32,
+                                    offset: const Offset(0, 18),
+                                  ),
+                                ],
+                              ),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  isDark
+                                      ? 'assets/images/signup_dark.png'
+                                      : 'assets/images/signup_light.png',
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (context, error, stackTrace) => Container(
+                                        color: colorScheme.surface,
+                                        child: Icon(
+                                          Icons.person_add_alt_1,
+                                          size: 78,
+                                          color: colorScheme.primary,
+                                        ),
+                                      ),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 24),
+                            const SizedBox(height: 24),
                           Text(
-                            'Tạo tài khoản mới',
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: textPrimary,
+                            'Tạo tài khoản học tập',
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w900,
                             ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Đăng ký để trải nghiệm đầy đủ các tính năng của hệ thống LMS',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: textSecondary,
+                            'Hoàn tất thông tin để lưu tiến độ học, nhận gợi ý khóa học và kết nối mentor.',
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
                             ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 28),
-                          Card(
-                            color: surfaceColor,
-                            elevation: 6,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface.withOpacity(
+                                isDark ? 0.86 : 0.96,
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: colorScheme.outline.withOpacity(0.10),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colorScheme.primary.withOpacity(
+                                    isDark ? 0.18 : 0.10,
+                                  ),
+                                  blurRadius: 32,
+                                  offset: const Offset(0, 18),
+                                ),
+                              ],
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 28,
-                              ),
-                              child: Column(
-                                children: [
-                                  CustomTextField(
-                                    labelText: 'Họ và tên',
-                                    controller: _nameController,
-                                    prefixAsset: 'assets/icons/user.png',
+                            child: Column(
+                              children: [
+                                CustomTextField(
+                                  labelText: 'Họ và tên',
+                                  controller: _nameController,
+                                  prefixAsset: 'assets/icons/user.png',
+                                ),
+                                const SizedBox(height: 18),
+                                CustomTextField(
+                                  labelText: 'Email',
+                                  controller: _emailController,
+                                  prefixAsset: 'assets/icons/email.png',
+                                ),
+                                const SizedBox(height: 18),
+                                CustomTextField(
+                                  labelText: 'Mật khẩu',
+                                  controller: _passwordController,
+                                  showVisibilityIcon: true,
+                                  obscureText: true,
+                                  prefixAsset: 'assets/icons/padlock.png',
+                                ),
+                                const SizedBox(height: 18),
+                                CustomTextField(
+                                  labelText: 'Nhập lại mật khẩu',
+                                  controller: _confirmPasswordController,
+                                  showVisibilityIcon: true,
+                                  obscureText: true,
+                                  prefixAsset: 'assets/icons/padlock.png',
+                                ),
+                                const SizedBox(height: 18),
+                                CustomTextField(
+                                  labelText: 'Số điện thoại',
+                                  controller: _phoneController,
+                                  prefixAsset: 'assets/icons/telephone.png',
+                                ),
+                                const SizedBox(height: 24),
+                                if (state is SignUpLoading)
+                                  Center(
+                                    child:
+                                        LoadingAnimationWidget.fourRotatingDots(
+                                          color: AppTheme.primary,
+                                          size: 40,
+                                        ),
+                                  )
+                                else
+                                  botton(
+                                    context: context,
+                                    text: 'Đăng ký',
+                                    onPressed: () {
+                                      context.read<SignUpCubit>().signUp(
+                                        context: context,
+                                        name: _nameController.text,
+                                        email: _emailController.text,
+                                        password: _passwordController.text,
+                                        confirmPassword:
+                                            _confirmPasswordController.text,
+                                        phone: _phoneController.text,
+                                      );
+                                    },
                                   ),
-                                  const SizedBox(height: 18),
-                                  CustomTextField(
-                                    labelText: 'Email',
-                                    controller: _emailController,
-                                    prefixAsset: 'assets/icons/email.png',
-                                  ),
-                                  const SizedBox(height: 18),
-                                  CustomTextField(
-                                    labelText: 'Mật khẩu',
-                                    controller: _passwordController,
-                                    showVisibilityIcon: true,
-                                    obscureText: true,
-                                    prefixAsset: 'assets/icons/padlock.png',
-                                  ),
-                                  const SizedBox(height: 18),
-                                  CustomTextField(
-                                    labelText: 'Nhập lại mật khẩu',
-                                    controller: _confirmPasswordController,
-                                    showVisibilityIcon: true,
-                                    obscureText: true,
-                                    prefixAsset: 'assets/icons/padlock.png',
-                                  ),
-                                  const SizedBox(height: 18),
-                                  CustomTextField(
-                                    labelText: 'Số điện thoại',
-                                    controller: _phoneController,
-                                    prefixAsset: 'assets/icons/telephone.png',
-                                  ),
-                                  const SizedBox(height: 24),
-                                  if (state is SignUpLoading)
-                                    Center(
-                                      child:
-                                          LoadingAnimationWidget.fourRotatingDots(
-                                            color: AppTheme.primary,
-                                            size: 40,
-                                          ),
-                                    )
-                                  else
-                                    botton(
-                                      context: context,
-                                      text: 'Đăng ký',
-                                      onPressed: () {
-                                        context.read<SignUpCubit>().signUp(
-                                          context: context,
-                                          name: _nameController.text,
-                                          email: _emailController.text,
-                                          password: _passwordController.text,
-                                          confirmPassword:
-                                              _confirmPasswordController.text,
-                                          phone: _phoneController.text,
-                                        );
-                                      },
+                                if (state is SignUpFailure)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16),
+                                    child: Text(
+                                      state.message,
+                                      style: TextStyle(color: AppTheme.error),
                                     ),
-                                  if (state is SignUpFailure)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 16),
-                                      child: Text(
-                                        state.message,
-                                        style: TextStyle(color: AppTheme.error),
-                                      ),
-                                    ),
-                                ],
-                              ),
+                                  ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 24),
                           Text(
                             'Hoặc đăng nhập bằng',
                             style: theme.textTheme.bodyLarge?.copyWith(
-                              color: textSecondary,
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 18),
@@ -297,7 +320,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               Text(
                                 "Đã có tài khoản?",
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: textSecondary,
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
                               TextButton(
@@ -321,6 +344,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ],
                           ),
                         ],
+                        ),
                       ),
                     ),
                   ),

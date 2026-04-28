@@ -12,18 +12,19 @@ ElevatedButton SocialLoginButton({
 }) {
   final theme = Theme.of(context);
 
-  Color iconColor = finalIconColor ?? theme.colorScheme.onSurface;
-
   return ElevatedButton(
     onPressed: onPressed, // Gọi hàm callback khi nhấn nút
     style: ElevatedButton.styleFrom(
       minimumSize: Size(width, height), // Tuỳ chỉnh kích thước button
       backgroundColor: theme.colorScheme.surface,
       foregroundColor: theme.colorScheme.onSurface,
+      elevation: 0,
+      shadowColor: Colors.transparent,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(18),
         side: BorderSide(
-          color: theme.colorScheme.outline.withOpacity(0.2),
+          color: theme.colorScheme.outline.withOpacity(0.16),
           width: 1, // Độ dày viền
         ),
       ),
@@ -43,8 +44,9 @@ ElevatedButton SocialLoginButton({
           const SizedBox(width: 10), // Khoảng cách giữa icon và text
           Text(
             text, // Sử dụng text tùy chỉnh
-            style: theme.textTheme.bodyLarge?.copyWith(
+            style: theme.textTheme.labelLarge?.copyWith(
               color: theme.colorScheme.onSurface,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],

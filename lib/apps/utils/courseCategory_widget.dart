@@ -35,17 +35,17 @@ class CourseCategoryWidget extends StatelessWidget {
         if (state is CategoryLoaded) {
           // Tạo thêm mục All với id = 0
           const allId = 0;
-          final allCat = CourseCategory(categoryId: allId, name: '🔥 Tất cả');
+          final allCat = CourseCategory(categoryId: allId, name: 'Tất cả');
 
           final cats = [allCat, ...state.categories];
           final selId = state.selectedId; // null => All
 
           return SizedBox(
-            height: 40,
+            height: 48,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
               itemCount: cats.length,
               itemBuilder: (_, i) {
                 final cat = cats[i];
@@ -65,49 +65,80 @@ class CourseCategoryWidget extends StatelessWidget {
                   );
                 }
 
-                return GestureDetector(
-                  onTap: () {
-                    print(
-                      'Chọn danh mục: id=${cat.categoryId}, name=${cat.name}',
-                    );
-                    final newSel =
-                        (cat.categoryId == allId) ? null : cat.categoryId;
-                    context.read<CategoryCubit>().selectCategory(newSel);
-                    // Gọi lại CourseCubit để lọc
-                    context.read<CourseCubit>().loadCourses(categoryId: newSel);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color:
-                          isSelected
-                              ? theme.colorScheme.primary
-                              : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: theme.colorScheme.primary,
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (iconWidget is! SizedBox) iconWidget,
-                        if (iconWidget is! SizedBox) const SizedBox(width: 4),
-                        Text(
-                          cat.name,
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            fontWeight: FontWeight.w500,
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOut,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow:
+                        isSelected
+                            ? [
+                              BoxShadow(
+                                color: theme.colorScheme.primary.withOpacity(
+                                  0.20,
+                                ),
+                                blurRadius: 18,
+                                offset: const Offset(0, 8),
+                              ),
+                            ]
+                            : null,
+                  ),
+                  child: Material(
+                    color:
+                        isSelected
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(18),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(18),
+                      onTap: () {
+                        print(
+                          'Chọn danh mục: id=${cat.categoryId}, name=${cat.name}',
+                        );
+                        final newSel =
+                            (cat.categoryId == allId) ? null : cat.categoryId;
+                        context.read<CategoryCubit>().selectCategory(newSel);
+                        // Gọi lại CourseCubit để lọc
+                        context.read<CourseCubit>().loadCourses(
+                          categoryId: newSel,
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
                             color:
                                 isSelected
-                                    ? theme.colorScheme.onPrimary
-                                    : theme.colorScheme.primary,
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.outline.withOpacity(
+                                      0.12,
+                                    ),
+                            width: 1,
                           ),
                         ),
-                      ],
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (iconWidget is! SizedBox) iconWidget,
+                            if (iconWidget is! SizedBox)
+                              const SizedBox(width: 4),
+                            Text(
+                              cat.name,
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color:
+                                    isSelected
+                                        ? theme.colorScheme.onPrimary
+                                        : theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 );

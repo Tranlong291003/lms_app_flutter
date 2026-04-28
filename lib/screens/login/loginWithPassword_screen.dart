@@ -18,13 +18,7 @@ class LoginWithPasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
-    final textPrimary =
-        isDark ? AppTheme.textPrimaryDark : AppTheme.textPrimaryLight;
-    final textSecondary =
-        isDark ? AppTheme.textSecondaryDark : AppTheme.textSecondaryLight;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
+    final colorScheme = theme.colorScheme;
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state.status == AuthStatus.authenticated) {
@@ -37,77 +31,71 @@ class LoginWithPasswordScreen extends StatelessWidget {
       },
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: backgroundColor,
-          body: SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                child: Padding(
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  colorScheme.primary.withOpacity(isDark ? 0.20 : 0.10),
+                  theme.scaffoldBackgroundColor,
+                  colorScheme.secondary.withOpacity(isDark ? 0.14 : 0.08),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
-                    vertical: 24,
+                    vertical: 28,
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Hình minh hoạ hoặc icon lớn
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppTheme.primary.withOpacity(0.08),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.primary.withOpacity(0.10),
-                              blurRadius: 24,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 460),
+                    child: Column(
+                      children: [
+                        _PasswordHeroIllustration(
+                          assetPath:
+                              isDark
+                                  ? 'assets/images/login_dark.png'
+                                  : 'assets/images/login_light.png',
                         ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            isDark
-                                ? 'assets/images/login_dark.png'
-                                : 'assets/images/login_light.png',
-                            fit: BoxFit.cover,
-                            errorBuilder:
-                                (context, error, stackTrace) => Icon(
-                                  Icons.lock_outline,
-                                  size: 70,
-                                  color: AppTheme.primary,
-                                ),
+                        const SizedBox(height: 24),
+                        Text(
+                          'Chào mừng bạn trở lại!',
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.w900,
                           ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'Chào mừng bạn trở lại!',
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: textPrimary,
+                        const SizedBox(height: 10),
+                        Text(
+                          'Đăng nhập để tiếp tục học, theo dõi tiến độ và luyện quiz.',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Đăng nhập để tiếp tục sử dụng hệ thống LMS',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: textSecondary,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 28),
-                      Card(
-                        color: surfaceColor,
-                        elevation: 6,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 28,
+                        const SizedBox(height: 28),
+                        Container(
+                          padding: const EdgeInsets.all(22),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface.withOpacity(
+                              isDark ? 0.88 : 0.96,
+                            ),
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(
+                              color: colorScheme.outline.withOpacity(0.10),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: colorScheme.primary.withOpacity(
+                                  isDark ? 0.18 : 0.10,
+                                ),
+                                blurRadius: 32,
+                                offset: const Offset(0, 18),
+                              ),
+                            ],
                           ),
                           child: Column(
                             children: [
@@ -116,7 +104,7 @@ class LoginWithPasswordScreen extends StatelessWidget {
                                 controller: _emailController,
                                 prefixAsset: 'assets/icons/email.png',
                               ),
-                              const SizedBox(height: 18),
+                              const SizedBox(height: 16),
                               CustomTextField(
                                 labelText: 'Mật khẩu',
                                 controller: _passwordController,
@@ -124,7 +112,19 @@ class LoginWithPasswordScreen extends StatelessWidget {
                                 obscureText: true,
                                 prefixAsset: 'assets/icons/padlock.png',
                               ),
-                              const SizedBox(height: 24),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRouter.forgotPassword,
+                                    );
+                                  },
+                                  child: const Text('Quên mật khẩu?'),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
                               if (state.status == AuthStatus.loading)
                                 Center(
                                   child:
@@ -137,6 +137,7 @@ class LoginWithPasswordScreen extends StatelessWidget {
                                 botton(
                                   context: context,
                                   text: 'Đăng nhập',
+                                  height: 54,
                                   onPressed: () {
                                     final email = _emailController.text;
                                     final password = _passwordController.text;
@@ -162,89 +163,62 @@ class LoginWithPasswordScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                context,
-                                AppRouter.forgotPassword,
-                              );
-                            },
-                            child: Text(
-                              "Quên mật khẩu",
-                              style: TextStyle(
-                                color: AppTheme.primary,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                        const SizedBox(height: 22),
+                        Text(
+                          'Hoặc đăng nhập bằng',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Hoặc đăng nhập bằng',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: textSecondary,
                         ),
-                      ),
-                      const SizedBox(height: 18),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SocialLoginButton(
-                            width: 70,
-                            context: context,
-                            assetPath: 'assets/icons/facebook.png',
-                            onPressed: () {},
-                          ),
-                          const SizedBox(width: 16),
-                          SocialLoginButton(
-                            width: 70,
-                            context: context,
-                            assetPath: 'assets/icons/google.png',
-                            onPressed: () {},
-                          ),
-                          const SizedBox(width: 16),
-                          SocialLoginButton(
-                            width: 70,
-                            context: context,
-                            assetPath: 'assets/icons/apple.png',
-                            finalIconColor:
-                                isDark ? Colors.white : Colors.black,
-                            onPressed: () {},
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Chưa có tài khoản? ",
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: textSecondary,
+                        const SizedBox(height: 14),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SocialLoginButton(
+                              width: 68,
+                              context: context,
+                              assetPath: 'assets/icons/facebook.png',
+                              onPressed: () {},
                             ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, AppRouter.signup);
-                            },
-                            child: Text(
-                              "Đăng ký",
-                              style: TextStyle(
-                                color: AppTheme.primary,
-                                fontWeight: FontWeight.bold,
+                            const SizedBox(width: 14),
+                            SocialLoginButton(
+                              width: 68,
+                              context: context,
+                              assetPath: 'assets/icons/google.png',
+                              onPressed: () {},
+                            ),
+                            const SizedBox(width: 14),
+                            SocialLoginButton(
+                              width: 68,
+                              context: context,
+                              assetPath: 'assets/icons/apple.png',
+                              finalIconColor:
+                                  isDark ? Colors.white : Colors.black,
+                              onPressed: () {},
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            Text(
+                              'Chưa có tài khoản? ',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, AppRouter.signup);
+                              },
+                              child: const Text('Đăng ký'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -252,6 +226,53 @@ class LoginWithPasswordScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _PasswordHeroIllustration extends StatelessWidget {
+  const _PasswordHeroIllustration({required this.assetPath});
+
+  final String assetPath;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: 144,
+      height: 144,
+      padding: const EdgeInsets.all(9),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          colors: [theme.colorScheme.primary, theme.colorScheme.secondary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.primary.withOpacity(0.22),
+            blurRadius: 30,
+            offset: const Offset(0, 16),
+          ),
+        ],
+      ),
+      child: ClipOval(
+        child: Image.asset(
+          assetPath,
+          fit: BoxFit.cover,
+          errorBuilder:
+              (context, error, stackTrace) => Container(
+                color: theme.colorScheme.surface,
+                child: Icon(
+                  Icons.lock_outline_rounded,
+                  size: 72,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+        ),
+      ),
     );
   }
 }

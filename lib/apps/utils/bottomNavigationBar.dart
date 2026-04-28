@@ -33,13 +33,6 @@ class _BottomNavigationBarExampleState
               ? (bloc.state as UserLoaded).user.role
               : '',
     );
-    final userName = context.select<UserBloc, String>(
-      (bloc) =>
-          (bloc.state is UserLoaded)
-              ? (bloc.state as UserLoaded).user.name
-              : '',
-    );
-
     // Xác định dashboardScreen phù hợp
     Widget? dashboardScreen;
     if (userRole == 'admin') {
@@ -61,65 +54,74 @@ class _BottomNavigationBarExampleState
       screens.insert(3, const MentorRequestScreen());
     }
 
-    // Build danh sách item
-    final items = <BottomNavigationBarItem>[
-      BottomNavigationBarItem(
-        icon: const Icon(Icons.home_outlined),
-        activeIcon: const Icon(Icons.home),
+    final destinations = <NavigationDestination>[
+      const NavigationDestination(
+        icon: Icon(Icons.home_outlined),
+        selectedIcon: Icon(Icons.home_rounded),
         label: 'Trang chủ',
       ),
-      BottomNavigationBarItem(
-        icon: const Icon(Icons.menu_book_outlined),
-        activeIcon: const Icon(Icons.menu_book),
+      const NavigationDestination(
+        icon: Icon(Icons.menu_book_outlined),
+        selectedIcon: Icon(Icons.menu_book_rounded),
         label: 'Khoá học',
       ),
-      BottomNavigationBarItem(
-        icon: const Icon(Icons.quiz_outlined),
-        activeIcon: const Icon(Icons.quiz),
+      const NavigationDestination(
+        icon: Icon(Icons.quiz_outlined),
+        selectedIcon: Icon(Icons.quiz_rounded),
         label: 'Quiz',
       ),
       if (userRole == 'user')
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.school_outlined),
-          activeIcon: const Icon(Icons.school),
-          label: 'Đăng ký Mentor',
+        const NavigationDestination(
+          icon: Icon(Icons.workspace_premium_outlined),
+          selectedIcon: Icon(Icons.workspace_premium_rounded),
+          label: 'Mentor',
         ),
       if (dashboardScreen != null)
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.dashboard_outlined),
-          activeIcon: const Icon(Icons.dashboard),
+        const NavigationDestination(
+          icon: Icon(Icons.dashboard_customize_outlined),
+          selectedIcon: Icon(Icons.dashboard_customize_rounded),
           label: 'Dashboard',
         ),
+      const NavigationDestination(
+        icon: Icon(Icons.person_outline_rounded),
+        selectedIcon: Icon(Icons.person_rounded),
+        label: 'Hồ sơ',
+      ),
     ];
 
     // Clamp index để tránh out-of-bounds khi số tab thay đổi
     final safeIndex = _selectedIndex.clamp(0, screens.length - 1);
 
-    // Nếu là user thì thêm nút tiện ích đăng ký mentor
-    final isUser = userRole == 'user';
-
     return Scaffold(
       body: IndexedStack(index: safeIndex, children: screens),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: safeIndex,
-        onTap: (idx) => setState(() => _selectedIndex = idx),
-        selectedItemColor: theme.colorScheme.primary,
-        unselectedItemColor: theme.colorScheme.onSurface.withOpacity(0.6),
-        selectedFontSize: 14,
-        unselectedFontSize: 12,
-        selectedLabelStyle: theme.textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.w500,
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: theme.colorScheme.outline.withOpacity(0.16)),
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.shadow.withOpacity(
+                theme.brightness == Brightness.dark ? 0.35 : 0.08,
+              ),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
+            ),
+          ],
         ),
-        unselectedLabelStyle: theme.textTheme.labelMedium?.copyWith(
-          fontWeight: FontWeight.w400,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: NavigationBar(
+            selectedIndex: safeIndex,
+            onDestinationSelected:
+                (idx) => setState(() => _selectedIndex = idx),
+            height: 72,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            destinations: destinations,
+          ),
         ),
-        backgroundColor:
-            theme.brightness == Brightness.dark
-                ? const Color(0xFF181A20)
-                : const Color(0xFFF8FAFC),
-        elevation: 8,
-        items: items,
       ),
     );
   }

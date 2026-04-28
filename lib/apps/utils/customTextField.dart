@@ -43,52 +43,27 @@ class _CustomTextFieldState extends State<CustomTextField> {
       obscureText: _isObscure, // Kiểm tra xem văn bản có bị ẩn hay không
       keyboardType: widget.keyboardType,
       validator: widget.validator,
-      style: TextStyle(color: theme.colorScheme.onSurface),
+      style: theme.textTheme.bodyLarge?.copyWith(
+        color: theme.colorScheme.onSurface,
+      ),
       decoration: InputDecoration(
         labelText: widget.labelText, // Sử dụng labelText được truyền vào
         labelStyle: TextStyle(
-          color: theme.colorScheme.onSurface.withOpacity(0.7),
+          color: theme.colorScheme.onSurfaceVariant,
         ),
         // Nếu không truyền prefixAsset thì mặc định dùng icon email cho trường email hoặc icon khóa cho mật khẩu
         prefixIcon:
             widget.prefixAsset != null
                 ? Image.asset(
                   widget.prefixAsset!,
-                  color: theme.colorScheme.onSurface,
+                  color: theme.colorScheme.primary,
+                  width: 20,
+                  height: 20,
                 )
                 : Icon(
                   Icons.email,
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.primary,
                 ), // Mặc định dùng icon email nếu không có asset
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12), // Bo góc
-          borderSide: BorderSide(
-            color: theme.colorScheme.outline,
-            width: 1, // Độ dày viền
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12), // Bo góc khi focus
-          borderSide: BorderSide(
-            color: theme.colorScheme.primary,
-            width: 1.5, // Độ dày viền khi focus
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12), // Bo góc khi bình thường
-          borderSide: BorderSide(
-            color: theme.colorScheme.outline.withOpacity(0.5), // Màu viền mờ
-            width: 1, // Độ dày viền khi bình thường
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: theme.colorScheme.error, width: 1),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: theme.colorScheme.error, width: 1.5),
-        ),
         // Kiểm tra xem có muốn hiển thị icon ẩn/hiện hay không
         suffixIcon:
             widget.showVisibilityIcon
@@ -97,7 +72,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     _isObscure
                         ? Icons.visibility_off
                         : Icons.visibility, // Icon thay đổi khi nhấn
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   onPressed: () {
                     setState(() {

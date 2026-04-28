@@ -15,6 +15,8 @@ import 'package:lms/screens/notification/notifications_screen.dart';
 
 AppBar AppBarHome(BuildContext context, String title) {
   const defaultAvatar = 'https://www.gravatar.com/avatar/?d=mp';
+  final theme = Theme.of(context);
+  final colorScheme = theme.colorScheme;
 
   // Lấy giờ hiện tại
   int gioHienTai = DateTime.now().hour;
@@ -32,6 +34,9 @@ AppBar AppBarHome(BuildContext context, String title) {
   return AppBar(
     automaticallyImplyLeading: false,
     elevation: 0,
+    backgroundColor: colorScheme.surface,
+    surfaceTintColor: Colors.transparent,
+    titleSpacing: 16,
     title: Builder(
       builder: (context) {
         // Luôn load notification khi app bar được build
@@ -43,81 +48,93 @@ AppBar AppBarHome(BuildContext context, String title) {
           cubit.loadNotifications();
         });
         return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                BlocBuilder<UserBloc, UserState>(
-                  builder: (context, state) {
-                    final role = (state is UserLoaded) ? state.user.role : null;
-                    final avatarUrl =
-                        (state is UserLoaded && state.user.avatarUrl.isNotEmpty)
-                            ? ApiConfig.getImageUrl(state.user.avatarUrl)
-                            : defaultAvatar;
+            Expanded(
+              child: Row(
+                children: [
+                  BlocBuilder<UserBloc, UserState>(
+                    builder: (context, state) {
+                      final avatarUrl =
+                          (state is UserLoaded &&
+                                  state.user.avatarUrl.isNotEmpty)
+                              ? ApiConfig.getImageUrl(state.user.avatarUrl)
+                              : defaultAvatar;
 
-                    return InkWell(
-                      borderRadius: BorderRadius.circular(20),
-                      onTap: () {
-                        Navigator.pushNamed(context, AppRouter.profile);
-                      },
-                      child: CircleAvatar(
-                        radius: 18,
-                        backgroundColor: Colors.transparent,
-                        backgroundImage: CachedNetworkImageProvider(avatarUrl),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AnimatedTextKit(
-                      animatedTexts: [
-                        TypewriterAnimatedText(
-                          loiChao,
-                          textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey,
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(24),
+                        onTap: () {
+                          Navigator.pushNamed(context, AppRouter.profile);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [
+                                colorScheme.primary,
+                                colorScheme.tertiary,
+                              ],
+                            ),
                           ),
-                          speed: const Duration(milliseconds: 300),
+                          child: CircleAvatar(
+                            radius: 20,
+                            backgroundColor: colorScheme.surface,
+                            child: CircleAvatar(
+                              radius: 18,
+                              backgroundColor:
+                                  colorScheme.surfaceContainerHighest,
+                              backgroundImage: CachedNetworkImageProvider(
+                                avatarUrl,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AnimatedTextKit(
+                          animatedTexts: [
+                            TypewriterAnimatedText(
+                              loiChao,
+                              textStyle: theme.textTheme.labelLarge?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              speed: const Duration(milliseconds: 150),
+                            ),
+                          ],
+                          pause: const Duration(milliseconds: 1000),
+                          isRepeatingAnimation: false,
+                        ),
+                        BlocBuilder<UserBloc, UserState>(
+                          builder: (context, state) {
+                            final name =
+                                state is UserLoaded ? state.user.name : 'User';
+                            return Text(
+                              name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            );
+                          },
                         ),
                       ],
-                      pause: const Duration(milliseconds: 1000),
-                      isRepeatingAnimation: false,
                     ),
-                    BlocBuilder<UserBloc, UserState>(
-                      builder: (context, state) {
-                        if (state is UserLoaded) {
-                          return Text(
-                            state.user.name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          );
-                        }
-                        return const Text(
-                          'User',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
             Row(
               children: [
-                IconButton(
-                  icon: Image.asset(
-                    'assets/icons/bookmark.png',
-                    color: Theme.of(context).iconTheme.color,
-                  ),
+                _AppBarAction(
+                  icon: Icons.bookmark_border_rounded,
                   onPressed: () {
                     final currentUser = FirebaseAuth.instance.currentUser;
                     if (currentUser != null) {
@@ -136,6 +153,7 @@ AppBar AppBarHome(BuildContext context, String title) {
                     }
                   },
                 ),
+                const SizedBox(width: 8),
                 BlocBuilder<NotificationCubit, NotificationState>(
                   builder: (context, state) {
                     int unreadCount = 0;
@@ -144,12 +162,10 @@ AppBar AppBarHome(BuildContext context, String title) {
                           state.notifications.where((n) => !n.isRead).length;
                     }
                     return Stack(
+                      clipBehavior: Clip.none,
                       children: [
-                        IconButton(
-                          icon: Image.asset(
-                            'assets/icons/notification.png',
-                            color: Theme.of(context).iconTheme.color,
-                          ),
+                        _AppBarAction(
+                          icon: Icons.notifications_none_rounded,
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -162,24 +178,28 @@ AppBar AppBarHome(BuildContext context, String title) {
                         ),
                         if (unreadCount > 0)
                           Positioned(
-                            right: 6,
-                            top: 6,
+                            right: -2,
+                            top: -4,
                             child: Container(
-                              padding: const EdgeInsets.all(4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 3,
+                              ),
                               decoration: BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
+                                color: colorScheme.error,
+                                borderRadius: BorderRadius.circular(999),
+                                border: Border.all(
+                                  color: colorScheme.surface,
+                                  width: 2,
+                                ),
                               ),
-                              constraints: const BoxConstraints(
-                                minWidth: 20,
-                                minHeight: 20,
-                              ),
+                              constraints: const BoxConstraints(minWidth: 22),
                               child: Text(
                                 unreadCount > 99 ? '99+' : '$unreadCount',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: colorScheme.onError,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 10,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -195,6 +215,36 @@ AppBar AppBarHome(BuildContext context, String title) {
         );
       },
     ),
-    toolbarHeight: 60,
+    toolbarHeight: 72,
   );
+}
+
+class _AppBarAction extends StatelessWidget {
+  const _AppBarAction({required this.icon, required this.onPressed});
+
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Material(
+      color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.55),
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onPressed,
+        child: SizedBox(
+          width: 42,
+          height: 42,
+          child: Icon(
+            icon,
+            color: theme.colorScheme.onSurface,
+            size: 22,
+          ),
+        ),
+      ),
+    );
+  }
 }

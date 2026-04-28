@@ -94,12 +94,12 @@ class _SearchBarWidgetState extends State<SearchBarWidget>
     final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      height: 52,
+      height: 58,
       margin:
           widget.margin ??
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(22),
         color:
             isDark
                 ? colorScheme.surfaceContainerHighest.withOpacity(0.5)
@@ -109,16 +109,16 @@ class _SearchBarWidgetState extends State<SearchBarWidget>
                 ? null
                 : [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
+                    color: colorScheme.primary.withOpacity(0.08),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
                   ),
                 ],
         border: Border.all(
           color:
               isDark
                   ? colorScheme.outline.withOpacity(0.2)
-                  : colorScheme.outline.withOpacity(0.1),
+                  : colorScheme.primary.withOpacity(0.08),
           width: 1,
         ),
       ),
@@ -149,7 +149,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget>
                 ),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
-                  vertical: 16,
+                  vertical: 18,
                   horizontal: 8,
                 ),
                 isDense: true,
