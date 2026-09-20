@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
+import 'package:lms/services/auth_service.dart';
 
 class ForgotpasswordScreen extends StatefulWidget {
   const ForgotpasswordScreen({super.key});
@@ -13,7 +13,6 @@ class ForgotpasswordScreen extends StatefulWidget {
 class _ForgotpasswordScreenState extends State<ForgotpasswordScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController _emailController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isLoading = false;
   String? _errorMessage;
   late AnimationController _dialogController;
@@ -45,7 +44,11 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen>
       _errorMessage = null;
     });
     try {
-      await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
+      // `POST /api/auth/forgot-password` — API luôn trả cùng một thông điệp dù
+      // email có tồn tại hay không (chống dò email đã đăng ký).
+      await AuthService().forgotPassword(
+        _emailController.text.trim(),
+      );
       setState(() {
         _isLoading = false;
       });
@@ -86,7 +89,7 @@ class _ForgotpasswordScreenState extends State<ForgotpasswordScreen>
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Email không hợp lệ hoặc chưa đăng ký.';
+        _errorMessage = e.toString().replaceFirst('Exception: ', '');
       });
     }
   }

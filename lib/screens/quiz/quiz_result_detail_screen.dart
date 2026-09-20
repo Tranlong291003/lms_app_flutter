@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/utils/json_parse.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/quiz/quiz_cubit.dart';
 import 'package:lms/models/quiz/quiz_result_model.dart';
@@ -13,7 +14,9 @@ class QuizResultDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final int? resultId = args != null ? args['resultId'] as int? : null;
+    // `resultId` có thể tới dưới dạng int hoặc chuỗi (PostgreSQL trả SERIAL
+    // dạng chuỗi) — ép thẳng bằng `as int?` sẽ ném lỗi và màn hình trắng.
+    final resultId = args != null ? asIntOrNull(args['resultId']) : null;
     if (resultId == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Kết quả kiểm tra')),

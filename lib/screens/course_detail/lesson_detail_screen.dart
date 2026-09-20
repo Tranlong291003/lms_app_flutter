@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +7,7 @@ import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/apps/utils/youtube_video_player.dart';
 import 'package:lms/cubits/lessons/lesson_detail_cubit.dart';
 import 'package:lms/cubits/lessons/lesson_detail_state.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -28,9 +28,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
   bool _hasCompleted = false;
   bool _isStateLoaded = false;
   late final LessonDetailCubit _lessonDetailCubit;
-  final _auth = FirebaseAuth.instance;
-
-  String get _userUid => _auth.currentUser?.uid ?? '';
+  String get _userUid => context.read<AuthCubit>().state.userId ?? '';
 
   @override
   void initState() {

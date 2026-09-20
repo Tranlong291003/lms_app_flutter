@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
@@ -34,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   @override
   void initState() {
     super.initState();
-    _userService = UserService(token: FirebaseAuth.instance.currentUser?.uid);
+    _userService = UserService();
     if (_isFirstLoad) {
       _loadMentor();
       _loadCurrentUser();
@@ -46,10 +45,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   }
 
   Future<void> _checkUserActive() async {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
+    final uid = context.read<AuthCubit>().state.userId;
+    if (uid != null && uid.isNotEmpty) {
       try {
-        final isActive = await _userService.checkUserActive(currentUser.uid);
+        final isActive = await _userService.checkUserActive(uid);
         if (!isActive) {
           await _handleInactiveUser();
         }
@@ -77,6 +76,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   Future<void> _handleInactiveUser() async {
     if (!mounted) return;
 
+    // Giữ sẵn cubit trước khi await: sau `await` widget có thể đã bị huỷ và
+    // `context` không còn dùng được.
+    final authCubit = context.read<AuthCubit>();
+
     // Show message first
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -88,8 +91,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     // Wait for message to be shown
     await Future.delayed(const Duration(seconds: 1));
 
-    // Gọi logoutWithContext để xử lý đăng xuất
-    await context.read<AuthCubit>().logout();
+    await authCubit.logout();
   }
 
   void _loadMentor() {
@@ -97,8 +99,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   }
 
   void _loadCurrentUser() {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
+    final uid = context.read<AuthCubit>().state.userId;
+    if (uid != null && uid.isNotEmpty) {
       context.read<UserBloc>().add(GetUserByUidEvent(uid));
     }
   }
@@ -259,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                             return ListCoursesWidget(
                               courses: list,
                               userUid:
-                                  FirebaseAuth.instance.currentUser?.uid ?? '',
+                                  context.read<AuthCubit>().state.userId ?? '',
                             );
                           } else if (courseState is CourseError) {
                             return SizedBox(

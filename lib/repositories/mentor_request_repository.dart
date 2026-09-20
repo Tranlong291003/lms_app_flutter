@@ -6,7 +6,10 @@ class MentorRequestRepository {
   final MentorRequestService service;
   MentorRequestRepository(this.service);
 
-  Future<void> sendMentorRequest({required String userUid, File? imageFile}) {
+  Future<void> sendMentorRequest({
+    required String userUid,
+    required File imageFile,
+  }) {
     return service.requestMentor(userUid: userUid, imageFile: imageFile);
   }
 

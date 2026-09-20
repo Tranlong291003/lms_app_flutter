@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
@@ -8,6 +7,7 @@ import 'package:lms/cubits/lessons/lessons_state.dart';
 import 'package:lms/cubits/reviews/review_cubit.dart';
 import 'package:lms/cubits/reviews/review_state.dart';
 import 'package:lms/models/reivew_model.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 
 class ReviewsTab extends StatefulWidget {
   final int courseId;
@@ -42,8 +42,8 @@ class _ReviewsTabState extends State<ReviewsTab> {
     Review? review,
     required ReviewCubit reviewCubit,
   }) {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) return;
+    final userUid = context.read<AuthCubit>().state.userId;
+    if (userUid == null || userUid.isEmpty) return;
 
     final TextEditingController commentController = TextEditingController(
       text: review?.comment ?? '',
@@ -100,8 +100,7 @@ class _ReviewsTabState extends State<ReviewsTab> {
                         if (review == null) {
                           reviewCubit.submitReview(
                             courseId: widget.courseId,
-                            userId: currentUser.uid,
-                            userName: currentUser.displayName ?? 'Người dùng',
+                            userId: userUid,
                             rating: rating,
                             comment: commentController.text,
                           );
@@ -109,6 +108,7 @@ class _ReviewsTabState extends State<ReviewsTab> {
                           reviewCubit.updateReview(
                             reviewId: review.reviewId,
                             courseId: widget.courseId,
+                            userUid: userUid,
                             rating: rating,
                             comment: commentController.text,
                           );
@@ -144,6 +144,7 @@ class _ReviewsTabState extends State<ReviewsTab> {
                   reviewCubit.deleteReview(
                     reviewId: review.reviewId,
                     courseId: widget.courseId,
+                    userUid: review.userUid,
                   );
                   Navigator.pop(context);
                 },
@@ -160,7 +161,7 @@ class _ReviewsTabState extends State<ReviewsTab> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = FirebaseAuth.instance.currentUser;
+    final userUid = context.read<AuthCubit>().state.userId;
 
     return BlocBuilder<ReviewCubit, ReviewState>(
       builder: (context, state) {
@@ -199,7 +200,7 @@ class _ReviewsTabState extends State<ReviewsTab> {
         if (state is ReviewLoaded) {
           final reviews = state.reviews;
           final userReview = reviews.firstWhere(
-            (review) => review.userUid == currentUser?.uid,
+            (review) => review.userUid == userUid,
             orElse:
                 () => Review(
                   reviewId: -1,
@@ -262,7 +263,7 @@ class _ReviewsTabState extends State<ReviewsTab> {
                   itemBuilder: (context, index) {
                     final review = reviews[index];
                     final isCurrentUserReview =
-                        review.userUid == currentUser?.uid;
+                        review.userUid == userUid;
                     final avatarUrl =
                         review.userAvatarUrl.isNotEmpty
                             ? (review.userAvatarUrl.startsWith('http')

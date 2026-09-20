@@ -34,6 +34,11 @@ class EnrolledCourseCubit extends Cubit<EnrolledCourseState> {
         '[EnrolledCourseCubit] Chi tiết: ${_ongoingCourses.length} khóa học đang học, ${_completedCourses.length} khóa học đã hoàn thành',
       );
 
+      // `isClosed`: request có thể trả về sau khi màn hình đã bị huỷ (người dùng
+      // đã rời trang). Emit lúc đó sẽ ném "Cannot emit new states after calling
+      // close" và làm sập app.
+      if (isClosed) return;
+
       emit(
         EnrolledCourseLoaded(
           allCourses: _allCourses,
@@ -43,6 +48,8 @@ class EnrolledCourseCubit extends Cubit<EnrolledCourseState> {
       );
     } catch (e) {
       print('[EnrolledCourseCubit] Lỗi khi tải khóa học: $e');
+      if (isClosed) return;
+
       // Nếu có lỗi, vẫn hiển thị danh sách trống thay vì hiển thị màn hình lỗi
       emit(
         EnrolledCourseLoaded(

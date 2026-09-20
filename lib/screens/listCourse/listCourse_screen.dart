@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/listCourses_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 
 class ListCoursescreen extends StatelessWidget {
   const ListCoursescreen({super.key});
@@ -61,7 +61,7 @@ class ListCoursescreen extends StatelessWidget {
                   if (state is CourseLoaded) {
                     return ListCoursesWidget(
                       courses: state.courses,
-                      userUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+                      userUid: context.read<AuthCubit>().state.userId ?? '',
                     );
                   }
                   return const SizedBox.shrink();

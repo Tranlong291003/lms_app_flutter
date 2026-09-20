@@ -1,9 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lms/apps/utils/bookmark_button.dart';
 import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 
 class CourseTitle extends StatelessWidget {
   final String title;
@@ -14,8 +14,7 @@ class CourseTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final currentUser = FirebaseAuth.instance.currentUser;
-    final userUid = currentUser?.uid ?? '';
+    final userUid = context.read<AuthCubit>().state.userId ?? '';
     final bookmarkCubit = context.read<BookmarkCubit>();
 
     // Kích thước cố định cho nút bookmark

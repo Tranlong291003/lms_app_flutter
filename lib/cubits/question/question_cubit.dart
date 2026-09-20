@@ -93,6 +93,7 @@ class QuestionCubit extends Cubit<QuestionState> {
         ),
       );
     } catch (e) {
+      if (isClosed) return;
       emit(
         state.copyWith(
           status: QuestionStatus.error,
@@ -188,6 +189,7 @@ class QuestionCubit extends Cubit<QuestionState> {
       );
       return result;
     } catch (e) {
+      if (isClosed) return {'success': false, 'message': 'Đã huỷ'};
       emit(
         state.copyWith(
           status: QuestionStatus.error,
@@ -207,6 +209,7 @@ class QuestionCubit extends Cubit<QuestionState> {
     final result = await _repository.updateQuestion(questionId, data);
     if (result) {
       await loadQuestionsByQuizId(quizId);
+      if (isClosed) return false;
       emit(state.copyWith(status: QuestionStatus.loaded));
     } else {
       emit(
@@ -237,6 +240,7 @@ class QuestionCubit extends Cubit<QuestionState> {
     final result = await _repository.createQuestionManual(data);
     if (result) {
       await loadQuestionsByQuizId(quizId);
+      if (isClosed) return false;
       emit(state.copyWith(status: QuestionStatus.loaded));
     } else {
       emit(
@@ -255,6 +259,7 @@ class QuestionCubit extends Cubit<QuestionState> {
     final result = await _repository.createQuestionAI(data);
     if (result) {
       await loadQuestionsByQuizId(quizId);
+      if (isClosed) return false;
       emit(state.copyWith(status: QuestionStatus.loaded));
     } else {
       emit(

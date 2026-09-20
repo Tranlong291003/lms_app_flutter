@@ -13,6 +13,7 @@ import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/repositories/bookmark_repository.dart';
 import 'package:lms/repositories/course_repository.dart';
 import 'package:lms/services/bookmark_service.dart';
+import 'package:lms/services/course_service.dart';
 import 'package:lms/apps/utils/bookmark_button.dart';
 
 class BookmarkScreen extends StatefulWidget {
@@ -88,6 +89,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
       print('Lỗi khi khởi tạo cubits: $e');
     }
 
+    if (!mounted) return;
     setState(() {
       _isLoading = false;
     });
@@ -406,7 +408,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                           const SizedBox(width: 8),
                           _tag(
                             context,
-                            course.level,
+                            courseLevelLabel(course.level),
                             _getLevelColor(context, course.level),
                             Theme.of(context).colorScheme.onPrimary,
                           ),

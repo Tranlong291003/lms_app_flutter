@@ -1,0 +1,11 @@
+# Cấu hình chạy test.
+#
+# Chạy TUẦN TỰ (concurrency: 1) là bắt buộc vì các test tích hợp gọi API
+# production dùng chung một Supabase pooler. Pooler ở chế độ session chỉ cho
+# tối đa ~15 kết nối; chạy song song nhiều file test sẽ làm cạn pool và mọi
+# request trả 500 (kể cả app thật đang chạy).
+#
+# Chạy:
+#   flutter test test/                 # tuân theo file này
+#   flutter test test/screen_smoke_test.dart   # test offline, nhanh
+concurrency: 1

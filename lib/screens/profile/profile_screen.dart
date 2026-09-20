@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
@@ -70,11 +69,11 @@ class ProfileScreen extends StatelessWidget {
                             right: 0,
                             child: GestureDetector(
                               onTap: () {
-                                final currentUser =
-                                    FirebaseAuth.instance.currentUser;
-                                if (currentUser != null) {
+                                final uid =
+                                    context.read<AuthCubit>().state.userId;
+                                if (uid != null && uid.isNotEmpty) {
                                   context.read<UserBloc>().add(
-                                    GetUserByUidEvent(currentUser.uid),
+                                    GetUserByUidEvent(uid),
                                   );
                                   Navigator.pushNamed(
                                     context,
@@ -207,10 +206,10 @@ class ProfileScreen extends StatelessWidget {
                   title: "Chỉnh sửa hồ sơ",
                   context: context,
                   onTap: () {
-                    final currentUser = FirebaseAuth.instance.currentUser;
-                    if (currentUser != null) {
+                    final uid = context.read<AuthCubit>().state.userId;
+                    if (uid != null && uid.isNotEmpty) {
                       context.read<UserBloc>().add(
-                        GetUserByUidEvent(currentUser.uid),
+                        GetUserByUidEvent(uid),
                       );
                       Navigator.pushNamed(context, AppRouter.editProfile);
                     }

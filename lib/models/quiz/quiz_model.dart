@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:intl/intl.dart';
+import 'package:lms/apps/utils/json_parse.dart';
 
 import 'question_model.dart';
 
@@ -44,6 +45,7 @@ class QuizModel {
   final List<QuestionModel>? questions;
   final int totalQuestions;
   final double averageScore;
+  final double passingRate;
 
   const QuizModel({
     required this.quizId,
@@ -59,49 +61,36 @@ class QuizModel {
     this.questions,
     this.totalQuestions = 0,
     this.averageScore = 0.0,
+    this.passingRate = 0.0,
   });
 
   factory QuizModel.fromJson(Map<String, dynamic> json) {
-    int totalQuestions = 0;
-    double averageScore = 0.0;
-    // Xử lý an toàn cho total_questions
-    if (json['total_questions'] is int) {
-      totalQuestions = json['total_questions'] as int;
-    } else if (json['total_questions'] is String) {
-      totalQuestions = int.tryParse(json['total_questions']) ?? 0;
-    }
-    // Xử lý an toàn cho average_score
-    if (json['average_score'] is int) {
-      averageScore = (json['average_score'] as int).toDouble();
-    } else if (json['average_score'] is double) {
-      averageScore = json['average_score'] as double;
-    } else if (json['average_score'] is String) {
-      averageScore = double.tryParse(json['average_score']) ?? 0.0;
-    } else if (json['average_score'] is num) {
-      averageScore = (json['average_score'] as num).toDouble();
-    }
+    // `COUNT()` và `NUMERIC` của PostgreSQL trả về dạng chuỗi trong JSON.
+    final questions = json['questions'];
+
     return QuizModel(
-      quizId: json['quiz_id'] as int,
-      title: json['title'] as String,
-      description: json['description'] as String?,
-      type: json['type'] as String,
-      timeLimit: json['time_limit'] as int,
-      attemptLimit: json['attempt_limit'] as int,
-      creatorUid: (json['creator_uid'] as String).trim(),
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt:
-          json['updated_at'] != null
-              ? DateTime.parse(json['updated_at'] as String)
-              : null,
-      attemptsUsed: json['attempts_used'] as int?,
-      questions:
-          json['questions'] != null
-              ? (json['questions'] as List)
-                  .map((q) => QuestionModel.fromJson(q))
-                  .toList()
-              : null,
-      totalQuestions: totalQuestions,
-      averageScore: averageScore,
+      quizId: asInt(json['quiz_id']),
+      title: asString(json['title']),
+      description: asStringOrNull(json['description']),
+      type: asString(json['type'], 'trac_nghiem'),
+      timeLimit: asInt(json['time_limit']),
+      attemptLimit: asInt(json['attempt_limit']),
+      creatorUid: asString(json['creator_uid']).trim(),
+      createdAt: asDateTimeOr(json['created_at'], DateTime.now()),
+      updatedAt: asDateTime(json['updated_at']),
+      attemptsUsed: asIntOrNull(json['attempts_used']),
+      questions: questions is List
+          ? questions
+                .map(
+                  (q) => QuestionModel.fromJson(
+                    Map<String, dynamic>.from(q as Map),
+                  ),
+                )
+                .toList()
+          : null,
+      totalQuestions: asInt(json['total_questions']),
+      averageScore: asDouble(json['average_score']),
+      passingRate: asDouble(json['passing_rate']),
     );
   }
 
@@ -133,14 +122,18 @@ class QuizModel {
         : '';
   }
 
+  /// Nhãn hiển thị. API dùng `trac_nghiem` | `tu_luan` (có nhận thêm các giá
+  /// trị cũ để tương thích dữ liệu đã tồn tại).
   String get displayType {
     switch (type) {
+      case 'trac_nghiem':
       case 'multiple_choice':
         return 'Trắc nghiệm';
-      case 'true_false':
-        return 'Đúng/Sai';
+      case 'tu_luan':
       case 'essay':
         return 'Tự luận';
+      case 'true_false':
+        return 'Đúng/Sai';
       default:
         return type;
     }

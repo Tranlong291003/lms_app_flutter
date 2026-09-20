@@ -6,6 +6,47 @@ import 'package:lms/models/courses/course_detail_model.dart';
 import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/services/base_service.dart';
 
+/// Cấp độ khóa học hợp lệ theo API (`beginner | intermediate | advanced`).
+const List<String> kCourseLevels = ['beginner', 'intermediate', 'advanced'];
+
+/// Nhãn tiếng Việt tương ứng để hiển thị trên UI.
+const Map<String, String> kCourseLevelLabels = {
+  'beginner': 'Cơ bản',
+  'intermediate': 'Trung cấp',
+  'advanced': 'Nâng cao',
+};
+
+/// Đổi giá trị hiển thị ("Cơ bản") sang giá trị API ("beginner").
+/// Nếu giá trị đã đúng chuẩn API thì giữ nguyên.
+String normalizeCourseLevel(String? level) {
+  final value = (level ?? '').trim();
+  if (kCourseLevels.contains(value)) return value;
+
+  switch (value.toLowerCase()) {
+    case 'cơ bản':
+    case 'co ban':
+    case 'basic':
+      return 'beginner';
+    case 'trung cấp':
+    case 'trung binh':
+    case 'trung bình':
+    case 'intermediate':
+      return 'intermediate';
+    case 'nâng cao':
+    case 'nang cao':
+    case 'advanced':
+      return 'advanced';
+    default:
+      return 'beginner';
+  }
+}
+
+/// Đổi giá trị API ("beginner") sang nhãn tiếng Việt để hiển thị.
+String courseLevelLabel(String? level) {
+  final value = (level ?? '').trim();
+  return kCourseLevelLabels[value] ?? value;
+}
+
 /// Service xử lý tất cả các yêu cầu API liên quan đến khóa học
 class CourseService extends BaseService {
   CourseService({super.token});
@@ -246,20 +287,45 @@ class CourseService extends BaseService {
     required int courseId,
   }) async {
     try {
-      final data = {'userUid': userUid, 'courseId': courseId};
-      final response = await post(ApiConfig.registerEnrollment, data: data);
+      final response = await post(
+        ApiConfig.registerEnrollment,
+        data: {'userUid': userUid, 'courseId': courseId},
+        // 201 = đăng ký mới, 400 = đã đăng ký (được xử lý riêng bên dưới).
+        options: Options(validateStatus: (status) => status == 201 || status == 400),
+      );
 
-      if (response.data is Map && response.data['notification'] != null) {
-        return response.data;
+      if (response.statusCode == 201) {
+        return response.data is Map ? response.data : true;
       }
-      return response.statusCode == 200 || response.statusCode == 201;
+
+      final message = response.data is Map
+          ? (response.data['error'] ?? response.data['message'])
+          : null;
+      throw Exception(
+        message?.toString() ?? 'Bạn đã đăng ký khóa học này',
+      );
     } catch (e) {
-      if (e is DioException && e.response != null) {
-        throw Exception(
-          'Đăng ký thất bại: ${e.response?.data?['message'] ?? e}',
-        );
+      throw Exception('Đăng ký thất bại: ${extractApiError(e, fallback: '$e')}');
+    }
+  }
+
+  /// Tiến độ học của người dùng trong khóa học
+  /// (`GET /api/enrollments/progress`).
+  Future<Map<String, dynamic>> getCourseProgress({
+    required String userUid,
+    required int courseId,
+  }) async {
+    try {
+      final response = await get(
+        ApiConfig.getCourseProgress(userUid: userUid, courseId: courseId),
+      );
+      if (response.statusCode == 200 && response.data['data'] is Map) {
+        return Map<String, dynamic>.from(response.data['data'] as Map);
       }
-      throw Exception('Đăng ký thất bại: $e');
+      return {};
+    } catch (e) {
+      print('[CourseService] Lỗi khi lấy tiến độ khóa học: $e');
+      return {};
     }
   }
 
@@ -275,34 +341,27 @@ class CourseService extends BaseService {
     required String uid,
     String? rejectionReason,
   }) async {
-    final data = {
-      'status': status,
-      'uid': uid,
-      if (rejectionReason?.isNotEmpty ?? false)
-        'rejectionReason': rejectionReason,
-    };
+    try {
+      final response = await patch(
+        ApiConfig.updateCourseStatus(courseId),
+        data: {
+          'uid': uid,
+          'status': status,
+          if (rejectionReason?.isNotEmpty ?? false)
+            'rejectionReason': rejectionReason,
+        },
+      );
 
-    // DEBUG: In ra thông tin request
-    print('\n===== DEBUG: UPDATE COURSE STATUS API REQUEST =====');
-    print('URL: ${ApiConfig.getAllCourses}/$courseId/status');
-    print('Method: PATCH');
-    print('Request body: $data');
-    print('=======================================\n');
-
-    final response = await patch(
-      '${ApiConfig.getAllCourses}/$courseId/status',
-      data: data,
-    );
-
-    // DEBUG: In ra thông tin response
-    print('\n===== DEBUG: UPDATE COURSE STATUS API RESPONSE =====');
-    print('Status code: ${response.statusCode}');
-    print('Response body: ${response.data}');
-    print('=======================================\n');
-
-    if (response.statusCode != 200) {
+      if (response.statusCode != 200) {
+        throw Exception(
+          response.data is Map
+              ? (response.data['error'] ?? response.data['message'])
+              : 'Cập nhật trạng thái thất bại',
+        );
+      }
+    } catch (e) {
       throw Exception(
-        response.data['message'] ?? 'Cập nhật trạng thái thất bại',
+        'Cập nhật trạng thái thất bại: ${extractApiError(e, fallback: '$e')}',
       );
     }
   }
@@ -374,16 +433,15 @@ class CourseService extends BaseService {
       }
 
       throw Exception(
-        response.data?['message'] ??
-            'Tạo khóa học thất bại với mã ${response.statusCode}',
+        response.data is Map
+            ? (response.data['error'] ?? response.data['message'])
+            : 'Tạo khóa học thất bại với mã ${response.statusCode}',
       );
     } catch (e) {
       print('[CourseService] Lỗi khi tạo khóa học: $e');
-      if (e is DioException && e.response != null) {
-        final errorMsg = e.response?.data?['message'] ?? e.message;
-        throw Exception('Tạo khóa học thất bại: $errorMsg');
-      }
-      throw Exception('Tạo khóa học thất bại: $e');
+      throw Exception(
+        'Tạo khóa học thất bại: ${extractApiError(e, fallback: '$e')}',
+      );
     }
   }
 
@@ -407,11 +465,15 @@ class CourseService extends BaseService {
       );
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception(
-          response.data?['message'] ?? 'Cập nhật khóa học thất bại',
+          response.data is Map
+              ? (response.data['error'] ?? response.data['message'])
+              : 'Cập nhật khóa học thất bại',
         );
       }
     } catch (e) {
-      throw Exception('Cập nhật khóa học thất bại: $e');
+      throw Exception(
+        'Cập nhật khóa học thất bại: ${extractApiError(e, fallback: '$e')}',
+      );
     }
   }
 

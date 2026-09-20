@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -11,6 +10,7 @@ import 'package:lms/cubits/lessons/lessons_cubit.dart';
 import 'package:lms/cubits/lessons/lessons_state.dart';
 import 'package:lms/models/lesson_model.dart';
 import 'package:lms/screens/course_detail/lesson_detail_screen.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 
 class LessonMentorTab extends StatelessWidget {
   final int courseId;
@@ -19,8 +19,7 @@ class LessonMentorTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    final userUid = user?.uid ?? '';
+    final userUid = context.read<AuthCubit>().state.userId ?? '';
     final cubit = context.read<LessonsCubit>();
 
     // Load lessons when widget is built
@@ -72,8 +71,8 @@ class LessonMentorTab extends StatelessWidget {
 
             return RefreshIndicator(
               onRefresh: () async {
-                final user = FirebaseAuth.instance.currentUser;
-                final userUid = user?.uid ?? '';
+                final userUid =
+                    context.read<AuthCubit>().state.userId ?? '';
                 await context.read<LessonsCubit>().loadLessons(
                   courseId: courseId,
                   userUid: userUid,
@@ -147,7 +146,7 @@ class LessonMentorTab extends StatelessWidget {
       if (!context.mounted) return;
       context.read<LessonsCubit>().loadLessons(
         courseId: courseId,
-        userUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+        userUid: context.read<AuthCubit>().state.userId ?? '',
       );
     });
   }
@@ -159,7 +158,7 @@ class LessonMentorTab extends StatelessWidget {
       builder:
           (ctx) => LessonFormDialog(
             courseId: courseId,
-            userUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+            userUid: context.read<AuthCubit>().state.userId ?? '',
             lesson: lesson,
             isEditing: true,
           ),
@@ -167,7 +166,7 @@ class LessonMentorTab extends StatelessWidget {
     if (result == true && context.mounted) {
       await context.read<LessonsCubit>().loadLessons(
         courseId: courseId,
-        userUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+        userUid: context.read<AuthCubit>().state.userId ?? '',
       );
       if (context.mounted) {
         CustomSnackBar.showSuccess(
@@ -209,7 +208,7 @@ class LessonMentorTab extends StatelessWidget {
         await context.read<LessonsCubit>().deleteLesson(
           lessonId: lesson.lessonId,
           courseId: courseId,
-          userUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+          userUid: context.read<AuthCubit>().state.userId ?? '',
         );
 
         if (context.mounted) {

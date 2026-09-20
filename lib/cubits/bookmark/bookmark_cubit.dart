@@ -18,6 +18,7 @@ class BookmarkCubit extends Cubit<BookmarkState> {
       print('Đã nhận được ${bookmarks.length} bookmark');
       emit(state.copyWith(status: BookmarkStatus.loaded, bookmarks: bookmarks));
     } catch (e) {
+      if (isClosed) return;
       print('Lỗi Cubit khi lấy danh sách bookmark: $e');
       emit(
         state.copyWith(
@@ -36,6 +37,7 @@ class BookmarkCubit extends Cubit<BookmarkState> {
       print('Đã làm mới: ${bookmarks.length} bookmark');
       emit(state.copyWith(bookmarks: bookmarks));
     } catch (e) {
+      if (isClosed) return;
       print('Lỗi khi làm mới bookmark: $e');
     }
   }
@@ -61,6 +63,7 @@ class BookmarkCubit extends Cubit<BookmarkState> {
       emit(state.copyWith(bookmarks: updatedBookmarks, isBookmarking: false));
       return newBookmark;
     } catch (e) {
+      if (isClosed) throw Exception('Đã huỷ');
       print('Lỗi Cubit khi tạo bookmark: $e');
       emit(
         state.copyWith(
@@ -98,6 +101,7 @@ class BookmarkCubit extends Cubit<BookmarkState> {
         throw Exception('Không thể xóa bookmark');
       }
     } catch (e) {
+      if (isClosed) return false;
       print('Lỗi Cubit khi xóa bookmark: $e');
       emit(
         state.copyWith(
@@ -131,6 +135,7 @@ class BookmarkCubit extends Cubit<BookmarkState> {
       print('Tìm thấy bookmark cho khóa học $courseId: ${bookmark.id}');
       return bookmark;
     } catch (_) {
+      if (isClosed) return null;
       print('Không tìm thấy bookmark cho khóa học $courseId');
       return null;
     }

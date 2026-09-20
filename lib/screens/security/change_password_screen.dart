@@ -1,8 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/customTextField.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
+import 'package:lms/services/auth_service.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -54,58 +57,36 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw Exception('Không tìm thấy người dùng');
-      }
-
-      // Reauthenticate user
-      final credential = EmailAuthProvider.credential(
-        email: user.email!,
-        password: _currentPasswordController.text,
+      // `POST /api/auth/change-password` — server kiểm tra mật khẩu hiện tại và
+      // thu hồi MỌI phiên sau khi đổi thành công.
+      await AuthService().changePassword(
+        currentPassword: _currentPasswordController.text,
+        newPassword: _newPasswordController.text,
       );
-      await user.reauthenticateWithCredential(credential);
 
-      // Change password
-      await user.updatePassword(_newPasswordController.text);
+      if (!mounted) return;
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Đổi mật khẩu thành công'),
-            backgroundColor: Theme.of(context).colorScheme.primary,
+      // Phiên đã bị thu hồi ở server -> phải đăng xuất ở phía app.
+      await context.read<AuthCubit>().logout();
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Đổi mật khẩu thành công. Vui lòng đăng nhập lại.',
           ),
-        );
-        Navigator.pop(context);
-      }
-    } on FirebaseAuthException catch (e) {
-      String message;
-      switch (e.code) {
-        case 'wrong-password':
-          message = 'Mật khẩu hiện tại không đúng';
-          break;
-        case 'weak-password':
-          message = 'Mật khẩu mới quá yếu';
-          break;
-        case 'requires-recent-login':
-          message = 'Vui lòng đăng nhập lại để thực hiện thay đổi này';
-          break;
-        default:
-          message = 'Có lỗi xảy ra: ${e.message}';
-      }
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+      );
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRouter.login,
+        (route) => false,
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Có lỗi xảy ra: $e'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

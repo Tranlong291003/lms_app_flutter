@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/services/course_service.dart';
 
 class AboutTab extends StatelessWidget {
   final String description;
@@ -133,7 +134,7 @@ class AboutTab extends StatelessWidget {
                   color: theme.colorScheme.primary,
                 ),
                 label: Text(
-                  level,
+                  courseLevelLabel(level),
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 backgroundColor: theme.colorScheme.surface,

@@ -1,4 +1,6 @@
 // lib/models/courses/course_model.dart
+import 'package:lms/apps/utils/json_parse.dart';
+
 class CourseListResponse {
   final List<Course> pending;
   final List<Course> approved;
@@ -23,19 +25,19 @@ class CourseListResponse {
         pending: [],
         approved: [],
         rejected: [],
-        total: json['total'] as int? ?? 0,
+        total: asInt(json['total']),
       );
     }
 
-    if (data is! Map<String, dynamic>) {
+    if (data is! Map) {
       print(
-        '[CourseListResponse] Data is not Map<String, dynamic>: ${data.runtimeType}',
+        '[CourseListResponse] Data is not a Map: ${data.runtimeType}',
       );
       return CourseListResponse(
         pending: [],
         approved: [],
         rejected: [],
-        total: json['total'] as int? ?? 0,
+        total: asInt(json['total']),
       );
     }
 
@@ -103,7 +105,7 @@ class CourseListResponse {
       pending: pending,
       approved: approved,
       rejected: rejected,
-      total: json['total'] as int? ?? 0,
+      total: asInt(json['total']),
     );
   }
 
@@ -163,42 +165,30 @@ class Course {
   });
 
   factory Course.fromJson(Map<String, dynamic> json) {
-    int parseInt(dynamic value, [int defaultValue = 0]) {
-      if (value == null) return defaultValue;
-      if (value is int) return value;
-      if (value is String) return int.tryParse(value) ?? defaultValue;
-      return defaultValue;
-    }
-
-    double parseDouble(dynamic value, [double defaultValue = 0.0]) {
-      if (value == null) return defaultValue;
-      if (value is double) return value;
-      if (value is int) return value.toDouble();
-      if (value is String) return double.tryParse(value) ?? defaultValue;
-      return defaultValue;
-    }
-
     return Course(
-      courseId: parseInt(json['course_id']),
-      title: json['title'] as String,
-      description: json['description'] as String? ?? '',
-      instructorUid: json['instructor_uid'] as String,
-      categoryId: parseInt(json['category_id']),
-      price: parseInt(json['price']),
-      level: json['level'] as String,
-      discountPrice: parseInt(json['discount_price']),
-      thumbnailUrl: json['thumbnail_url'] as String?,
-      status: json['status'] as String,
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-      instructorName: json['instructor_name'] as String,
-      instructorAvatar: json['instructor_avatar'] as String?,
-      categoryName: json['category_name'] as String,
-      rating: parseDouble(json['rating']),
-      enrollCount: parseInt(json['enroll_count']),
-      lessonCount: parseInt(json['lesson_count']),
-      totalDuration: json['total_duration'] as String? ?? '00:00:00',
-      isBookmarked: json['is_bookmarked'] as bool? ?? false,
-      rejectionReason: json['rejection_reason'] as String?,
+      courseId: asInt(json['course_id']),
+      title: asString(json['title']),
+      description: asString(json['description']),
+      instructorUid: asString(json['instructor_uid']),
+      categoryId: asInt(json['category_id']),
+      price: asInt(json['price']),
+      level: asString(json['level']),
+      discountPrice: asInt(json['discount_price']),
+      thumbnailUrl: asStringOrNull(json['thumbnail_url']),
+      status: asString(json['status'], 'pending'),
+      updatedAt: asDateTimeOr(
+        json['updated_at'] ?? json['created_at'],
+        DateTime.fromMillisecondsSinceEpoch(0),
+      ),
+      instructorName: asString(json['instructor_name']),
+      instructorAvatar: asStringOrNull(json['instructor_avatar']),
+      categoryName: asString(json['category_name']),
+      rating: asDouble(json['rating']),
+      enrollCount: asInt(json['enroll_count']),
+      lessonCount: asInt(json['lesson_count']),
+      totalDuration: asString(json['total_duration'], '00:00:00'),
+      isBookmarked: asBool(json['is_bookmarked']),
+      rejectionReason: asStringOrNull(json['rejection_reason']),
     );
   }
 

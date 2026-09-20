@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/models/notification_model.dart';
 import 'package:lms/services/base_service.dart';
 
-/// Service quản lý thông báo cục bộ
+/// Service quản lý thông báo cục bộ và đồng bộ với API.
 class NotificationService extends BaseService {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -14,8 +14,18 @@ class NotificationService extends BaseService {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
 
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
+          requestAlertPermission: false,
+          requestBadgePermission: false,
+          requestSoundPermission: false,
+        );
+
     const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS,
+        );
 
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
@@ -49,72 +59,66 @@ class NotificationService extends BaseService {
     );
   }
 
-  Future<List<NotificationModel>> getNotifications() async {
+  /// `POST /api/notifications` body `{ uid }` → `{ notifications: [...] }`.
+  Future<List<NotificationModel>> getNotifications({
+    required String userUid,
+  }) async {
     try {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) {
-        throw Exception('User not authenticated');
-      }
-
       final response = await post(
-        '${ApiConfig.baseUrl}/api/notifications',
-        data: {'uid': currentUser.uid},
+        ApiConfig.notifications,
+        data: {'uid': userUid},
       );
 
-      if (response.statusCode == 200) {
-        final List<dynamic> notificationsData =
-            response.data['notifications'] ?? [];
-        return notificationsData
-            .map((json) => NotificationModel.fromJson(json))
+      if (response.data is Map && response.data['notifications'] is List) {
+        return (response.data['notifications'] as List)
+            .map(
+              (json) => NotificationModel.fromJson(
+                Map<String, dynamic>.from(json as Map),
+              ),
+            )
             .toList();
-      } else {
-        throw Exception('Failed to load notifications');
       }
-    } catch (e) {
-      print('Error fetching notifications: $e');
-      rethrow;
+      return [];
+    } on DioException catch (e) {
+      throw Exception('Không thể tải thông báo: ${extractApiError(e)}');
     }
   }
 
-  Future<void> markAsRead(String notiId) async {
+  Future<void> markAsRead({
+    required String notiId,
+    required String userUid,
+  }) async {
     try {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) {
-        throw Exception('User not authenticated');
-      }
-
       final response = await post(
-        '${ApiConfig.baseUrl}/api/notifications/mark-read',
-        data: {'uid': currentUser.uid, 'noti_id': notiId},
+        ApiConfig.markNotificationRead,
+        data: {'uid': userUid, 'noti_id': notiId},
       );
 
       if (response.statusCode != 200) {
-        throw Exception('Failed to mark notification as read');
+        throw Exception('Không thể đánh dấu thông báo đã đọc');
       }
-    } catch (e) {
-      print('Error marking notification as read: $e');
-      rethrow;
+    } on DioException catch (e) {
+      throw Exception(
+        'Không thể đánh dấu thông báo đã đọc: ${extractApiError(e)}',
+      );
     }
   }
 
-  Future<void> deleteNotification(String notiId) async {
+  Future<void> deleteNotification({
+    required String notiId,
+    required String userUid,
+  }) async {
     try {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) {
-        throw Exception('User not authenticated');
-      }
-
       final response = await delete(
-        '${ApiConfig.baseUrl}/api/notifications/delete/$notiId',
-        data: {'uid': currentUser.uid},
+        ApiConfig.deleteNotification(notiId),
+        data: {'uid': userUid},
       );
 
       if (response.statusCode != 200) {
-        throw Exception('Failed to delete notification');
+        throw Exception('Không thể xóa thông báo');
       }
-    } catch (e) {
-      print('Error deleting notification: $e');
-      rethrow;
+    } on DioException catch (e) {
+      throw Exception('Không thể xóa thông báo: ${extractApiError(e)}');
     }
   }
 }

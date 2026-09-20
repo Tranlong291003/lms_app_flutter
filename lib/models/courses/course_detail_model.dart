@@ -1,3 +1,5 @@
+import 'package:lms/apps/utils/json_parse.dart';
+
 class CourseDetail {
   final int courseId;
   final String title;
@@ -51,35 +53,35 @@ class CourseDetail {
 
   factory CourseDetail.fromJson(Map<String, dynamic> json) {
     return CourseDetail(
-      courseId: json['course_id'] as int,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      level: json['level'] as String,
-      language: json['language'] as String,
-      tags: json['tags'] as String,
-      price: json['price'] as int,
-      discountPrice: json['discount_price'] as int,
-      status: json['status'] as String,
-      approvedAt:
-          json['approved_at'] != null
-              ? DateTime.tryParse(json['approved_at'])
-              : null,
-      thumbnailUrl: json['thumbnail_url'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-      categoryId: json['category_id'] as int,
-      categoryName: json['category_name'] as String,
-      instructorUid: json['instructor_uid'] as String,
-      instructorName: json['instructor_name'] as String,
-      instructorAvatarUrl: json['instructor_avatar_url'] as String?,
-      instructorBio: json['instructor_bio'] as String?,
-      avgRating:
-          json['avg_rating'] != null
-              ? (json['avg_rating'] as num?)?.toDouble()
-              : null,
-      reviewCount: json['review_count'] as int,
-      enrollmentCount: json['enrollment_count'] as int,
-      totalVideoDuration: json['total_video_duration'] as String,
+      courseId: asInt(json['course_id']),
+      title: asString(json['title']),
+      description: asString(json['description']),
+      level: asString(json['level']),
+      language: asString(json['language']),
+      tags: asString(json['tags']),
+      price: asInt(json['price']),
+      discountPrice: asInt(json['discount_price']),
+      status: asString(json['status'], 'pending'),
+      approvedAt: asDateTime(json['approved_at']),
+      thumbnailUrl: asStringOrNull(json['thumbnail_url']),
+      createdAt: asDateTimeOr(
+        json['created_at'],
+        DateTime.fromMillisecondsSinceEpoch(0),
+      ),
+      updatedAt: asDateTimeOr(
+        json['updated_at'],
+        DateTime.fromMillisecondsSinceEpoch(0),
+      ),
+      categoryId: asInt(json['category_id']),
+      categoryName: asString(json['category_name']),
+      instructorUid: asString(json['instructor_uid']),
+      instructorName: asString(json['instructor_name']),
+      instructorAvatarUrl: asStringOrNull(json['instructor_avatar_url']),
+      instructorBio: asStringOrNull(json['instructor_bio']),
+      avgRating: asDoubleOrNull(json['avg_rating']),
+      reviewCount: asInt(json['review_count']),
+      enrollmentCount: asInt(json['enrollment_count']),
+      totalVideoDuration: asString(json['total_video_duration'], '00:00:00'),
     );
   }
 

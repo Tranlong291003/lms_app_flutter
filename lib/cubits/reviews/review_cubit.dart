@@ -17,6 +17,7 @@ class ReviewCubit extends Cubit<ReviewState> {
       print('DEBUG ReviewCubit: Loaded ${reviews.length} reviews');
       emit(ReviewLoaded(reviews));
     } catch (e) {
+      if (isClosed) return;
       print('ERROR ReviewCubit: Failed to load reviews');
       print('ERROR ReviewCubit: $e');
       emit(ReviewError(e.toString()));
@@ -30,7 +31,6 @@ class ReviewCubit extends Cubit<ReviewState> {
   Future<void> submitReview({
     required int courseId,
     required String userId,
-    required String userName,
     required int rating,
     required String comment,
   }) async {
@@ -39,13 +39,13 @@ class ReviewCubit extends Cubit<ReviewState> {
       await _repository.submitReview(
         courseId: courseId,
         userId: userId,
-        userName: userName,
         rating: rating,
         comment: comment,
       );
       // Refresh reviews after submitting
       await loadCourseReviews(courseId);
     } catch (e) {
+      if (isClosed) return;
       print('ERROR ReviewCubit: Failed to submit review');
       print('ERROR ReviewCubit: $e');
       emit(ReviewError(e.toString()));
@@ -55,6 +55,7 @@ class ReviewCubit extends Cubit<ReviewState> {
   Future<void> updateReview({
     required int reviewId,
     required int courseId,
+    required String userUid,
     required int rating,
     required String comment,
   }) async {
@@ -62,12 +63,14 @@ class ReviewCubit extends Cubit<ReviewState> {
       emit(const ReviewLoading());
       await _repository.updateReview(
         reviewId: reviewId,
+        userUid: userUid,
         rating: rating,
         comment: comment,
       );
       // Refresh reviews after updating
       await loadCourseReviews(courseId);
     } catch (e) {
+      if (isClosed) return;
       print('ERROR ReviewCubit: Failed to update review');
       print('ERROR ReviewCubit: $e');
       emit(ReviewError(e.toString()));
@@ -77,13 +80,15 @@ class ReviewCubit extends Cubit<ReviewState> {
   Future<void> deleteReview({
     required int reviewId,
     required int courseId,
+    required String userUid,
   }) async {
     try {
       emit(const ReviewLoading());
-      await _repository.deleteReview(reviewId);
+      await _repository.deleteReview(reviewId: reviewId, userUid: userUid);
       // Refresh reviews after deleting
       await loadCourseReviews(courseId);
     } catch (e) {
+      if (isClosed) return;
       print('ERROR ReviewCubit: Failed to delete review');
       print('ERROR ReviewCubit: $e');
       emit(ReviewError(e.toString()));

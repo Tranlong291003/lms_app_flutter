@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import to adjust system UI
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -63,11 +62,4 @@ Future<void> _setSystemNavigationBarColor(ThemeMode themeMode) async {
       ),
     );
   }
-}
-
-// Hàm lấy thông tin người dùng (async function)
-Future<User?> _getUser() async {
-  // Simulate async delay for Firebase Auth check
-  await Future.delayed(Duration(milliseconds: 500));
-  return FirebaseAuth.instance.currentUser; // Lấy người dùng hiện tại
 }

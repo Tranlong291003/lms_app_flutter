@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/repositories/mentor_request_repository.dart';
-import 'package:meta/meta.dart';
 
 part 'mentor_request_state.dart';
 
@@ -12,7 +12,7 @@ class MentorRequestCubit extends Cubit<MentorRequestState> {
 
   Future<void> sendMentorRequest({
     required String userUid,
-    File? imageFile,
+    required File imageFile,
   }) async {
     emit(MentorRequestLoading());
     try {
@@ -22,6 +22,7 @@ class MentorRequestCubit extends Cubit<MentorRequestState> {
       );
       emit(MentorRequestSuccess());
     } catch (e) {
+      if (isClosed) return;
       emit(MentorRequestError(e.toString()));
     }
   }
@@ -34,6 +35,7 @@ class MentorRequestCubit extends Cubit<MentorRequestState> {
       print('[MentorRequestCubit] Fetched: $list');
       emit(MentorRequestListLoaded(list));
     } catch (e) {
+      if (isClosed) return;
       print('[MentorRequestCubit] Error fetchAllUpgradeRequests: $e');
       emit(MentorRequestError(e.toString()));
     }
@@ -55,6 +57,7 @@ class MentorRequestCubit extends Cubit<MentorRequestState> {
       print('[MentorRequestCubit] Update success');
       emit(MentorRequestSuccess());
     } catch (e) {
+      if (isClosed) return;
       print('[MentorRequestCubit] Error updateUpgradeRequestStatus: $e');
       emit(MentorRequestError(e.toString()));
     }

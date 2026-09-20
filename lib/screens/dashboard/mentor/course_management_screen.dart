@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -8,6 +7,7 @@ import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/models/courses/courses_model.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 
 import 'course_detail/course_detail_screen.dart';
 import 'course_form_screen.dart';
@@ -51,8 +51,8 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
     });
 
     try {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) {
+      final currentUser = context.read<AuthCubit>().state.userId;
+      if (currentUser == null || currentUser.isEmpty) {
         setState(() {
           _isLoading = false;
           _errorMessage = 'Bạn cần đăng nhập để xem khóa học của mình';
@@ -62,7 +62,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
 
       // Tải tất cả khóa học của mentor và phân loại theo trạng thái
       final courses = await context.read<CourseCubit>().getMentorCourses(
-        currentUser.uid,
+        currentUser,
       );
 
       // DEBUG: In ra dữ liệu khóa học
@@ -202,15 +202,15 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
     if (ok ?? false) {
       try {
         // Lấy uid của mentor hiện tại
-        final currentUser = FirebaseAuth.instance.currentUser;
-        if (currentUser == null) {
+        final currentUser = context.read<AuthCubit>().state.userId;
+        if (currentUser == null || currentUser.isEmpty) {
           throw Exception('Bạn cần đăng nhập để thực hiện chức năng này');
         }
 
         // Gọi API xóa khóa học
         await context.read<CourseCubit>().deleteCourse(
           courseId: course.courseId,
-          instructorUid: currentUser.uid,
+          instructorUid: currentUser,
         );
 
         // Hiển thị thông báo thành công
@@ -744,15 +744,15 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
 
       if (confirmed == true) {
         // Lấy uid của mentor hiện tại
-        final currentUser = FirebaseAuth.instance.currentUser;
-        if (currentUser == null) {
+        final currentUser = context.read<AuthCubit>().state.userId;
+        if (currentUser == null || currentUser.isEmpty) {
           throw Exception('Bạn cần đăng nhập để thực hiện chức năng này');
         }
 
         // DEBUG: In thông tin trước khi gọi API
         print('\n===== DEBUG: RESUBMIT COURSE PARAMETERS =====');
         print('CourseId: ${course.courseId}');
-        print('InstructorUid: ${currentUser.uid}');
+        print('InstructorUid: $currentUser');
         print('Current status: ${course.status}');
         print('Target status: pending');
         print('=======================================\n');
@@ -760,7 +760,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
         // Gọi API cập nhật trạng thái khóa học sang pending (chờ duyệt)
         await context.read<CourseCubit>().resubmitCourse(
           course.courseId,
-          instructorUid: currentUser.uid,
+          instructorUid: currentUser,
         );
 
         // Hiển thị thông báo thành công

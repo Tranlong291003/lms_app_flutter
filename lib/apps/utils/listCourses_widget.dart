@@ -10,6 +10,7 @@ import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
 import 'package:lms/cubits/bookmark/bookmark_state.dart';
 import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/repositories/bookmark_repository.dart';
+import 'package:lms/services/course_service.dart';
 import 'package:lms/services/bookmark_service.dart';
 
 class ListCoursesWidget extends StatefulWidget {
@@ -47,16 +48,21 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
   }
 
   Future<void> _initBookmarks() async {
-    if (widget.userUid.isEmpty) {
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
-
+    // Luôn khởi tạo `_bookmarkCubit` TRƯỚC mọi nhánh return: `build` dùng nó
+    // trong BlocProvider nên nếu bỏ qua sẽ ném LateInitializationError và làm
+    // sập cả danh sách khóa học (xảy ra khi người dùng chưa đăng nhập).
     final bookmarkService = BookmarkService(token: widget.token);
     final bookmarkRepository = BookmarkRepository(bookmarkService);
     _bookmarkCubit = BookmarkCubit(bookmarkRepository);
+
+    if (widget.userUid.isEmpty) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      return;
+    }
 
     try {
       await _bookmarkCubit.getBookmarks(widget.userUid);
@@ -65,9 +71,11 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
     } catch (e) {
       print('Không thể tải bookmarks: $e');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -205,7 +213,7 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                                     const SizedBox(width: 8),
                                     _tag(
                                       context,
-                                      c.level,
+                                      courseLevelLabel(c.level),
                                       _getLevelColor(context, c.level),
                                       theme.colorScheme.onPrimary,
                                     ),
@@ -360,12 +368,14 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
 
   static Color _getLevelColor(BuildContext context, String level) {
     final theme = Theme.of(context);
-    switch (level.toLowerCase()) {
-      case 'cơ bản':
+    // API trả `level` dạng beginner | intermediate | advanced; vẫn nhận thêm
+    // nhãn tiếng Việt để tương thích dữ liệu cũ.
+    switch (normalizeCourseLevel(level)) {
+      case 'beginner':
         return theme.colorScheme.tertiary;
-      case 'trung cấp':
+      case 'intermediate':
         return theme.colorScheme.secondary;
-      case 'nâng cao':
+      case 'advanced':
         return theme.colorScheme.error;
       default:
         return theme.colorScheme.surfaceContainerHighest;

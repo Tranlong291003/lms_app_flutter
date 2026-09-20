@@ -7,69 +7,80 @@ import 'package:lms/services/base_service.dart';
 class MentorRequestService extends BaseService {
   MentorRequestService() : super();
 
-  Future<void> requestMentor({required String userUid, File? imageFile}) async {
-    final formData = FormData.fromMap({
-      'user_uid': userUid,
-      if (imageFile != null)
+  /// `POST /api/mentor-requests` — multipart, field `image` **bắt buộc**.
+  Future<void> requestMentor({
+    required String userUid,
+    required File imageFile,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'user_uid': userUid,
         'image': await MultipartFile.fromFile(
           imageFile.path,
-          filename: imageFile.path.split('/').last,
+          filename: imageFile.path.split(Platform.pathSeparator).last,
         ),
-    });
-    print(
-      '[MentorRequestService] POST /api/mentor-requests, data: user_uid=$userUid, imageFile=${imageFile?.path}',
-    );
-    try {
+      });
+
       final response = await post(
         ApiConfig.mentorRequest,
         data: formData,
         options: Options(contentType: 'multipart/form-data'),
       );
-      print(
-        '[MentorRequestService] Response: ${response.statusCode} - ${response.data}',
-      );
+
       if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception('Gửi yêu cầu thất bại: ${response.statusCode}');
+        throw Exception('Gửi yêu cầu thất bại (${response.statusCode})');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 400) {
-        throw Exception('Bạn đã gửi yêu cầu rồi, vui lòng thử lại sau nhé');
+        throw Exception(
+          extractApiError(e, fallback: 'Bạn đã gửi yêu cầu rồi'),
+        );
       }
-      rethrow;
+      throw Exception('Gửi yêu cầu thất bại: ${extractApiError(e)}');
     }
   }
 
+  /// `GET /api/mentor-requests` (chỉ admin) → mảng request.
   Future<List<Map<String, dynamic>>> getAllUpgradeRequests() async {
-    print('[MentorRequestService] GET /api/mentor-requests');
-    final response = await get(ApiConfig.mentorRequest);
-    print(
-      '[MentorRequestService] Response: ${response.statusCode} - ${response.data}',
-    );
-    if (response.statusCode == 200 && response.data is List) {
-      return List<Map<String, dynamic>>.from(response.data);
-    } else if (response.statusCode == 200 && response.data['data'] is List) {
-      return List<Map<String, dynamic>>.from(response.data['data']);
+    try {
+      final response = await get(ApiConfig.mentorRequest);
+
+      if (response.data is List) {
+        return (response.data as List)
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList();
+      }
+      if (response.data is Map && response.data['data'] is List) {
+        return (response.data['data'] as List)
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList();
+      }
+      throw Exception('Không thể lấy danh sách yêu cầu nâng cấp');
+    } on DioException catch (e) {
+      throw Exception(
+        'Không thể lấy danh sách yêu cầu nâng cấp: ${extractApiError(e)}',
+      );
     }
-    throw Exception('Không thể lấy danh sách yêu cầu nâng cấp');
   }
 
+  /// `PUT /api/mentor-requests/:id/status` (chỉ admin).
   Future<void> updateUpgradeRequestStatus({
     required int id,
     required String status,
     String? reason,
   }) async {
-    print(
-      '[MentorRequestService] PUT /api/mentor-requests/$id/status, status=$status, reason=$reason',
-    );
-    final response = await put(
-      '${ApiConfig.mentorRequest}/$id/status',
-      data: {'status': status, 'reason': reason},
-    );
-    print(
-      '[MentorRequestService] Response: ${response.statusCode} - ${response.data}',
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Cập nhật trạng thái thất bại: ${response.statusCode}');
+    try {
+      final response = await put(
+        ApiConfig.mentorRequestStatus(id),
+        data: {'status': status, 'reason': reason},
+      );
+      if (response.statusCode != 200) {
+        throw Exception('Cập nhật trạng thái thất bại');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+        'Cập nhật trạng thái thất bại: ${extractApiError(e)}',
+      );
     }
   }
 }

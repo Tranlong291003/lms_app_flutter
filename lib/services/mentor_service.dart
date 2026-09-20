@@ -6,37 +6,39 @@ import 'package:lms/services/base_service.dart';
 class MentorService extends BaseService {
   MentorService({super.token});
 
-  /// Lấy danh sách mentor với tùy chọn tìm kiếm
+  /// `GET /api/users/listmentor` → `{ message, mentors: [...] }`.
+  ///
+  /// Lưu ý: endpoint này không hỗ trợ tham số `search`; việc tìm kiếm được thực
+  /// hiện ở phía client trên danh sách trả về.
   Future<List<Map<String, dynamic>>> fetchAllMentors({String? search}) async {
     try {
-      final response = await get(
-        ApiConfig.getAllMentor,
-        queryParameters: {if (search?.isNotEmpty ?? false) 'search': search},
+      final response = await get(ApiConfig.getAllMentor);
+
+      if (response.data is! Map || response.data['mentors'] is! List) {
+        throw Exception('Không thể tải danh sách mentor');
+      }
+
+      var mentors = List<Map<String, dynamic>>.from(
+        (response.data['mentors'] as List).map(
+          (e) => Map<String, dynamic>.from(e as Map),
+        ),
       );
 
-      if (response.statusCode == 200 && response.data['mentors'] is List) {
-        return List<Map<String, dynamic>>.from(response.data['mentors']);
+      if (search != null && search.trim().isNotEmpty) {
+        final keyword = search.trim().toLowerCase();
+        mentors = mentors.where((mentor) {
+          final name = (mentor['name'] ?? '').toString().toLowerCase();
+          final email = (mentor['email'] ?? '').toString().toLowerCase();
+          return name.contains(keyword) || email.contains(keyword);
+        }).toList();
       }
-      throw DioException(
-        requestOptions: response.requestOptions,
-        response: response,
-        type: DioExceptionType.badResponse,
-        error:
-            'Không thể tải danh sách mentor: Mã trạng thái ${response.statusCode}',
+
+      return mentors;
+    } on DioException catch (e) {
+      print('[MentorService] Lỗi khi tải danh sách mentor: ${e.message}');
+      throw Exception(
+        'Lỗi khi tải danh sách mentor: ${extractApiError(e)}',
       );
-    } catch (e) {
-      if (e is DioException) {
-        print('[MentorService] Lỗi Dio khi tải danh sách mentor: ${e.message}');
-        if (e.response != null) {
-          print('[MentorService] Response data: ${e.response?.data}');
-        }
-        throw Exception('Lỗi tải danh sách mentor: ${e.message}');
-      } else {
-        print(
-          '[MentorService] Lỗi không xác định khi tải danh sách mentor: $e',
-        );
-        throw Exception('Lỗi khi tải danh sách mentor: $e');
-      }
     }
   }
 
@@ -44,32 +46,15 @@ class MentorService extends BaseService {
     try {
       final response = await get('${ApiConfig.getUserByUid}/$uid');
 
-      if (response.statusCode == 200 &&
-          response.data['user'] is Map<String, dynamic>) {
-        return User.fromJson(response.data['user']);
-      }
-      throw DioException(
-        requestOptions: response.requestOptions,
-        response: response,
-        type: DioExceptionType.badResponse,
-        error:
-            'Không thể tải thông tin người dùng: Mã trạng thái ${response.statusCode}',
-      );
-    } catch (e) {
-      if (e is DioException) {
-        print(
-          '[MentorService] Lỗi Dio khi tải thông tin người dùng: ${e.message}',
+      if (response.statusCode == 200 && response.data['user'] is Map) {
+        return User.fromJson(
+          Map<String, dynamic>.from(response.data['user'] as Map),
         );
-        if (e.response != null) {
-          print('[MentorService] Response data: ${e.response?.data}');
-        }
-        throw Exception('Lỗi tải thông tin người dùng: ${e.message}');
-      } else {
-        print(
-          '[MentorService] Lỗi không xác định khi tải thông tin người dùng: $e',
-        );
-        throw Exception('Lỗi khi tải thông tin người dùng: $e');
       }
+      throw Exception('Không thể tải thông tin mentor');
+    } on DioException catch (e) {
+      print('[MentorService] Lỗi khi tải thông tin mentor: ${e.message}');
+      throw Exception('Lỗi khi tải thông tin mentor: ${extractApiError(e)}');
     }
   }
 }

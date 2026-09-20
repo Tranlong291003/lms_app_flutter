@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
+import 'package:lms/apps/utils/json_parse.dart';
 
 class QuestionModel {
   final int questionId;
@@ -24,36 +25,29 @@ class QuestionModel {
   });
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) {
-    List<String> optionsList = [];
-
-    if (json['options'] != null) {
-      // Xử lý options lưu dạng JSON string
-      if (json['options'] is String) {
-        try {
-          optionsList = List<String>.from(jsonDecode(json['options']));
-        } catch (e) {
-          print('Lỗi khi parse options: $e');
-          optionsList = [];
-        }
+    // `options` do backend lưu dạng chuỗi JSON đã serialize, nhưng một số
+    // endpoint trả về mảng thật → chấp nhận cả hai.
+    List<String> optionsList = const [];
+    if (json['options'] is String) {
+      try {
+        optionsList = asStringList(jsonDecode(json['options'] as String));
+      } catch (e) {
+        print('Lỗi khi parse options: $e');
       }
-      // Trường hợp options đã là một mảng
-      else if (json['options'] is List) {
-        optionsList = List<String>.from(json['options']);
-      }
+    } else if (json['options'] is List) {
+      optionsList = asStringList(json['options']);
     }
 
     return QuestionModel(
-      questionId: json['question_id'],
-      quizId: json['quiz_id'],
-      question: json['question'],
+      questionId: asInt(json['question_id']),
+      quizId: asInt(json['quiz_id']),
+      question: asString(json['question']),
       options: optionsList,
-      correctIndex: json['correct_index'],
-      expectedKeywords: json['expected_keywords'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt:
-          json['updated_at'] != null
-              ? DateTime.parse(json['updated_at'])
-              : null,
+      // API luôn trả `correct_index` 0-based (dùng trực tiếp với options[i]).
+      correctIndex: asInt(json['correct_index'], -1),
+      expectedKeywords: asStringOrNull(json['expected_keywords']),
+      createdAt: asDateTimeOr(json['created_at'], DateTime.now()),
+      updatedAt: asDateTime(json['updated_at']),
     );
   }
 

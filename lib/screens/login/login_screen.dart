@@ -85,58 +85,14 @@ class LoginScreen extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 32),
-                      // Button sections for Facebook, Google, Apple
-                      SocialLoginButton(
-                        context: context,
-                        assetPath: 'assets/icons/facebook.png',
-                        text: 'Tiếp tục với Facebook',
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Facebook button pressed'),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      SocialLoginButton(
-                        context: context,
-                        assetPath: 'assets/icons/google.png',
-                        text: 'Tiếp tục với Google',
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Google button pressed'),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      SocialLoginButton(
-                        context: context,
-                        assetPath: 'assets/icons/apple.png',
-                        text: 'Tiếp tục với Apple',
-                        finalIconColor: isDark ? Colors.white : Colors.black,
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Apple button pressed'),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        "hoặc",
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      // Sign in with password
+                      // Đăng nhập bằng mật khẩu là cách DUY NHẤT hoạt động.
+                      // Trước đây có 3 nút Facebook/Google/Apple nhưng chỉ hiện
+                      // snackbar "button pressed" — backend đã bỏ Firebase Auth
+                      // nên đăng nhập mạng xã hội không còn hỗ trợ. Giữ lại sẽ
+                      // khiến người dùng tưởng bấm được mà thực ra không.
                       botton(
                         context: context,
-                        text: 'Đăng nhập với mật khẩu',
+                        text: 'Đăng nhập',
                         onPressed: () {
                           Navigator.pushNamed(
                             context,

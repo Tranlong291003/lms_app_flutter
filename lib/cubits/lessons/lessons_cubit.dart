@@ -26,6 +26,7 @@ class LessonsCubit extends Cubit<LessonsState> {
       final lessons = await _repository.getAllLessons(courseId, userUid);
       emit(LessonsLoaded(lessons: lessons));
     } catch (e) {
+      if (isClosed) return;
       emit(LessonsError(e.toString()));
     }
   }
@@ -49,6 +50,7 @@ class LessonsCubit extends Cubit<LessonsState> {
       // Trả về lesson cho caller
       return lesson;
     } catch (e) {
+      if (isClosed) rethrow;
       print('[LessonsCubit] Lỗi khi tải chi tiết bài học: $e');
       emit(LessonsError(e.toString()));
       rethrow; // Throw lại lỗi để caller xử lý
@@ -79,6 +81,7 @@ class LessonsCubit extends Cubit<LessonsState> {
       );
       await loadLessons(courseId: courseId, userUid: uid);
     } catch (e) {
+      if (isClosed) return;
       emit(LessonsError(e.toString()));
     }
   }
@@ -116,6 +119,7 @@ class LessonsCubit extends Cubit<LessonsState> {
 
       await loadLessons(courseId: courseId, userUid: uid);
     } catch (e) {
+      if (isClosed) return;
       print('[LessonsCubit] ❌ Lỗi cập nhật bài học: $e');
       emit(LessonsError(e.toString()));
       rethrow;
@@ -138,6 +142,7 @@ class LessonsCubit extends Cubit<LessonsState> {
       // Reload danh sách bài học sau khi xoá
       await loadLessons(courseId: courseId, userUid: userUid);
     } catch (e) {
+      if (isClosed) return;
       print('[LessonsCubit] ❌ Lỗi xoá bài học: $e');
       emit(LessonsError(e.toString()));
       rethrow;

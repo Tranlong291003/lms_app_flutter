@@ -1,3 +1,12 @@
+import 'package:lms/apps/utils/json_parse.dart';
+
+/// Kết quả một lượt làm bài.
+///
+/// Model này được dùng cho cả hai nguồn dữ liệu của API:
+/// - `GET /api/quiz-results/users/:uid/results` — mỗi phần tử có
+///   `result_id, title, score, passed, submitted_at`.
+/// - `GET /api/quiz-results/:result_id` — chi tiết gồm `score, explanation,
+///   total_correct_answers, total_wrong_answers, questions`.
 class QuizResultModel {
   final int resultId;
   final String title;
@@ -7,6 +16,7 @@ class QuizResultModel {
   final int incorrectAnswers;
   final int unansweredQuestions;
   final double score;
+  final String? explanation;
   final List<dynamic> detailedResults;
   final DateTime? submittedAt;
 
@@ -19,31 +29,38 @@ class QuizResultModel {
     required this.incorrectAnswers,
     required this.unansweredQuestions,
     required this.score,
+    this.explanation,
     required this.detailedResults,
     this.submittedAt,
   });
 
   factory QuizResultModel.fromJson(Map<String, dynamic> json) {
-    final questions = json['questions'] ?? json['detailedResults'] ?? [];
-    final correct =
-        json['total_correct_answers'] ?? json['correctAnswers'] ?? 0;
-    final wrong = json['total_wrong_answers'] ?? json['incorrectAnswers'] ?? 0;
-    final unanswered =
-        (questions as List).where((q) => q['user_answer'] == null).length;
+    final questions = json['questions'] ?? json['detailedResults'];
+    final questionList = questions is List ? questions : const [];
+
+    final correct = asInt(
+      json['total_correct_answers'] ?? json['correctAnswers'],
+    );
+    final wrong = asInt(json['total_wrong_answers'] ?? json['incorrectAnswers']);
+    final unanswered = questionList
+        .where((q) => q is Map && q['user_answer'] == null)
+        .length;
+
     return QuizResultModel(
-      resultId: json['result_id'] ?? json['id'] ?? 0,
-      title: (json['title'] ?? json['quiz_title'] ?? '').toString(),
-      passed: json['passed'] == true,
-      totalQuestions: questions.length,
+      resultId: asInt(json['result_id'] ?? json['id']),
+      title: asString(json['title'] ?? json['quiz_title']),
+      passed: asBool(json['passed']),
+      // Ở danh sách không có mảng questions → suy ra tổng số câu đã chấm.
+      totalQuestions: questionList.isNotEmpty
+          ? questionList.length
+          : correct + wrong,
       correctAnswers: correct,
       incorrectAnswers: wrong,
       unansweredQuestions: unanswered,
-      score: (json['score'] ?? 0.0).toDouble(),
-      detailedResults: questions,
-      submittedAt:
-          (json['submitted_at'] ?? json['submittedAt']) != null
-              ? DateTime.tryParse(json['submitted_at'] ?? json['submittedAt'])
-              : null,
+      score: asDouble(json['score']),
+      explanation: asStringOrNull(json['explanation']),
+      detailedResults: questionList,
+      submittedAt: asDateTime(json['submitted_at'] ?? json['submittedAt']),
     );
   }
 
@@ -57,6 +74,7 @@ class QuizResultModel {
       'incorrectAnswers': incorrectAnswers,
       'unansweredQuestions': unansweredQuestions,
       'score': score,
+      'explanation': explanation,
       'detailedResults': detailedResults,
       'submitted_at': submittedAt?.toIso8601String(),
     };

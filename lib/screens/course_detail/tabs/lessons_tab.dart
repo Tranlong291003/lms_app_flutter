@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
@@ -6,6 +5,7 @@ import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/lessons/lessons_cubit.dart';
 import 'package:lms/cubits/lessons/lessons_state.dart';
 import 'package:lms/models/lesson_model.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/services/course_service.dart';
 
 class LessonsTab extends StatelessWidget {
@@ -14,8 +14,7 @@ class LessonsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    final userUid = user?.uid ?? '';
+    final userUid = context.read<AuthCubit>().state.userId ?? '';
     final cubit = context.read<LessonsCubit>();
 
     // Load lessons when widget is built
@@ -76,8 +75,7 @@ class _LessonsList extends StatelessWidget {
       );
     }
 
-    final user = FirebaseAuth.instance.currentUser;
-    final userUid = user?.uid ?? '';
+    final userUid = context.read<AuthCubit>().state.userId ?? '';
     final theme = Theme.of(context);
 
     return FutureBuilder<bool>(
@@ -152,11 +150,14 @@ class _LessonsList extends StatelessWidget {
                             await Navigator.pushNamed(
                               context,
                               AppRouter.lessonDetail,
-                              arguments: lesson.lessonId,
+                              arguments: {
+                                'lessonId': lesson.lessonId,
+                                'courseId': lesson.courseId,
+                              },
                             );
                             // Sau khi quay lại, refresh lại danh sách bài học
-                            final user = FirebaseAuth.instance.currentUser;
-                            final userUid = user?.uid ?? '';
+                            final userUid =
+                                context.read<AuthCubit>().state.userId ?? '';
                             context.read<LessonsCubit>().loadLessons(
                               courseId: courseId,
                               userUid: userUid,

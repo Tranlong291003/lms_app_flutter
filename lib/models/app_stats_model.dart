@@ -1,3 +1,5 @@
+import 'package:lms/apps/utils/json_parse.dart';
+
 class AppStatsModel {
   final String role;
   final int totalCourses;
@@ -19,16 +21,18 @@ class AppStatsModel {
     this.totalReviews,
   });
 
+  /// Mọi giá trị đều là kết quả `COUNT()`/`AVG()` của PostgreSQL nên có thể
+  /// được trả về dạng **chuỗi** trong JSON — đọc qua helper để không vỡ kiểu.
   factory AppStatsModel.fromJson(Map<String, dynamic> json) {
     return AppStatsModel(
-      role: json['role'] as String,
-      totalCourses: json['total_courses'] as int,
-      totalStudents: json['total_students'] as int?,
-      totalLessons: json['total_lessons'] as int?,
-      avgRating: (json['avg_rating'] as num?)?.toDouble(),
-      totalUsers: json['total_users'] as int?,
-      totalQuizzes: json['total_quizzes'] as int?,
-      totalReviews: json['total_reviews'] as int?,
+      role: asString(json['role']),
+      totalCourses: asInt(json['total_courses']),
+      totalStudents: asIntOrNull(json['total_students']),
+      totalLessons: asIntOrNull(json['total_lessons']),
+      avgRating: asDoubleOrNull(json['avg_rating']),
+      totalUsers: asIntOrNull(json['total_users']),
+      totalQuizzes: asIntOrNull(json['total_quizzes']),
+      totalReviews: asIntOrNull(json['total_reviews']),
     );
   }
 }

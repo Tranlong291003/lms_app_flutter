@@ -1,104 +1,94 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:dio/dio.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/models/reivew_model.dart';
 import 'package:lms/services/base_service.dart';
 
 class ReviewService extends BaseService {
+  ReviewService({super.token});
+
+  /// `GET /api/reviews/course/:courseId` → `{ data: [{ review_id, ... }] }`
   Future<List<Review>> getCourseReviews(int courseId) async {
     try {
-      print('Fetching reviews for course: $courseId');
-      final response = await get(
-        '${ApiConfig.baseUrl}/api/reviews/course/$courseId',
-      );
+      final response = await get(ApiConfig.getCourseReviews(courseId));
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = response.data;
-        final List<dynamic> reviewsData = responseData['data'] ?? [];
-        return reviewsData.map((json) => Review.fromJson(json)).toList();
-      } else {
-        throw Exception('Failed to load reviews');
+      if (response.data is Map && response.data['data'] is List) {
+        return (response.data['data'] as List)
+            .map(
+              (json) => Review.fromJson(Map<String, dynamic>.from(json as Map)),
+            )
+            .toList();
       }
-    } catch (e) {
-      print('Error fetching reviews: $e');
-      rethrow;
+      return [];
+    } on DioException catch (e) {
+      throw Exception('Không thể tải đánh giá: ${extractApiError(e)}');
     }
   }
 
+  /// `POST /api/reviews/create` → `201 { data: { review_id } }`.
+  /// `user_uid` phải trùng với uid trong token.
   Future<void> submitReview({
     required int courseId,
     required String userId,
-    required String userName,
     required int rating,
     required String comment,
   }) async {
     try {
       final response = await post(
-        '${ApiConfig.baseUrl}/api/reviews/create',
+        ApiConfig.createReview,
         data: {
           'course_id': courseId,
           'user_uid': userId,
-          'user_name': userName,
           'rating': rating,
           'comment': comment,
         },
       );
 
-      if (response.statusCode != 201) {
-        throw Exception('Failed to submit review');
+      if (response.statusCode != 201 && response.statusCode != 200) {
+        throw Exception('Gửi đánh giá thất bại');
       }
-    } catch (e) {
-      print('Error submitting review: $e');
-      rethrow;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 400) {
+        throw Exception('Bạn đã đánh giá khóa học này rồi');
+      }
+      throw Exception('Gửi đánh giá thất bại: ${extractApiError(e)}');
     }
   }
 
   Future<void> updateReview({
     required int reviewId,
+    required String userUid,
     required int rating,
     required String comment,
   }) async {
     try {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) {
-        throw Exception('User not authenticated');
-      }
-
       final response = await put(
-        '${ApiConfig.baseUrl}/api/reviews/update/$reviewId',
-        data: {
-          'user_uid': currentUser.uid,
-          'rating': rating,
-          'comment': comment,
-        },
+        ApiConfig.updateReview(reviewId),
+        data: {'user_uid': userUid, 'rating': rating, 'comment': comment},
       );
 
       if (response.statusCode != 200) {
-        throw Exception('Failed to update review');
+        throw Exception('Cập nhật đánh giá thất bại');
       }
-    } catch (e) {
-      print('Error updating review: $e');
-      rethrow;
+    } on DioException catch (e) {
+      throw Exception('Cập nhật đánh giá thất bại: ${extractApiError(e)}');
     }
   }
 
-  Future<void> deleteReview({required int reviewId}) async {
+  Future<void> deleteReview({
+    required int reviewId,
+    required String userUid,
+  }) async {
     try {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) {
-        throw Exception('User not authenticated');
-      }
-
       final response = await delete(
-        '${ApiConfig.baseUrl}/api/reviews/delete/$reviewId',
-        data: {'user_uid': currentUser.uid},
+        ApiConfig.deleteReview(reviewId),
+        data: {'user_uid': userUid},
       );
 
       if (response.statusCode != 200) {
-        throw Exception('Failed to delete review');
+        throw Exception('Xóa đánh giá thất bại');
       }
-    } catch (e) {
-      print('Error deleting review: $e');
-      rethrow;
+    } on DioException catch (e) {
+      throw Exception('Xóa đánh giá thất bại: ${extractApiError(e)}');
     }
   }
 }

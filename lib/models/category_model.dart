@@ -1,3 +1,5 @@
+import 'package:lms/apps/utils/json_parse.dart';
+
 class CourseCategory {
   final int categoryId;
   final String name;
@@ -20,19 +22,13 @@ class CourseCategory {
   /// Tạo từ JSON map (ví dụ lấy từ API)
   factory CourseCategory.fromJson(Map<String, dynamic> json) {
     return CourseCategory(
-      categoryId: json['category_id'] as int,
-      name: json['name'] as String,
-      description: json['description'] as String?,
-      createdAt:
-          json['created_at'] != null
-              ? DateTime.parse(json['created_at'] as String)
-              : null,
-      updatedAt:
-          json['updated_at'] != null
-              ? DateTime.parse(json['updated_at'] as String)
-              : null,
-      icon: json['icon'] as String?,
-      courseCount: json['course_count'] as int? ?? 0,
+      categoryId: asInt(json['category_id']),
+      name: asString(json['name']),
+      description: asStringOrNull(json['description']),
+      createdAt: asDateTime(json['created_at']),
+      updatedAt: asDateTime(json['updated_at']),
+      icon: asStringOrNull(json['icon']),
+      courseCount: asInt(json['course_count']),
     );
   }
 

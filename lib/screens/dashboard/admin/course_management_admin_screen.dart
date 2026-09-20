@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
@@ -8,6 +7,7 @@ import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/models/courses/courses_model.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 
 class CourseManagementAdminScreen extends StatefulWidget {
   const CourseManagementAdminScreen({super.key});
@@ -255,7 +255,7 @@ class _CourseManagementAdminScreenState
   }
 
   void _showApproveConfirmation(BuildContext context, Course course) {
-    final adminUid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final adminUid = context.read<AuthCubit>().state.userId ?? '';
     showDialog(
       context: context,
       builder: (context) {
@@ -303,7 +303,7 @@ class _CourseManagementAdminScreenState
 
   void _showRejectDialog(BuildContext context, Course course) {
     final reasonController = TextEditingController();
-    final adminUid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final adminUid = context.read<AuthCubit>().state.userId ?? '';
 
     // Danh sách các lý do từ chối phổ biến
     final List<String> commonReasons = [
