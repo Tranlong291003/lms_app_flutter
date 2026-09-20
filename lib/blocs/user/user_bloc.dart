@@ -22,6 +22,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       final user = await _userRepository.getUserByUid(event.uid);
       emit(UserLoaded(user));
     } catch (e) {
+      if (isClosed) return;
       emit(UserError('Không thể tải thông tin người dùng: $e'));
     }
   }
@@ -54,6 +55,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
       emit(UserUpdateSuccess(user, notification));
     } catch (e) {
+      if (isClosed) return;
       emit(UserUpdateFailure('Cập nhật hồ sơ thất bại: $e'));
     }
   }

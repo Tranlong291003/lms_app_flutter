@@ -33,6 +33,7 @@ class AdminUserCubit extends Cubit<AdminUserState> {
       debugPrint('🧩 AdminUserCubit: Emitting AdminUserLoaded state');
       emit(AdminUserLoaded(users));
     } catch (e) {
+      if (isClosed) return;
       debugPrint('❌ AdminUserCubit: getAllUsers failed with error: $e');
       emit(AdminUserError(e.toString()));
     }
@@ -54,6 +55,7 @@ class AdminUserCubit extends Cubit<AdminUserState> {
       await getAllUsers();
       debugPrint('🧩 AdminUserCubit: User list refreshed successfully');
     } catch (e) {
+      if (isClosed) return;
       debugPrint('❌ AdminUserCubit: toggleUserStatus failed with error: $e');
       debugPrint('❌ AdminUserCubit: Error details:');
       debugPrint('  - User ID: $uid');
@@ -75,6 +77,7 @@ class AdminUserCubit extends Cubit<AdminUserState> {
       await getAllUsers();
       debugPrint('🧩 AdminUserCubit: User list refreshed after role update');
     } catch (e) {
+      if (isClosed) return;
       debugPrint('❌ AdminUserCubit: updateUserRole failed with error: $e');
       emit(AdminUserError(e.toString()));
     }

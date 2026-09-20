@@ -22,6 +22,7 @@ class LessonDetailCubit extends Cubit<LessonDetailState> {
 
       emit(LessonDetailLoaded(lesson: lesson));
     } catch (e) {
+      if (isClosed) return;
       print('[LessonDetailCubit] ❌ Lỗi khi tải chi tiết bài học: $e');
       emit(LessonDetailError(e.toString()));
     }
@@ -54,6 +55,7 @@ class LessonDetailCubit extends Cubit<LessonDetailState> {
         throw Exception('Không thể đánh dấu bài học: State không hợp lệ');
       }
     } catch (e) {
+      if (isClosed) return;
       print('[LessonDetailCubit] ❌ Lỗi khi đánh dấu bài học: $e');
       emit(LessonDetailError(e.toString()));
     }

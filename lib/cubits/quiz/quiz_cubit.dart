@@ -37,6 +37,7 @@ class QuizCubit extends Cubit<QuizState> {
         ),
       );
     } catch (e) {
+      if (isClosed) return;
       print('Lỗi Cubit khi lấy danh sách bài kiểm tra: $e');
       emit(
         state.copyWith(
@@ -75,6 +76,7 @@ class QuizCubit extends Cubit<QuizState> {
         ),
       );
     } catch (e) {
+      if (isClosed) return;
       print('Lỗi QuizCubit khi làm mới danh sách bài kiểm tra: $e');
       emit(state.copyWith(isLoading: false));
     }
@@ -108,6 +110,7 @@ class QuizCubit extends Cubit<QuizState> {
         ),
       );
     } catch (e) {
+      if (isClosed) return;
       emit(
         state.copyWith(
           status: QuizStatus.error,
@@ -172,6 +175,7 @@ class QuizResultCubit extends Cubit<QuizResultState> {
         emit(QuizResultError(result['message'] ?? 'Lỗi không xác định'));
       }
     } catch (e) {
+      if (isClosed) return;
       emit(QuizResultError(e.toString()));
     }
   }
@@ -207,6 +211,7 @@ class QuizResultListCubit extends Cubit<QuizResultListState> {
       print('QuizResultListCubit: Đã fetch xong, có ${results.length} kết quả');
       emit(QuizResultListLoaded(results));
     } catch (e) {
+      if (isClosed) return;
       print('QuizResultListCubit: Lỗi khi fetch kết quả: $e');
       emit(QuizResultListError(e.toString()));
     }

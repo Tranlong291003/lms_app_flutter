@@ -89,6 +89,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
       print('Lỗi khi khởi tạo cubits: $e');
     }
 
+    if (!mounted) return;
     setState(() {
       _isLoading = false;
     });

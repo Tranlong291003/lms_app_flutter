@@ -22,6 +22,7 @@ class MentorRequestCubit extends Cubit<MentorRequestState> {
       );
       emit(MentorRequestSuccess());
     } catch (e) {
+      if (isClosed) return;
       emit(MentorRequestError(e.toString()));
     }
   }
@@ -34,6 +35,7 @@ class MentorRequestCubit extends Cubit<MentorRequestState> {
       print('[MentorRequestCubit] Fetched: $list');
       emit(MentorRequestListLoaded(list));
     } catch (e) {
+      if (isClosed) return;
       print('[MentorRequestCubit] Error fetchAllUpgradeRequests: $e');
       emit(MentorRequestError(e.toString()));
     }
@@ -55,6 +57,7 @@ class MentorRequestCubit extends Cubit<MentorRequestState> {
       print('[MentorRequestCubit] Update success');
       emit(MentorRequestSuccess());
     } catch (e) {
+      if (isClosed) return;
       print('[MentorRequestCubit] Error updateUpgradeRequestStatus: $e');
       emit(MentorRequestError(e.toString()));
     }

@@ -76,6 +76,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   Future<void> _handleInactiveUser() async {
     if (!mounted) return;
 
+    // Giữ sẵn cubit trước khi await: sau `await` widget có thể đã bị huỷ và
+    // `context` không còn dùng được.
+    final authCubit = context.read<AuthCubit>();
+
     // Show message first
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -87,8 +91,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     // Wait for message to be shown
     await Future.delayed(const Duration(seconds: 1));
 
-    // Gọi logoutWithContext để xử lý đăng xuất
-    await context.read<AuthCubit>().logout();
+    await authCubit.logout();
   }
 
   void _loadMentor() {

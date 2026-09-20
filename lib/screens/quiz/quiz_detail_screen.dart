@@ -89,17 +89,21 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
               'DEBUG: timeLimit = $timeLimit, requiredQuestions = $requiredQuestions',
             );
 
-            // Kiểm tra số câu hỏi có đủ không
-            if (_loadedQuestionsCount >= requiredQuestions) {
-              _questionsCount =
-                  requiredQuestions; // Số câu hỏi sẽ làm theo thời gian
+            // `requiredQuestions` chỉ là số câu MONG ĐỢI theo thời gian, không
+            // phải điều kiện bắt buộc. Trước đây nếu ngân hàng câu hỏi ít hơn
+            // thì đặt `_questionsCount = 0` và chặn luôn người dùng, dù bài
+            // kiểm tra hoàn toàn làm được với số câu hiện có.
+            //
+            // Giờ dùng số câu tối đa có thể: ưu tiên đúng số câu theo thời gian,
+            // nếu ít hơn thì làm hết những gì có.
+            _questionsCount =
+                _loadedQuestionsCount >= requiredQuestions
+                    ? requiredQuestions
+                    : _loadedQuestionsCount;
+            if (_questionsCount < requiredQuestions) {
               print(
-                'DEBUG: Số câu hỏi đủ yêu cầu, sẽ làm $_questionsCount câu',
-              );
-            } else {
-              _questionsCount = 0; // Không đủ câu hỏi, không cho phép làm
-              print(
-                'DEBUG: Số câu hỏi không đủ yêu cầu (cần $requiredQuestions, có $_loadedQuestionsCount)',
+                'DEBUG: Chỉ có $_loadedQuestionsCount/$requiredQuestions câu — '
+                'vẫn cho làm với số câu hiện có',
               );
             }
           } else {
@@ -338,7 +342,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                           ? 'Đang tải số lượng câu hỏi...'
                           : _questionsCount > 0
                           ? '$_questionsCount câu hỏi (theo thời gian $timeLimit phút)'
-                          : 'Không đủ câu hỏi theo yêu cầu thời gian',
+                          : 'Bài kiểm tra chưa có câu hỏi',
                     ),
                     _buildInfoItem(Icons.timer_outlined, '$timeLimit phút'),
 
@@ -347,6 +351,8 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                       'Số lần làm: $attemptsUsed/$attemptLimit',
                     ),
                   ]),
+                  // Chỉ cảnh báo khi bài kiểm tra THỰC SỰ chưa có câu hỏi.
+                  // Ít hơn số câu mong đợi theo thời gian vẫn làm được bình thường.
                   if (!_isLoading && _questionsCount == 0)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -360,7 +366,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'Bài kiểm tra này không đủ số lượng câu hỏi theo yêu cầu thời gian. Vui lòng liên hệ quản trị viên để bổ sung.',
+                              'Bài kiểm tra này chưa có câu hỏi nào. Vui lòng liên hệ quản trị viên để bổ sung.',
                               style: TextStyle(
                                 color: Colors.orange[800],
                                 fontSize: 13,

@@ -41,6 +41,7 @@ class CourseCubit extends Cubit<CourseState> {
 
       _emitLoadedState(courseResponse);
     } catch (e) {
+      if (isClosed) return;
       emit(CourseError(e.toString()));
     }
   }
@@ -52,6 +53,7 @@ class CourseCubit extends Cubit<CourseState> {
       final courseResponse = await _repo.getAllCourses();
       _emitLoadedState(courseResponse);
     } catch (e) {
+      if (isClosed) return;
       emit(CourseError(e.toString()));
     }
   }
@@ -106,6 +108,7 @@ class CourseCubit extends Cubit<CourseState> {
       );
       await fetchAllCourses();
     } catch (e) {
+      if (isClosed) return;
       emit(CourseError(e.toString()));
     }
   }
@@ -129,6 +132,7 @@ class CourseCubit extends Cubit<CourseState> {
       );
       await fetchAllCourses();
     } catch (e) {
+      if (isClosed) return;
       emit(CourseError(e.toString()));
     }
   }
@@ -232,6 +236,7 @@ class CourseCubit extends Cubit<CourseState> {
       );
       return courses;
     } catch (e) {
+      if (isClosed) return [];
       emit(CourseError(e.toString()));
       return [];
     }
@@ -254,6 +259,7 @@ class CourseCubit extends Cubit<CourseState> {
         uid: instructorUid,
       );
     } catch (e) {
+      if (isClosed) return;
       emit(CourseError(e.toString()));
       rethrow;
     }
@@ -280,6 +286,7 @@ class CourseCubit extends Cubit<CourseState> {
       await _repo.createCourse(data);
       await fetchAllCourses(); // Refresh danh sách khóa học sau khi tạo mới
     } catch (e) {
+      if (isClosed) return;
       emit(CourseError(e.toString()));
       rethrow;
     }
@@ -291,6 +298,7 @@ class CourseCubit extends Cubit<CourseState> {
       await _repo.updateCourse(courseId, data);
       await fetchAllCourses();
     } catch (e) {
+      if (isClosed) return;
       emit(CourseError(e.toString()));
       rethrow;
     }
@@ -342,6 +350,7 @@ class CourseCubit extends Cubit<CourseState> {
         );
       }
     } catch (e) {
+      if (isClosed) return;
       emit(CourseError(e.toString()));
       rethrow;
     }
@@ -364,6 +373,7 @@ class CourseDetailCubit extends Cubit<CourseDetailState> {
       final detail = await _repository.getCourseDetail(courseId);
       emit(CourseDetailLoaded(detail));
     } catch (e) {
+      if (isClosed) return;
       emit(CourseDetailError(e.toString()));
     }
   }

@@ -39,6 +39,7 @@ class MentorsBloc extends Bloc<MentorsEvent, MentorsState> {
 
       emit(MentorsLoaded(list));
     } catch (e) {
+      if (isClosed) return;
       emit(MentorsError('Không thể tải danh sách mentor: $e'));
     }
   }
@@ -52,6 +53,7 @@ class MentorsBloc extends Bloc<MentorsEvent, MentorsState> {
       final Mentor = await _mentorRepository.getMentorByUid(event.uid);
       emit(MentorsLoaded([Mentor]));
     } catch (e) {
+      if (isClosed) return;
       emit(MentorsError('Không thể tải thông tin người dùng: $e'));
     }
   }

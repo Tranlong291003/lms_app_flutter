@@ -22,6 +22,7 @@ class CategoryCubit extends Cubit<CategoryState> {
       );
       emit(CategoryLoaded(categories));
     } catch (e) {
+      if (isClosed) return;
       debugPrint('CategoryCubit: fetchAllCategory error: \\${e.toString()}');
       emit(CategoryError(e.toString()));
     }
@@ -61,6 +62,7 @@ class CategoryCubit extends Cubit<CategoryState> {
       );
       await fetchAllCategory();
     } catch (e) {
+      if (isClosed) return;
       debugPrint('CategoryCubit: createCategory error: \\${e.toString()}');
       emit(CategoryError(e.toString()));
     }
@@ -78,6 +80,7 @@ class CategoryCubit extends Cubit<CategoryState> {
       );
       await fetchAllCategory();
     } catch (e) {
+      if (isClosed) return;
       debugPrint('CategoryCubit: deleteCategory error: ${e.toString()}');
       emit(CategoryError(e.toString()));
     }
@@ -107,6 +110,7 @@ class CategoryCubit extends Cubit<CategoryState> {
       );
       await fetchAllCategory();
     } catch (e) {
+      if (isClosed) return;
       debugPrint('CategoryCubit: updateCategory error: ${e.toString()}');
       emit(CategoryError(e.toString()));
     }

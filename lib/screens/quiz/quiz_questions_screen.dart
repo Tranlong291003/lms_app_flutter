@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/utils/json_parse.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_state.dart';
@@ -274,9 +275,12 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
     final totalCorrect = _questionCubit.getCorrectAnswersCount();
     final totalQuestions = _questionCubit.state.questions.length;
     final score = _questionCubit.getScore();
-    final resultId =
-        _questionCubit.state.quizResult?['data']?['result_id'] ??
-        _questionCubit.state.quizResult?['result_id'];
+    // `result_id` là SERIAL nên PostgreSQL trả về dạng CHUỖI trong JSON.
+    // Phải đọc qua `asIntOrNull` thay vì `as int?` (sẽ ném lỗi ép kiểu).
+    final resultId = asIntOrNull(
+      _questionCubit.state.quizResult?['data']?['result_id'] ??
+          _questionCubit.state.quizResult?['result_id'],
+    );
 
     showDialog(
       context: context,

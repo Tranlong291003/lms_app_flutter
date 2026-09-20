@@ -19,6 +19,7 @@ class MentorDetailBloc extends Bloc<MentorsEvent, MentorsState> {
       final mentor = await mentorRepository.getMentorByUid(event.uid);
       emit(MentorsLoaded([mentor]));
     } catch (e) {
+      if (isClosed) return;
       emit(MentorsError('Không thể tải thông tin người dùng: $e'));
     }
   }

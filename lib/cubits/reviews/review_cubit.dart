@@ -17,6 +17,7 @@ class ReviewCubit extends Cubit<ReviewState> {
       print('DEBUG ReviewCubit: Loaded ${reviews.length} reviews');
       emit(ReviewLoaded(reviews));
     } catch (e) {
+      if (isClosed) return;
       print('ERROR ReviewCubit: Failed to load reviews');
       print('ERROR ReviewCubit: $e');
       emit(ReviewError(e.toString()));
@@ -44,6 +45,7 @@ class ReviewCubit extends Cubit<ReviewState> {
       // Refresh reviews after submitting
       await loadCourseReviews(courseId);
     } catch (e) {
+      if (isClosed) return;
       print('ERROR ReviewCubit: Failed to submit review');
       print('ERROR ReviewCubit: $e');
       emit(ReviewError(e.toString()));
@@ -68,6 +70,7 @@ class ReviewCubit extends Cubit<ReviewState> {
       // Refresh reviews after updating
       await loadCourseReviews(courseId);
     } catch (e) {
+      if (isClosed) return;
       print('ERROR ReviewCubit: Failed to update review');
       print('ERROR ReviewCubit: $e');
       emit(ReviewError(e.toString()));
@@ -85,6 +88,7 @@ class ReviewCubit extends Cubit<ReviewState> {
       // Refresh reviews after deleting
       await loadCourseReviews(courseId);
     } catch (e) {
+      if (isClosed) return;
       print('ERROR ReviewCubit: Failed to delete review');
       print('ERROR ReviewCubit: $e');
       emit(ReviewError(e.toString()));

@@ -45,6 +45,7 @@ class AppStatsCubit extends Cubit<AppStatsState> {
 
       developer.log('Stats fetched successfully', name: 'AppStatsCubit');
     } catch (e) {
+      if (isClosed) return;
       developer.log('Error fetching stats: $e', name: 'AppStatsCubit');
 
       _retryCount++;

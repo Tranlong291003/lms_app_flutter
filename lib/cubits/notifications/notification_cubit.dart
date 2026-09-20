@@ -21,6 +21,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       final notifications = await _notificationRepository.getNotifications();
       emit(NotificationLoaded(notifications));
     } catch (e) {
+      if (isClosed) return;
       print('ERROR NotificationCubit: Failed to load notifications');
       print('ERROR NotificationCubit: $e');
       emit(NotificationError(e.toString()));
@@ -32,6 +33,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       await _notificationRepository.markAsRead(notiId);
       await loadNotifications(); // Reload notifications after marking as read
     } catch (e) {
+      if (isClosed) return;
       print('ERROR NotificationCubit: Failed to mark notification as read');
       print('ERROR NotificationCubit: $e');
       emit(NotificationError(e.toString()));
@@ -43,6 +45,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       await _notificationRepository.deleteNotification(notiId);
       await loadNotifications(); // Reload notifications after deletion
     } catch (e) {
+      if (isClosed) return;
       print('ERROR NotificationCubit: Failed to delete notification');
       print('ERROR NotificationCubit: $e');
       emit(NotificationError(e.toString()));
@@ -59,6 +62,7 @@ class NotificationCubit extends Cubit<NotificationState> {
         emit(NotificationLoaded(updated));
       }
     } catch (e) {
+      if (isClosed) return;
       emit(NotificationError('Không thể đánh dấu tất cả là đã đọc'));
     }
   }
@@ -68,6 +72,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       // Gọi service/repository nếu có API, ở đây giả lập local
       emit(NotificationLoaded([]));
     } catch (e) {
+      if (isClosed) return;
       emit(NotificationError('Không thể xoá tất cả thông báo'));
     }
   }
@@ -91,6 +96,7 @@ class NotificationCubit extends Cubit<NotificationState> {
         emit(NotificationFailure('NotificationService chưa được khởi tạo'));
       }
     } catch (e) {
+      if (isClosed) return;
       emit(NotificationFailure('Không thể hiển thị thông báo'));
     }
   }

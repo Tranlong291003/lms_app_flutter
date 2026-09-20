@@ -48,16 +48,21 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
   }
 
   Future<void> _initBookmarks() async {
-    if (widget.userUid.isEmpty) {
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
-
+    // Luôn khởi tạo `_bookmarkCubit` TRƯỚC mọi nhánh return: `build` dùng nó
+    // trong BlocProvider nên nếu bỏ qua sẽ ném LateInitializationError và làm
+    // sập cả danh sách khóa học (xảy ra khi người dùng chưa đăng nhập).
     final bookmarkService = BookmarkService(token: widget.token);
     final bookmarkRepository = BookmarkRepository(bookmarkService);
     _bookmarkCubit = BookmarkCubit(bookmarkRepository);
+
+    if (widget.userUid.isEmpty) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      return;
+    }
 
     try {
       await _bookmarkCubit.getBookmarks(widget.userUid);
@@ -66,9 +71,11 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
     } catch (e) {
       print('Không thể tải bookmarks: $e');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
