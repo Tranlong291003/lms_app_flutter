@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +10,7 @@ import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/category/category_cubit.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 
 class CategoryManagementScreen extends StatefulWidget {
   const CategoryManagementScreen({super.key});
@@ -530,7 +530,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                             child: FilledButton.icon(
                               onPressed: () async {
                                 final uid =
-                                    FirebaseAuth.instance.currentUser?.uid ??
+                                    context.read<AuthCubit>().state.userId ??
                                     '';
                                 try {
                                   if (isEdit) {
@@ -762,7 +762,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                       onPressed: () async {
                         try {
                           final uid =
-                              FirebaseAuth.instance.currentUser?.uid ?? '';
+                              context.read<AuthCubit>().state.userId ?? '';
                           await context.read<CategoryCubit>().deleteCategory(
                             id,
                             uid,

@@ -24,55 +24,49 @@ class ReviewRepository extends BaseRepository<ReviewService> {
   Future<void> submitReview({
     required int courseId,
     required String userId,
-    required String userName,
     required int rating,
     required String comment,
   }) async {
     try {
-      print('DEBUG ReviewRepository: Submitting review for course $courseId');
       await service.submitReview(
         courseId: courseId,
         userId: userId,
-        userName: userName,
         rating: rating,
         comment: comment,
       );
-      print('DEBUG ReviewRepository: Review submitted successfully');
     } catch (e) {
-      print('ERROR ReviewRepository: Failed to submit review');
-      print('ERROR ReviewRepository: $e');
+      print('ERROR ReviewRepository: Failed to submit review: $e');
       rethrow;
     }
   }
 
   Future<void> updateReview({
     required int reviewId,
+    required String userUid,
     required int rating,
     required String comment,
   }) async {
     try {
-      print('DEBUG ReviewRepository: Updating review $reviewId');
       await service.updateReview(
         reviewId: reviewId,
+        userUid: userUid,
         rating: rating,
         comment: comment,
       );
-      print('DEBUG ReviewRepository: Review updated successfully');
     } catch (e) {
-      print('ERROR ReviewRepository: Failed to update review');
-      print('ERROR ReviewRepository: $e');
+      print('ERROR ReviewRepository: Failed to update review: $e');
       rethrow;
     }
   }
 
-  Future<void> deleteReview(int reviewId) async {
+  Future<void> deleteReview({
+    required int reviewId,
+    required String userUid,
+  }) async {
     try {
-      print('DEBUG ReviewRepository: Deleting review $reviewId');
-      await service.deleteReview(reviewId: reviewId);
-      print('DEBUG ReviewRepository: Review deleted successfully');
+      await service.deleteReview(reviewId: reviewId, userUid: userUid);
     } catch (e) {
-      print('ERROR ReviewRepository: Failed to delete review');
-      print('ERROR ReviewRepository: $e');
+      print('ERROR ReviewRepository: Failed to delete review: $e');
       rethrow;
     }
   }

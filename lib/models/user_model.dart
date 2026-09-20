@@ -1,5 +1,7 @@
 // lib/models/user_model.dart
 
+import 'package:lms/apps/utils/json_parse.dart';
+
 class User {
   final String uid;
   final String email;
@@ -32,32 +34,24 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
-    DateTime? parseDate(dynamic value) {
-      if (value == null) return null;
-      try {
-        return DateTime.parse(value.toString());
-      } catch (_) {
-        return null;
-      }
-    }
-
     return User(
-      uid: json['uid']?.toString() ?? '',
-      email: json['email']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-      avatarUrl: json['avatar_url']?.toString() ?? '',
-      bio: json['bio']?.toString() ?? '',
-      phone: json['phone']?.toString() ?? '',
-      gender: json['gender']?.toString() ?? '',
-      birthdate: parseDate(json['birthdate']),
-      role: json['role']?.toString() ?? '',
-      fcmToken: json['fcm_token']?.toString() ?? '',
-      isActive:
-          json['is_active'] is bool
-              ? json['is_active']
-              : (json['is_active']?.toString().toLowerCase() == 'true'),
-      createdAt: parseDate(json['created_at']),
-      updatedAt: parseDate(json['updated_at']),
+      uid: asString(json['uid']),
+      email: asString(json['email']),
+      name: asString(json['name']),
+      avatarUrl: asString(json['avatar_url']),
+      bio: asString(json['bio']),
+      phone: asString(json['phone']),
+      gender: asString(json['gender']),
+      birthdate: asDateTime(json['birthdate']),
+      role: asString(json['role']),
+      fcmToken: asString(json['fcm_token']),
+      // Thiếu trường KHÔNG có nghĩa là tài khoản bị khoá. `GET /api/users/:id`
+      // (hồ sơ công khai) không trả `is_active`; nếu mặc định false thì mọi
+      // mentor đều hiển thị "Không hoạt động". Khi cần biết chắc trạng thái của
+      // chính mình, dùng `/api/auth/me` hoặc `checkUserActive`.
+      isActive: json.containsKey('is_active') ? asBool(json['is_active']) : true,
+      createdAt: asDateTime(json['created_at']),
+      updatedAt: asDateTime(json['updated_at']),
     );
   }
 

@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
@@ -8,6 +7,7 @@ import 'package:lms/cubits/quiz/quiz_state.dart';
 import 'package:lms/models/quiz/quiz_course_model.dart';
 import 'package:lms/models/quiz/quiz_model.dart';
 import 'package:lms/repositories/quiz_repository.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/quiz/user_quiz_results_screen.dart';
 import 'package:lms/services/quiz_service.dart';
 
@@ -43,10 +43,10 @@ class _QuizListScreenState extends State<QuizListScreen>
   }
 
   Future<void> _initUser() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
+    final uid = context.read<AuthCubit>().state.userId;
+    if (uid != null && uid.isNotEmpty) {
       setState(() {
-        _userUid = user.uid;
+        _userUid = uid;
         _isInitialized = true;
       });
 

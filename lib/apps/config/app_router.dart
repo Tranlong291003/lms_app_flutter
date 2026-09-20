@@ -35,6 +35,7 @@ import 'package:lms/screens/security/change_password_screen.dart';
 import 'package:lms/screens/security/security_screen.dart';
 import 'package:lms/screens/signup/signup_screen.dart';
 import 'package:lms/screens/user_detail_screen.dart';
+import 'package:lms/apps/utils/role_guard.dart';
 
 import '../utils/bottomNavigationBar.dart';
 
@@ -73,6 +74,20 @@ class AppRouter {
   static const String adminCourses = '/admin/courses';
   static const String adminCategories = '/admin/categories';
   static const String mentorCourseManagement = '/mentor/courses';
+
+  /// Route → danh sách role được phép truy cập.
+  ///
+  /// Không có route guard thì bất kỳ ai đã đăng nhập cũng gõ tay `/admin/users`
+  /// là vào được. Lưu ý: guard chỉ chặn **điều hướng**, không chặn nút bấm — các
+  /// nút/tab của admin & mentor vẫn phải ẩn theo role ở tầng UI.
+  static const Map<String, List<String>> _routeRoles = {
+    adminDashboard: ['admin'],
+    adminUsers: ['admin'],
+    adminUserDetail: ['admin'],
+    adminCourses: ['admin'],
+    adminCategories: ['admin'],
+    mentorCourseManagement: ['admin', 'mentor'],
+  };
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     Widget page;
@@ -158,10 +173,28 @@ class AppRouter {
         break;
       case lessonDetail:
         final args = settings.arguments;
+        // Nhận `lessonId` (int) hoặc `Map { lessonId, courseId }`. `courseId`
+        // cần thiết cho `POST /api/lessons/complete`.
+        int? lessonId;
+        int? courseId;
         if (args is int) {
+          lessonId = args;
+        } else if (args is Map) {
+          final rawLesson = args['lessonId'];
+          final rawCourse = args['courseId'];
+          lessonId =
+              rawLesson is int ? rawLesson : int.tryParse('$rawLesson');
+          courseId =
+              rawCourse is int ? rawCourse : int.tryParse('$rawCourse');
+        }
+
+        if (lessonId != null) {
           page = BlocProvider(
-            create: (context) => LessonsCubit()..loadLessonDetail(args),
-            child: LessonDetailScreen(lessonId: args, courseId: args),
+            create: (context) => LessonsCubit()..loadLessonDetail(lessonId!),
+            child: LessonDetailScreen(
+              lessonId: lessonId,
+              courseId: courseId,
+            ),
           );
         } else {
           page = const Scaffold(
@@ -232,6 +265,12 @@ class AppRouter {
         page = const Scaffold(
           body: Center(child: Text('Không tìm thấy trang')),
         );
+    }
+
+    // Chặn điều hướng vào màn chỉ dành cho một số role nhất định.
+    final allowedRoles = _routeRoles[settings.name];
+    if (allowedRoles != null) {
+      page = RoleGuard(allowedRoles: allowedRoles, child: page);
     }
 
     return _buildAnimatedRoute(page, settings);

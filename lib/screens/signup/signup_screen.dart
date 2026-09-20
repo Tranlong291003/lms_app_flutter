@@ -1,5 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_theme.dart';
@@ -100,7 +98,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return BlocProvider<SignUpCubit>(
       create:
           (_) => SignUpCubit(
-            AuthService(FirebaseAuth.instance, FirebaseMessaging.instance),
+            AuthService(),
           ),
       child: BlocListener<SignUpCubit, SignUpState>(
         listener: (context, state) {

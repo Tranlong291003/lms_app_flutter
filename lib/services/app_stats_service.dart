@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
 
+import 'package:dio/dio.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/models/app_stats_model.dart';
 import 'package:lms/services/base_service.dart';
@@ -23,15 +24,30 @@ class AppStatsService extends BaseService {
       developer.log('Response data: ${response.data}', name: 'AppStatsService');
 
       if (response.statusCode == 200) {
-        return AppStatsModel.fromJson(response.data);
-      } else if (response.statusCode == 404) {
-        throw Exception(
-          'API endpoint không tồn tại. Vui lòng kiểm tra lại URL.',
+        return AppStatsModel.fromJson(
+          Map<String, dynamic>.from(response.data as Map),
         );
-      } else if (response.statusCode == 401) {
-        throw Exception('Không có quyền truy cập. Vui lòng đăng nhập lại.');
+      } else if (response.statusCode == 403) {
+        // Chỉ admin và mentor mới xem được thống kê.
+        throw Exception(
+          extractApiError(
+            DioException(
+              requestOptions: response.requestOptions,
+              response: response,
+            ),
+            fallback: 'Bạn không có quyền xem thống kê',
+          ),
+        );
       } else {
-        throw Exception('Lỗi server: ${response.statusCode}');
+        throw Exception(
+          extractApiError(
+            DioException(
+              requestOptions: response.requestOptions,
+              response: response,
+            ),
+            fallback: 'Lỗi server: ${response.statusCode}',
+          ),
+        );
       }
     } catch (e) {
       developer.log('Error in service: $e', name: 'AppStatsService');

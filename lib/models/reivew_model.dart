@@ -1,3 +1,5 @@
+import 'package:lms/apps/utils/json_parse.dart';
+
 class Review {
   final int reviewId;
   final int courseId;
@@ -21,21 +23,19 @@ class Review {
     this.updatedAt,
   });
 
-  // Convert JSON data into Review object
+  /// Lưu ý: `review_id`/`course_id` là `SERIAL` nên PostgreSQL trả về dạng
+  /// **chuỗi** trong JSON — phải đọc qua helper thay vì ép `as int`.
   factory Review.fromJson(Map<String, dynamic> json) {
     return Review(
-      reviewId: json['review_id'],
-      courseId: json['course_id'],
-      userUid: json['user_uid'],
-      userName: json['user_name'],
-      userAvatarUrl: json['user_avatar_url'] ?? '',
-      rating: json['rating'],
-      comment: json['comment'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt:
-          json['updated_at'] != null
-              ? DateTime.parse(json['updated_at'])
-              : null,
+      reviewId: asInt(json['review_id']),
+      courseId: asInt(json['course_id']),
+      userUid: asString(json['user_uid']),
+      userName: asString(json['user_name']),
+      userAvatarUrl: asString(json['user_avatar_url']),
+      rating: asInt(json['rating']),
+      comment: asString(json['comment']),
+      createdAt: asDateTimeOr(json['created_at'], DateTime.now()),
+      updatedAt: asDateTime(json['updated_at']),
     );
   }
 

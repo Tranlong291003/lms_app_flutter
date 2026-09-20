@@ -2,7 +2,6 @@
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
@@ -11,6 +10,7 @@ import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_state.dart';
 import 'package:lms/cubits/notifications/notification_cubit.dart';
 import 'package:lms/cubits/notifications/notification_state.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/notification/notifications_screen.dart';
 
 AppBar AppBarHome(BuildContext context, String title) {
@@ -49,7 +49,6 @@ AppBar AppBarHome(BuildContext context, String title) {
               children: [
                 BlocBuilder<UserBloc, UserState>(
                   builder: (context, state) {
-                    final role = (state is UserLoaded) ? state.user.role : null;
                     final avatarUrl =
                         (state is UserLoaded && state.user.avatarUrl.isNotEmpty)
                             ? ApiConfig.getImageUrl(state.user.avatarUrl)
@@ -119,12 +118,12 @@ AppBar AppBarHome(BuildContext context, String title) {
                     color: Theme.of(context).iconTheme.color,
                   ),
                   onPressed: () {
-                    final currentUser = FirebaseAuth.instance.currentUser;
-                    if (currentUser != null) {
+                    final uid = context.read<AuthCubit>().state.userId;
+                    if (uid != null && uid.isNotEmpty) {
                       Navigator.pushNamed(
                         context,
                         AppRouter.bookmark,
-                        arguments: currentUser.uid,
+                        arguments: uid,
                       );
                     } else {
                       // Hiển thị thông báo yêu cầu đăng nhập nếu chưa đăng nhập

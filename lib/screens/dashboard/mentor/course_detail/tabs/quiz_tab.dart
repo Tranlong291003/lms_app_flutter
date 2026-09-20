@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -6,6 +5,7 @@ import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/quiz/quiz_cubit.dart';
 import 'package:lms/cubits/quiz/quiz_state.dart';
 import 'package:lms/models/quiz/quiz_model.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/quiz/quiz_question_list_screen.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
 
@@ -115,7 +115,11 @@ class QuizTab extends StatelessWidget {
                             );
                             if (confirm == true) {
                               final adminUid =
-                                  FirebaseAuth.instance.currentUser?.uid ?? '';
+                                  parentContext
+                                      .read<AuthCubit>()
+                                      .state
+                                      .userId ??
+                                  '';
                               final result = await parentContext
                                   .read<QuizCubit>()
                                   .deleteQuiz(quiz.quizId, courseId, {
@@ -196,7 +200,7 @@ class QuizTab extends StatelessWidget {
     final attemptLimitOptions = [1, 2, 3, 4, 5];
     int selectedTimeLimit = quiz?.timeLimit ?? 60;
     int selectedAttemptLimit = quiz?.attemptLimit ?? 3;
-    final adminUid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final adminUid = parentContext.read<AuthCubit>().state.userId ?? '';
 
     final result = await showDialog<bool>(
       context: parentContext,

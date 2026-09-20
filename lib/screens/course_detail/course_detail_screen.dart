@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
@@ -11,6 +10,7 @@ import 'package:lms/screens/course_detail/course_stats_section.dart';
 import 'package:lms/screens/course_detail/course_tab_view.dart';
 import 'package:lms/screens/course_detail/course_title.dart';
 import 'package:lms/screens/course_detail/enroll_button.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/services/bookmark_service.dart';
 import 'package:lms/services/course_service.dart';
 
@@ -28,12 +28,12 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   @override
   void initState() {
     super.initState();
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final bookmarkService = BookmarkService();
-      final bookmarkRepository = BookmarkRepository(bookmarkService);
-      _bookmarkCubit = BookmarkCubit(bookmarkRepository);
-      _bookmarkCubit.getBookmarks(user.uid);
+    final uid = context.read<AuthCubit>().state.userId;
+    final bookmarkService = BookmarkService();
+    final bookmarkRepository = BookmarkRepository(bookmarkService);
+    _bookmarkCubit = BookmarkCubit(bookmarkRepository);
+    if (uid != null && uid.isNotEmpty) {
+      _bookmarkCubit.getBookmarks(uid);
     }
   }
 
@@ -90,8 +90,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
 
         if (state is CourseDetailLoaded) {
           final detail = state.detail;
-          final user = FirebaseAuth.instance.currentUser;
-          final userUid = user?.uid ?? '';
+          final userUid = context.read<AuthCubit>().state.userId ?? '';
           return BlocProvider.value(
             value: _bookmarkCubit,
             child: Scaffold(

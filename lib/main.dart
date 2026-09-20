@@ -1,6 +1,5 @@
 // lib/main.dart
 import 'package:dio/dio.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -64,7 +63,21 @@ Future<void> main() async {
     debugPrint = (String? message, {int? wrapWidth}) {};
   }
 
-  await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp();
+  } catch (_) {
+    // iOS chưa có GoogleService-Info.plist (đang chuyển sang Supabase):
+    // khởi tạo bằng cấu hình tạm để app vẫn mở được, các tính năng Firebase sẽ báo lỗi khi gọi.
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: 'AIzaSyBS1hZb4McK8IFxAzng7IBwAbCekfKTfZo',
+        appId: '1:203223131122:ios:0000000000000000000000',
+        messagingSenderId: '203223131122',
+        projectId: 'lmsdoan',
+        storageBucket: 'lmsdoan.firebasestorage.app',
+      ),
+    );
+  }
   await initializeDateFormatting('vi', null);
 
   // Yêu cầu quyền ngay khi vào app
@@ -96,9 +109,15 @@ Future<void> main() async {
   // 3. Các Cubit/Bloc không phụ thuộc vào BuildContext
   final themeBloc = ThemeBloc()..add(ThemeStarted());
   final introCubit = IntroCubit();
-  final authCubit = AuthCubit(
-    AuthService(FirebaseAuth.instance, FirebaseMessaging.instance),
-  );
+  // FirebaseMessaging.instance ném lỗi nếu Firebase chưa được cấu hình; push
+  // notification là tính năng phụ nên không được chặn khởi động app.
+  FirebaseMessaging? messaging;
+  try {
+    messaging = FirebaseMessaging.instance;
+  } catch (_) {
+    messaging = null;
+  }
+  final authCubit = AuthCubit(AuthService(messaging));
   final userBloc = UserBloc(userRepository);
   final mentorBloc = MentorsBloc(mentorRepository);
   final mentorDetailBloc = MentorDetailBloc(mentorRepository);

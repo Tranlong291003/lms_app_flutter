@@ -1,3 +1,5 @@
+import 'package:lms/apps/utils/json_parse.dart';
+
 class Lesson {
   final int lessonId;
   final int courseId;
@@ -32,35 +34,21 @@ class Lesson {
   });
 
   factory Lesson.fromJson(Map<String, dynamic> json) => Lesson(
-    lessonId:
-        json['lesson_id'] is int
-            ? json['lesson_id']
-            : int.tryParse(json['lesson_id']?.toString() ?? '0') ?? 0,
-    courseId:
-        json['course_id'] is int
-            ? json['course_id']
-            : int.tryParse(json['course_id']?.toString() ?? '0') ?? 0,
-    title: json['title']?.toString() ?? '',
-    videoUrl: json['video_url']?.toString() ?? '',
-    pdfUrl: json['pdf_url']?.toString(),
-    slideUrl: json['slide_url']?.toString(),
-    content: json['content']?.toString(),
-    order:
-        json['order'] is int
-            ? json['order']
-            : int.tryParse(json['order']?.toString() ?? '0') ?? 0,
-    createdAt:
-        json['created_at'] != null
-            ? DateTime.parse(json['created_at'].toString())
-            : DateTime.now(),
-    updatedAt:
-        json['updated_at'] != null
-            ? DateTime.tryParse(json['updated_at'].toString())
-            : null,
-    creatorUid: json['creator_uid']?.toString() ?? '',
-    videoId: json['video_id']?.toString(),
-    videoDuration: json['video_duration']?.toString(),
-    isCompleted: json['is_completed'] == 1,
+    lessonId: asInt(json['lesson_id']),
+    courseId: asInt(json['course_id']),
+    title: asString(json['title']),
+    videoUrl: asString(json['video_url']),
+    pdfUrl: asStringOrNull(json['pdf_url']),
+    slideUrl: asStringOrNull(json['slide_url']),
+    content: asStringOrNull(json['content']),
+    order: asInt(json['order']),
+    createdAt: asDateTimeOr(json['created_at'], DateTime.now()),
+    updatedAt: asDateTime(json['updated_at']),
+    creatorUid: asString(json['creator_uid']),
+    videoId: asStringOrNull(json['video_id']),
+    videoDuration: asStringOrNull(json['video_duration']),
+    // Backend trả `is_completed` dạng số (1/0), có thể là chuỗi với BIGINT.
+    isCompleted: asBool(json['is_completed']),
   );
 
   Map<String, dynamic> toJson() => {

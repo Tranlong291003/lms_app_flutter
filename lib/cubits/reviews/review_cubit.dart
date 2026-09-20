@@ -30,7 +30,6 @@ class ReviewCubit extends Cubit<ReviewState> {
   Future<void> submitReview({
     required int courseId,
     required String userId,
-    required String userName,
     required int rating,
     required String comment,
   }) async {
@@ -39,7 +38,6 @@ class ReviewCubit extends Cubit<ReviewState> {
       await _repository.submitReview(
         courseId: courseId,
         userId: userId,
-        userName: userName,
         rating: rating,
         comment: comment,
       );
@@ -55,6 +53,7 @@ class ReviewCubit extends Cubit<ReviewState> {
   Future<void> updateReview({
     required int reviewId,
     required int courseId,
+    required String userUid,
     required int rating,
     required String comment,
   }) async {
@@ -62,6 +61,7 @@ class ReviewCubit extends Cubit<ReviewState> {
       emit(const ReviewLoading());
       await _repository.updateReview(
         reviewId: reviewId,
+        userUid: userUid,
         rating: rating,
         comment: comment,
       );
@@ -77,10 +77,11 @@ class ReviewCubit extends Cubit<ReviewState> {
   Future<void> deleteReview({
     required int reviewId,
     required int courseId,
+    required String userUid,
   }) async {
     try {
       emit(const ReviewLoading());
-      await _repository.deleteReview(reviewId);
+      await _repository.deleteReview(reviewId: reviewId, userUid: userUid);
       // Refresh reviews after deleting
       await loadCourseReviews(courseId);
     } catch (e) {

@@ -10,6 +10,7 @@ import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
 import 'package:lms/cubits/bookmark/bookmark_state.dart';
 import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/repositories/bookmark_repository.dart';
+import 'package:lms/services/course_service.dart';
 import 'package:lms/services/bookmark_service.dart';
 
 class ListCoursesWidget extends StatefulWidget {
@@ -205,7 +206,7 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                                     const SizedBox(width: 8),
                                     _tag(
                                       context,
-                                      c.level,
+                                      courseLevelLabel(c.level),
                                       _getLevelColor(context, c.level),
                                       theme.colorScheme.onPrimary,
                                     ),
@@ -360,12 +361,14 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
 
   static Color _getLevelColor(BuildContext context, String level) {
     final theme = Theme.of(context);
-    switch (level.toLowerCase()) {
-      case 'cơ bản':
+    // API trả `level` dạng beginner | intermediate | advanced; vẫn nhận thêm
+    // nhãn tiếng Việt để tương thích dữ liệu cũ.
+    switch (normalizeCourseLevel(level)) {
+      case 'beginner':
         return theme.colorScheme.tertiary;
-      case 'trung cấp':
+      case 'intermediate':
         return theme.colorScheme.secondary;
-      case 'nâng cao':
+      case 'advanced':
         return theme.colorScheme.error;
       default:
         return theme.colorScheme.surfaceContainerHighest;

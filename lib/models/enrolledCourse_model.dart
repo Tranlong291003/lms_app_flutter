@@ -1,4 +1,6 @@
 // lib/models/enrolled_course.dart
+import 'package:lms/apps/utils/json_parse.dart';
+
 class EnrolledCourse {
   final int courseId;
   final String title;
@@ -30,13 +32,13 @@ class EnrolledCourse {
       print('[EnrolledCourse] Đang parse JSON: $json');
 
       return EnrolledCourse(
-        courseId: json['course_id'] as int? ?? 0,
-        title: json['title'] as String? ?? 'Khóa học không có tiêu đề',
-        thumbnailUrl: json['thumbnail_url'] as String?,
-        totalLessons: json['total_lessons'] as int? ?? 0,
-        completedLessons: json['completed_lessons'] as int? ?? 0,
-        progressPercent: json['progress_percent'] as int? ?? 0,
-        totalDuration: json['total_duration'] as String? ?? '0 phút',
+        courseId: asInt(json['course_id']),
+        title: asString(json['title'], 'Khóa học không có tiêu đề'),
+        thumbnailUrl: asStringOrNull(json['thumbnail_url']),
+        totalLessons: asInt(json['total_lessons']),
+        completedLessons: asInt(json['completed_lessons']),
+        progressPercent: asInt(json['progress_percent']),
+        totalDuration: asString(json['total_duration'], '0 phút'),
       );
     } catch (e) {
       print('[EnrolledCourse] Lỗi khi parse JSON: $e');

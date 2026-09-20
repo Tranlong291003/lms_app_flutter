@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
@@ -7,6 +6,7 @@ import 'package:lms/cubits/enrolled_courses/enrolled_course_cubit.dart';
 import 'package:lms/cubits/enrolled_courses/enrolled_course_state.dart';
 import 'package:lms/repositories/course_repository.dart';
 import 'package:lms/screens/course_detail/course_detail_screen.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/myCourse/course_card_widget.dart';
 import 'package:lms/services/course_service.dart';
 
@@ -47,9 +47,9 @@ class _MyCompletedCoursesScreenState extends State<MyCompletedCoursesScreen> {
   }
 
   void _loadEnrolledCourses() {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      _cubit.loadEnrolledCourses(user.uid);
+    final uid = context.read<AuthCubit>().state.userId;
+    if (uid != null && uid.isNotEmpty) {
+      _cubit.loadEnrolledCourses(uid);
     }
   }
 

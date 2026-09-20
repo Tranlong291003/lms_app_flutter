@@ -1,7 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lms/screens/login/loginWithPassword_screen.dart';
+import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/services/auth_service.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -41,42 +42,41 @@ class SignUpCubit extends Cubit<SignUpState> {
     required String phone,
   }) async {
     if (!_isEmailValid(email)) {
-      emit(SignUpFailure(message: "Email không hợp lệ"));
+      emit(SignUpFailure(message: 'Email không hợp lệ'));
       return;
     }
     if (!_arePasswordsValid(password, confirmPassword)) {
-      emit(SignUpFailure(message: "Mật khẩu và mật khẩu xác nhận không khớp"));
+      emit(SignUpFailure(message: 'Mật khẩu và mật khẩu xác nhận không khớp'));
       return;
     }
-    if (!_isPhoneNumberValid(phone)) {
-      emit(SignUpFailure(message: "Số điện thoại không hợp lệ"));
+    // Số điện thoại là tùy chọn — chỉ kiểm tra khi người dùng có nhập.
+    if (phone.trim().isNotEmpty && !_isPhoneNumberValid(phone.trim())) {
+      emit(SignUpFailure(message: 'Số điện thoại không hợp lệ'));
       return;
     }
 
     try {
       emit(SignUpLoading());
 
-      await _authService.signUp(
+      // `POST /api/auth/register` trả token luôn -> đăng ký qua AuthCubit để
+      // phiên (uid/role) được thiết lập ngay, không cần đăng nhập lại.
+      final message = await context.read<AuthCubit>().signUp(
         name: name,
         email: email,
         password: password,
-        phone: phone,
       );
 
-      // Nếu đăng ký thành công, chuyển sang trạng thái thành công
+      if (message != null) {
+        emit(SignUpFailure(message: message));
+        return;
+      }
+
       emit(SignUpSuccess());
 
-      // Điều hướng về trang đăng nhập
-      Navigator.pushReplacement(
-        context,
-        PageTransition(
-          type: PageTransitionType.fade,
-          child: LoginWithPasswordScreen(),
-        ),
-      );
+      // Đã có phiên -> về cổng vào app để vào thẳng trang chủ.
+      Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (r) => false);
     } catch (e) {
-      // Xử lý lỗi khi gọi API
-      emit(SignUpFailure(message: e.toString()));
+      emit(SignUpFailure(message: e.toString().replaceFirst('Exception: ', '')));
     }
   }
 }

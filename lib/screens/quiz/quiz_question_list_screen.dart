@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -7,6 +6,7 @@ import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/question/question_cubit.dart';
 import 'package:lms/models/quiz/question_model.dart';
 import 'package:lms/repositories/question_repository.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/services/question_service.dart';
 
 class QuizQuestionListScreen extends StatelessWidget {
@@ -128,7 +128,7 @@ class _QuizQuestionListView extends StatelessWidget {
                           if (confirm == true) {
                             final currentContext = context;
                             final uid =
-                                FirebaseAuth.instance.currentUser?.uid ?? '';
+                                context.read<AuthCubit>().state.userId ?? '';
                             final ok = await currentContext
                                 .read<QuestionCubit>()
                                 .deleteQuestion(q.questionId, {
@@ -367,7 +367,7 @@ class _EditQuestionDialogState extends State<_EditQuestionDialog> {
         ElevatedButton(
           onPressed: () async {
             if (!formKey.currentState!.validate()) return;
-            final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+            final uid = context.read<AuthCubit>().state.userId ?? '';
             final data = {
               'question': questionController.text.trim(),
               'type': 'trac_nghiem',
@@ -486,7 +486,7 @@ class _CreateQuestionManualDialogState
                       isLoading = true;
                     });
 
-                    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+                    final uid = context.read<AuthCubit>().state.userId ?? '';
                     final data = {
                       'quiz_id': widget.quizId,
                       'question': questionController.text.trim(),
@@ -675,7 +675,7 @@ class _CreateQuestionAIDialogState extends State<_CreateQuestionAIDialog> {
                       isLoading = true;
                     });
 
-                    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+                    final uid = context.read<AuthCubit>().state.userId ?? '';
                     final data = {
                       'uid': uid,
                       'quiz_id': widget.quizId,

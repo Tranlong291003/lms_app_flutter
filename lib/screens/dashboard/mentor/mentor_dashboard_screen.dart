@@ -1,12 +1,12 @@
 import 'dart:developer' as developer;
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/admin/app_stats_cubit.dart';
 import 'package:lms/repositories/app_stats_repository.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/login/login_screen.dart';
 import 'package:lms/services/app_stats_service.dart';
 
@@ -24,10 +24,10 @@ class MentorDashboardScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     // Get current user and handle null case
-    final user = FirebaseAuth.instance.currentUser;
-    developer.log('Current user: ${user?.uid}', name: 'MentorDashboard');
+    final uid = context.read<AuthCubit>().state.userId;
+    developer.log('Current user: $uid', name: 'MentorDashboard');
 
-    if (user == null) {
+    if (uid == null || uid.isEmpty) {
       developer.log(
         'No user found, redirecting to login',
         name: 'MentorDashboard',
@@ -45,11 +45,11 @@ class MentorDashboardScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) {
         developer.log(
-          'Creating AppStatsCubit with uid: ${user.uid}',
+          'Creating AppStatsCubit with uid: $uid',
           name: 'MentorDashboard',
         );
         return AppStatsCubit(AppStatsRepository(AppStatsService()))
-          ..fetchStats(user.uid);
+          ..fetchStats(uid);
       },
       child: Scaffold(
         appBar: CustomAppBar(title: 'Trang chủ'),
@@ -98,7 +98,7 @@ class MentorDashboardScreen extends StatelessWidget {
                                       name: 'MentorDashboard',
                                     );
                                     context.read<AppStatsCubit>().fetchStats(
-                                      user.uid,
+                                      uid,
                                     );
                                   },
                                   child: const Text('Thử lại'),

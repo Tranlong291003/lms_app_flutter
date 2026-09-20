@@ -8,6 +8,7 @@ import 'package:lms/screens/home/home_screen.dart';
 import 'package:lms/screens/mentor_request/mentor_request_screen.dart';
 import 'package:lms/screens/myCourse/my_course_screen.dart';
 import 'package:lms/screens/profile/profile_screen.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/quiz/quiz_list_screen.dart';
 
 class BottomNavigationBarExample extends StatefulWidget {
@@ -26,13 +27,14 @@ class _BottomNavigationBarExampleState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Lấy role và tên user
-    final userRole = context.select<UserBloc, String>(
-      (bloc) =>
-          (bloc.state is UserLoaded)
-              ? (bloc.state as UserLoaded).user.role
-              : '',
-    );
+    // Role lấy từ AuthCubit (`/api/auth/me`) — nguồn chân lý duy nhất.
+    // `UserBloc` vẫn giữ cho dữ liệu hồ sơ (tên/avatar) nhưng KHÔNG dùng để
+    // phân quyền: role ở đó phụ thuộc `GET /api/users/:uid`, có thể thất bại và
+    // làm tab Dashboard biến mất.
+    final userRole = context.select<AuthCubit, String?>(
+          (cubit) => cubit.state.role,
+        ) ??
+        '';
     final userName = context.select<UserBloc, String>(
       (bloc) =>
           (bloc.state is UserLoaded)

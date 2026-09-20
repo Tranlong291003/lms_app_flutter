@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/repositories/mentor_request_repository.dart';
-import 'package:meta/meta.dart';
 
 part 'mentor_request_state.dart';
 
@@ -12,7 +12,7 @@ class MentorRequestCubit extends Cubit<MentorRequestState> {
 
   Future<void> sendMentorRequest({
     required String userUid,
-    File? imageFile,
+    required File imageFile,
   }) async {
     emit(MentorRequestLoading());
     try {

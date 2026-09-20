@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,6 +9,8 @@ import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/category/category_cubit.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/models/category_model.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
+import 'package:lms/services/course_service.dart';
 
 class CourseFormScreen extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -31,9 +32,11 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
   final _tagsController = TextEditingController();
   XFile? _thumbnail;
   String? _thumbnailUrl;
-  String _selectedLevel = 'Cơ bản';
+  // Giá trị `level` phải đúng chuẩn API (beginner | intermediate | advanced);
+  // nhãn hiển thị lấy từ kCourseLevelLabels.
+  String _selectedLevel = kCourseLevels.first;
   String _selectedLanguage = 'Tiếng Việt';
-  final List<String> _levels = ['Cơ bản', 'Trung bình', 'Nâng cao'];
+  final List<String> _levels = kCourseLevels;
   final List<String> _languages = [
     'Tiếng Việt',
     'Tiếng Anh',
@@ -79,7 +82,7 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
         }
       }
       _selectedCategoryName = d['category_name']?.toString();
-      _selectedLevel = d['level']?.toString() ?? 'Cơ bản';
+      _selectedLevel = normalizeCourseLevel(d['level']?.toString());
       _selectedLanguage = d['language']?.toString() ?? 'Tiếng Việt';
       _priceController.text = d['price']?.toString() ?? '';
       _discountPriceController.text = d['discount_price']?.toString() ?? '';
@@ -116,8 +119,8 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
     if (_formKey.currentState?.validate() ?? false) {
       try {
         // Lấy UID của người dùng hiện tại
-        final currentUser = FirebaseAuth.instance.currentUser;
-        if (currentUser == null) {
+        final currentUser = context.read<AuthCubit>().state.userId;
+        if (currentUser == null || currentUser.isEmpty) {
           throw Exception('Bạn cần đăng nhập để tạo khóa học');
         }
 
@@ -141,7 +144,7 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
               int.tryParse(_discountPriceController.text.trim()) ?? 0,
           'language': _selectedLanguage,
           'tags': _tagsController.text.trim(),
-          'uid': currentUser.uid,
+          'uid': currentUser,
           'status': 'pending',
         };
 
@@ -406,7 +409,7 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
                                 .map(
                                   (level) => DropdownMenuItem(
                                     value: level,
-                                    child: Text(level),
+                                    child: Text(courseLevelLabel(level)),
                                   ),
                                 )
                                 .toList(),
