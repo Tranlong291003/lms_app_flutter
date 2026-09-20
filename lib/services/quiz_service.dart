@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/utils/json_parse.dart';
 import 'package:lms/models/quiz/quiz_model.dart';
 import 'package:lms/models/quiz/quiz_result_model.dart';
 import 'package:lms/services/base_service.dart';
@@ -44,7 +45,10 @@ class QuizService extends BaseService {
     return coursesData.map<Map<String, dynamic>>((courseData) {
       final map = Map<String, dynamic>.from(courseData as Map);
       return {
-        'courseId': map['course_id'],
+        // `course_id` là SERIAL → API trả về CHUỖI. Phải ép về int vì UI dùng
+        // nó làm khoá so sánh (`Set<int>`, `==`), để nguyên chuỗi thì việc mở
+        // rộng khóa học không bao giờ khớp.
+        'courseId': asInt(map['course_id']),
         'courseTitle': map['course_title'],
         'quizzes':
             map['quizzes'] is List
