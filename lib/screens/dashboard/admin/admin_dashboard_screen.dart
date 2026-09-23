@@ -2,8 +2,11 @@ import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/config/app_dimens.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/admin/app_stats_cubit.dart';
@@ -19,10 +22,6 @@ class AdminDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     developer.log('Building AdminDashboardScreen', name: 'AdminDashboard');
-
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
 
     final uid = context.read<AuthCubit>().state.userId;
     developer.log('Current user: $uid', name: 'AdminDashboard');
@@ -86,25 +85,15 @@ class AdminDashboardScreen extends StatelessWidget {
                             'Error loading stats: ${state.message}',
                             name: 'AdminDashboard',
                           );
-                          return Center(
-                            child: Column(
-                              children: [
-                                Text('Lỗi: ${state.message}'),
-                                const SizedBox(height: 8),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    developer.log(
-                                      'Retrying stats fetch...',
-                                      name: 'AdminDashboard',
-                                    );
-                                    context.read<AppStatsCubit>().fetchStats(
-                                      uid,
-                                    );
-                                  },
-                                  child: const Text('Thử lại'),
-                                ),
-                              ],
-                            ),
+                          return EmptyStateWidget(
+                            icon: Icons.cloud_off_rounded,
+                            title: 'Không tải được số liệu',
+                            message: state.message,
+                            isError: true,
+                            actionLabel: 'Thử lại',
+                            onAction: () {
+                              context.read<AppStatsCubit>().fetchStats(uid);
+                            },
                           );
                         }
 
@@ -114,31 +103,36 @@ class AdminDashboardScreen extends StatelessWidget {
                             'Stats loaded successfully: ${stats.toString()}',
                             name: 'AdminDashboard',
                           );
+                          // Màu lấy từ bảng màu ngữ nghĩa của theme thay vì
+                          // `Colors.indigo/teal/red/amber`: bốn màu Material
+                          // đó không nằm trong bảng màu app và khi dùng làm màu
+                          // CHỮ số liệu trên nền tối chỉ đạt ~2.1:1.
+                          final c = AppColors.of(context);
                           return _StatsGrid(
                             stats: [
                               _Stat(
-                                'Tổng khóa học',
+                                'Tổng khoá học',
                                 stats.totalCourses.toString(),
                                 Icons.school,
-                                Colors.indigo,
+                                c.info,
                               ),
                               _Stat(
                                 'Tổng người dùng',
                                 stats.totalUsers?.toString() ?? '-',
                                 Icons.people,
-                                Colors.teal,
+                                c.success,
                               ),
                               _Stat(
                                 'Số bài kiểm tra',
                                 stats.totalQuizzes?.toString() ?? '-',
                                 Icons.quiz,
-                                Colors.red,
+                                c.warning,
                               ),
                               _Stat(
                                 'Lượt đánh giá',
                                 stats.totalReviews?.toString() ?? '-',
                                 Icons.star_rate,
-                                Colors.amber,
+                                c.error,
                               ),
                             ],
                           );
@@ -148,7 +142,7 @@ class AdminDashboardScreen extends StatelessWidget {
                           'Unknown state: ${state.runtimeType}',
                           name: 'AdminDashboard',
                         );
-                        return const SizedBox.shrink();
+                        return const Center(child: LoadingIndicator());
                       },
                     ),
                   ],
@@ -168,8 +162,11 @@ class AdminDashboardScreen extends StatelessWidget {
                 ),
               ),
 
-              // Bottom space for better UX
-              const SizedBox(height: 40),
+              // Chừa vùng an toàn dưới đáy (home indicator) thay vì hằng số
+              // 40px cứng.
+              SizedBox(
+                height: MediaQuery.viewPaddingOf(context).bottom + AppSpacing.xxl,
+              ),
             ],
           ),
         ),
@@ -203,45 +200,48 @@ class _QuickActionsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Màu lấy từ bảng màu ngữ nghĩa của theme — `Colors.deepPurple` và
+    // `Colors.purple` trước đây thậm chí không nằm trong bảng màu app.
+    final c = AppColors.of(context);
     return Column(
       children: [
         _QuickActionCard(
           icon: Icons.people,
           title: 'Quản lý người dùng',
           subtitle: 'Quản lý học viên, giảng viên và quản trị viên',
-          color: Colors.indigo,
+          color: c.info,
           onTap: () => _navigateToUserManagement(context),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         _QuickActionCard(
           icon: Icons.school,
-          title: 'Quản lý khóa học',
-          subtitle: 'Phê duyệt, từ chối và quản lý tất cả khóa học',
-          color: Colors.teal,
+          title: 'Quản lý khoá học',
+          subtitle: 'Phê duyệt, từ chối và quản lý tất cả khoá học',
+          color: c.success,
           onTap: () => _navigateToCourseManagement(context),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         _QuickActionCard(
           icon: Icons.category,
           title: 'Quản lý danh mục',
-          subtitle: 'Thêm, sửa, xóa danh mục và bộ lọc',
-          color: Colors.amber.shade700,
+          subtitle: 'Thêm, sửa, xoá danh mục và bộ lọc',
+          color: c.warning,
           onTap: () => _navigateToCategoryManagement(context),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         _QuickActionCard(
           icon: Icons.verified_user,
           title: 'Duyệt Mentor',
           subtitle: 'Xem và duyệt các yêu cầu nâng cấp mentor',
-          color: Colors.deepPurple,
+          color: c.info,
           onTap: () => _navigateToMentorRequest(context),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         _QuickActionCard(
           icon: Icons.payments_outlined,
           title: 'Quản lý thanh toán',
           subtitle: 'Xem và quản lý các giao dịch thanh toán',
-          color: Colors.green,
+          color: c.success,
           onTap: () {
             CustomSnackBar.showInfo(
               context: context,
@@ -249,12 +249,12 @@ class _QuickActionsList extends StatelessWidget {
             );
           },
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         _QuickActionCard(
           icon: Icons.settings,
           title: 'Cài đặt hệ thống',
-          subtitle: 'Cấu hình chung và tùy chỉnh giao diện người dùng',
-          color: Colors.purple,
+          subtitle: 'Cấu hình chung và tuỳ chỉnh giao diện người dùng',
+          color: c.warning,
           onTap: () {
             CustomSnackBar.showInfo(
               context: context,
@@ -301,16 +301,16 @@ class _QuickActionCard extends StatelessWidget {
             border: Border.all(
               color:
                   isDark
-                      ? Colors.white.withOpacity(0.1)
-                      : Colors.grey.withOpacity(0.1),
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.grey.withValues(alpha: 0.1),
               width: 0.5,
             ),
             boxShadow: [
               BoxShadow(
                 color:
                     isDark
-                        ? Colors.white.withOpacity(0.05)
-                        : Colors.black.withOpacity(0.05),
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.black.withValues(alpha: 0.05),
                 blurRadius: 5,
                 spreadRadius: 0,
                 offset: const Offset(0, 1),
@@ -323,7 +323,7 @@ class _QuickActionCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(isDark ? 0.2 : 0.1),
+                  color: color.withValues(alpha: isDark ? 0.2 : 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 24),
@@ -429,26 +429,26 @@ class _StatsGrid extends StatelessWidget {
                 colors: [
                   isDark
                       ? colors.surfaceContainerHighest
-                      : s.color.withOpacity(0.05),
+                      : s.color.withValues(alpha: 0.05),
                   isDark
                       ? colors.surfaceContainerHigh
-                      : s.color.withOpacity(0.15),
+                      : s.color.withValues(alpha: 0.15),
                 ],
               ),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color:
                     isDark
-                        ? Colors.white.withOpacity(0.15)
-                        : s.color.withOpacity(0.1),
+                        ? Colors.white.withValues(alpha: 0.15)
+                        : s.color.withValues(alpha: 0.1),
                 width: 0.5,
               ),
               boxShadow: [
                 BoxShadow(
                   color:
                       isDark
-                          ? Colors.white.withOpacity(0.05)
-                          : Colors.black.withOpacity(0.05),
+                          ? Colors.white.withValues(alpha: 0.05)
+                          : Colors.black.withValues(alpha: 0.05),
                   blurRadius: 5,
                   spreadRadius: 0,
                   offset: const Offset(0, 1),
@@ -462,7 +462,7 @@ class _StatsGrid extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: s.color.withOpacity(isDark ? .25 : .15),
+                    color: s.color.withValues(alpha: isDark ? .25 : .15),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(s.icon, color: s.color, size: 24),

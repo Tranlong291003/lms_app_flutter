@@ -245,7 +245,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
           controller: _tabController,
           dividerColor: Colors.transparent,
           labelColor: colors.primary,
-          unselectedLabelColor: colors.onSurface.withOpacity(0.7),
+          unselectedLabelColor: colors.onSurface.withValues(alpha: 0.7),
           labelStyle: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
             fontSize: 16,
@@ -352,13 +352,13 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
             Icon(
               Icons.school_outlined,
               size: 64,
-              color: colors.onSurface.withOpacity(0.3),
+              color: colors.onSurface.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),
             Text(
               'Bạn chưa có khóa học nào ở trạng thái $statusType',
               style: theme.textTheme.titleMedium?.copyWith(
-                color: colors.onSurface.withOpacity(0.7),
+                color: colors.onSurface.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -457,7 +457,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
                                         Icons.image,
                                         size: 30,
                                         color: colors.onSurfaceVariant
-                                            .withOpacity(0.5),
+                                            .withValues(alpha: 0.5),
                                       ),
                                     ),
                                 errorWidget:
@@ -633,7 +633,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
           Icon(
             Icons.image_not_supported_outlined,
             size: 32,
-            color: colors.primary.withOpacity(0.7),
+            color: colors.primary.withValues(alpha: 0.7),
           ),
           const SizedBox(height: 4),
           Text(
@@ -659,7 +659,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
           Icon(
             Icons.image_outlined,
             size: 32,
-            color: colors.primary.withOpacity(0.7),
+            color: colors.primary.withValues(alpha: 0.7),
           ),
           const SizedBox(height: 4),
           Text(

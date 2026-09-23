@@ -64,6 +64,9 @@ class AdminUserCubit extends Cubit<AdminUserState> {
       debugPrint('  - Error Message: $e');
       debugPrint('❌ AdminUserCubit: Emitting error state');
       emit(AdminUserError(e.toString()));
+      // Ném tiếp để nơi gọi biết thao tác thất bại. Nếu chỉ emit rồi nuốt,
+      // `await` ở màn hình hoàn tất bình thường và nó báo "thành công" sai.
+      rethrow;
     }
   }
 
@@ -80,6 +83,7 @@ class AdminUserCubit extends Cubit<AdminUserState> {
       if (isClosed) return;
       debugPrint('❌ AdminUserCubit: updateUserRole failed with error: $e');
       emit(AdminUserError(e.toString()));
+      rethrow;
     }
   }
 

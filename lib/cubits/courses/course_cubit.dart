@@ -110,6 +110,8 @@ class CourseCubit extends Cubit<CourseState> {
     } catch (e) {
       if (isClosed) return;
       emit(CourseError(e.toString()));
+      // Ném tiếp để màn hình không báo "Duyệt thành công!" khi thất bại.
+      rethrow;
     }
   }
 
@@ -134,6 +136,7 @@ class CourseCubit extends Cubit<CourseState> {
     } catch (e) {
       if (isClosed) return;
       emit(CourseError(e.toString()));
+      rethrow;
     }
   }
 

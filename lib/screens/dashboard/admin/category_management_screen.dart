@@ -5,8 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lms/apps/config/api_config.dart';
-import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/config/app_dimens.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/category/category_cubit.dart';
@@ -36,13 +37,6 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     super.dispose();
   }
 
-  void _navigateToCourseList(BuildContext context, String categoryId) {
-    Navigator.pushNamed(
-      context,
-      AppRouter.listCourse,
-      arguments: {'categoryId': categoryId},
-    );
-  }
 
   String? _getIconUrl(String? icon) {
     if (icon == null || icon.isEmpty) return null;
@@ -54,7 +48,6 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -82,7 +75,17 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                   return const Center(child: LoadingIndicator());
                 }
                 if (state is CategoryError) {
-                  return Center(child: Text('Lỗi: ${state.message}'));
+                  // Trước đây chỉ một dòng "Lỗi: ..." không icon, không cách
+                  // thử lại — người dùng phải thoát màn hình mới tải lại được.
+                  return EmptyStateWidget(
+                    icon: Icons.cloud_off_rounded,
+                    title: 'Không tải được danh mục',
+                    message: state.message,
+                    isError: true,
+                    actionLabel: 'Thử lại',
+                    onAction: () =>
+                        context.read<CategoryCubit>().fetchAllCategory(),
+                  );
                 }
                 if (state is CategoryLoaded) {
                   final categories = state.categories;
@@ -93,11 +96,32 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                                 cat.name.toLowerCase().contains(_searchQuery),
                           )
                           .toList();
+
                   if (filteredCategories.isEmpty) {
-                    return const Center(child: Text('Không có danh mục nào'));
+                    // Phân biệt "chưa có danh mục nào" với "tìm không ra":
+                    // trước đây cả hai đều là một dòng chữ giống nhau.
+                    return _searchQuery.isEmpty
+                        ? EmptyStateWidget(
+                          icon: Icons.category_outlined,
+                          title: 'Chưa có danh mục nào',
+                          message:
+                              'Nhấn nút + để tạo danh mục đầu tiên cho khoá học.',
+                          actionLabel: 'Tạo danh mục',
+                          onAction: () => _showCategoryDialog(context),
+                        )
+                        : EmptyStateWidget(
+                          icon: Icons.search_off_rounded,
+                          title: 'Không tìm thấy danh mục',
+                          message: 'Không có danh mục nào khớp "$_searchQuery".',
+                        );
                   }
+
                   return ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: listPaddingWithBottomInset(
+                      context,
+                      // Chừa chỗ cho nút "+" nổi ở góc dưới phải.
+                      all: AppSpacing.lg,
+                    ).copyWith(bottom: 88),
                     itemCount: filteredCategories.length,
                     itemBuilder: (context, index) {
                       final cat = filteredCategories[index];
@@ -112,7 +136,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                     },
                   );
                 }
-                return const SizedBox();
+                return const Center(child: LoadingIndicator());
               },
             ),
           ),
@@ -131,7 +155,6 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -142,7 +165,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
           height: 56,
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: colorScheme.primary.withOpacity(0.1),
+            color: colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child:
@@ -177,7 +200,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer.withOpacity(0.1),
+                color: colorScheme.primaryContainer.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -239,7 +262,6 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
           builder: (context, setState) {
             final theme = Theme.of(context);
             final colorScheme = theme.colorScheme;
-            final isDark = theme.brightness == Brightness.dark;
 
             return Dialog(
               backgroundColor: colorScheme.surface,
@@ -300,10 +322,10 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                               onPressed:
                                   () => Navigator.of(dialogContext).pop(),
                               icon: const Icon(Icons.close_rounded),
-                              color: colorScheme.onPrimary.withOpacity(0.8),
+                              color: colorScheme.onPrimary.withValues(alpha: 0.8),
                               style: IconButton.styleFrom(
                                 backgroundColor: colorScheme.onPrimary
-                                    .withOpacity(0.12),
+                                    .withValues(alpha: 0.12),
                                 padding: const EdgeInsets.all(8),
                               ),
                             ),
@@ -332,24 +354,18 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                                     color:
                                         selectedIcon != null
                                             ? Colors.transparent
-                                            : colorScheme.primary.withOpacity(
-                                              0.07,
-                                            ),
+                                            : colorScheme.primary.withValues(alpha: 0.07),
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
                                       color:
                                           selectedIcon != null
                                               ? colorScheme.primary
-                                              : colorScheme.primary.withOpacity(
-                                                0.18,
-                                              ),
+                                              : colorScheme.primary.withValues(alpha: 0.18),
                                       width: 2,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: colorScheme.shadow.withOpacity(
-                                          0.08,
-                                        ),
+                                        color: colorScheme.shadow.withValues(alpha: 0.08),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
@@ -391,7 +407,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                                               Icons.image_rounded,
                                               size: 40,
                                               color: colorScheme.primary
-                                                  .withOpacity(0.7),
+                                                  .withValues(alpha: 0.7),
                                             ),
                                             const SizedBox(height: 8),
                                             Text(
@@ -434,7 +450,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                                         boxShadow: [
                                           BoxShadow(
                                             color: colorScheme.shadow
-                                                .withOpacity(0.18),
+                                                .withValues(alpha: 0.18),
                                             blurRadius: 6,
                                             offset: const Offset(0, 2),
                                           ),
@@ -568,14 +584,17 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                                     }
                                   }
                                   Navigator.of(dialogContext).pop();
-                                } catch (e) {
+                                } catch (_) {
+                                  // Cubit giờ ném lại lỗi nên nhánh này mới
+                                  // chạy được; trước đây nó là code chết và
+                                  // hộp thoại luôn báo "Thành công".
                                   if (mounted) {
                                     CustomSnackBar.showError(
                                       context: context,
                                       message:
                                           isEdit
-                                              ? 'Cập nhật danh mục thất bại: \\${e.toString()}'
-                                              : 'Thêm danh mục mới thất bại: \\${e.toString()}',
+                                              ? 'Cập nhật danh mục thất bại. Vui lòng thử lại.'
+                                              : 'Thêm danh mục thất bại. Vui lòng thử lại.',
                                     );
                                   }
                                 }
@@ -613,63 +632,6 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData prefixIcon,
-    required ColorScheme colorScheme,
-    required bool isDark,
-    int maxLines = 1,
-    int? maxLength,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color:
-            isDark ? colorScheme.surfaceContainerHighest : colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withOpacity(0.04),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-        border: Border.all(
-          color:
-              isDark
-                  ? colorScheme.outline.withOpacity(0.2)
-                  : colorScheme.outline.withOpacity(0.1),
-        ),
-      ),
-      child: TextField(
-        controller: controller,
-        maxLines: maxLines,
-        maxLength: maxLength,
-        style: TextStyle(color: colorScheme.onSurface, fontSize: 16),
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: TextStyle(
-            color: colorScheme.onSurfaceVariant.withOpacity(0.7),
-          ),
-          prefixIcon: Padding(
-            padding: const EdgeInsets.only(left: 16, right: 12),
-            child: Icon(
-              prefixIcon,
-              color: colorScheme.primary.withOpacity(0.8),
-              size: 22,
-            ),
-          ),
-          prefixIconConstraints: const BoxConstraints(minWidth: 50),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-          counter: const SizedBox.shrink(),
-        ),
-      ),
-    );
-  }
 
   Future<void> _showDeleteConfirmation(
     BuildContext context,
@@ -700,7 +662,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: colorScheme.error.withOpacity(0.08),
+                    color: colorScheme.error.withValues(alpha: 0.08),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -837,7 +799,6 @@ class _DescriptionTextFieldState extends State<DescriptionTextField>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
-  bool _isFocused = false;
 
   @override
   void initState() {
@@ -860,7 +821,6 @@ class _DescriptionTextFieldState extends State<DescriptionTextField>
 
   void _handleFocusChange(bool hasFocus) {
     setState(() {
-      _isFocused = hasFocus;
       if (hasFocus) {
         HapticFeedback.lightImpact();
         _animationController.forward();
@@ -878,24 +838,24 @@ class _DescriptionTextFieldState extends State<DescriptionTextField>
         return Container(
           decoration: BoxDecoration(
             color: Color.lerp(
-              widget.colorScheme.surfaceContainerHighest.withOpacity(0.3),
-              widget.colorScheme.primaryContainer.withOpacity(0.1),
+              widget.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+              widget.colorScheme.primaryContainer.withValues(alpha: 0.1),
               _animation.value,
             ),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color:
                   Color.lerp(
-                    widget.colorScheme.outline.withOpacity(0.5),
-                    widget.colorScheme.primary.withOpacity(0.5),
+                    widget.colorScheme.outline.withValues(alpha: 0.5),
+                    widget.colorScheme.primary.withValues(alpha: 0.5),
                     _animation.value,
                   )!,
               width: 1 + (_animation.value * 0.5),
             ),
             boxShadow: [
               BoxShadow(
-                color: widget.colorScheme.shadow.withOpacity(
-                  0.05 * _animation.value,
+                color: widget.colorScheme.shadow.withValues(
+                  alpha: 0.05 * _animation.value,
                 ),
                 blurRadius: 8 * _animation.value,
                 offset: Offset(0, 2 * _animation.value),
@@ -917,7 +877,7 @@ class _DescriptionTextFieldState extends State<DescriptionTextField>
               decoration: InputDecoration(
                 hintText: widget.hintText,
                 hintStyle: TextStyle(
-                  color: widget.colorScheme.onSurfaceVariant.withOpacity(0.7),
+                  color: widget.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                   fontSize: 16,
                 ),
                 prefixIcon: AnimatedBuilder(
@@ -929,7 +889,7 @@ class _DescriptionTextFieldState extends State<DescriptionTextField>
                         widget.prefixIcon,
                         color: Color.lerp(
                           widget.colorScheme.primary,
-                          widget.colorScheme.primary.withOpacity(0.8),
+                          widget.colorScheme.primary.withValues(alpha: 0.8),
                           _animation.value,
                         ),
                         size: 22 + (_animation.value * 2),

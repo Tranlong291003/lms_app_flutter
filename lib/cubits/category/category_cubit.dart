@@ -63,8 +63,13 @@ class CategoryCubit extends Cubit<CategoryState> {
       await fetchAllCategory();
     } catch (e) {
       if (isClosed) return;
-      debugPrint('CategoryCubit: createCategory error: \\${e.toString()}');
+      debugPrint('CategoryCubit: createCategory error: ${e.toString()}');
       emit(CategoryError(e.toString()));
+      // Phải ném tiếp: nơi gọi `await` thao tác này để quyết định báo thành
+      // công hay thất bại. Nếu chỉ `emit(CategoryError)` rồi nuốt lỗi, `await`
+      // hoàn tất bình thường nên màn hình luôn hiện "Thành công" và đóng hộp
+      // thoại — kể cả khi máy chủ từ chối.
+      rethrow;
     }
   }
 
@@ -83,6 +88,7 @@ class CategoryCubit extends Cubit<CategoryState> {
       if (isClosed) return;
       debugPrint('CategoryCubit: deleteCategory error: ${e.toString()}');
       emit(CategoryError(e.toString()));
+      rethrow;
     }
   }
 
@@ -113,6 +119,7 @@ class CategoryCubit extends Cubit<CategoryState> {
       if (isClosed) return;
       debugPrint('CategoryCubit: updateCategory error: ${e.toString()}');
       emit(CategoryError(e.toString()));
+      rethrow;
     }
   }
 }

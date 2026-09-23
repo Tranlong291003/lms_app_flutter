@@ -2,15 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HelpScreen extends StatelessWidget {
   const HelpScreen({super.key});
+
+  static const _supportEmail = 'tranlong291003@example.com';
+  static const _supportPhone = '0889112490';
+
+  /// Mở ứng dụng ngoài (mail/điện thoại). Nếu hệ thống không có ứng dụng nào
+  /// xử lý được thì báo cho người dùng biết thay vì im lặng.
+  Future<void> _launch(BuildContext context, Uri uri) async {
+    try {
+      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!ok && context.mounted) {
+        CustomSnackBar.showError(
+          context: context,
+          message: 'Không mở được ứng dụng cho liên kết này.',
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        CustomSnackBar.showError(
+          context: context,
+          message: 'Không mở được ứng dụng cho liên kết này.',
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: CustomAppBar(title: 'Trung tâm trợ giúp', showBack: true),
@@ -31,16 +55,12 @@ class HelpScreen extends StatelessWidget {
                 message: 'Tìm kiếm câu hỏi đang được phát triển',
               );
             },
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Tìm kiếm câu hỏi',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
-                ),
-              ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+              prefixIcon: Icon(Icons.search),
+              // Viền và đệm lấy từ `inputDecorationTheme` — trước đây tự khai
+              // báo lại bằng `Colors.grey.shade300/700` nên lệch tông với mọi
+              // ô nhập khác trong app.
             ),
           ),
 
@@ -125,6 +145,9 @@ class HelpScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  // Email và điện thoại là hành động THẬT — trước đây cả hai
+                  // đều chỉ hiện "Chức năng đang được phát triển" dù địa chỉ và
+                  // số đã hiển thị ngay bên dưới. Giờ mở ứng dụng tương ứng.
                   _buildContactMethod(
                     context: context,
                     icon: Icons.chat_outlined,
@@ -144,13 +167,8 @@ class HelpScreen extends StatelessWidget {
                     context: context,
                     icon: Icons.email_outlined,
                     title: 'Email',
-                    subtitle: 'tranlong291003@example.com',
-                    onTap: () {
-                      CustomSnackBar.showInfo(
-                        context: context,
-                        message: 'Chức năng đang được phát triển',
-                      );
-                    },
+                    subtitle: _supportEmail,
+                    onTap: () => _launch(context, Uri(scheme: 'mailto', path: _supportEmail)),
                   ),
 
                   const Divider(height: 24),
@@ -159,13 +177,8 @@ class HelpScreen extends StatelessWidget {
                     context: context,
                     icon: Icons.phone_outlined,
                     title: 'Điện thoại',
-                    subtitle: '0889112490',
-                    onTap: () {
-                      CustomSnackBar.showInfo(
-                        context: context,
-                        message: 'Chức năng đang được phát triển',
-                      );
-                    },
+                    subtitle: _supportPhone,
+                    onTap: () => _launch(context, Uri(scheme: 'tel', path: _supportPhone)),
                   ),
                 ],
               ),
@@ -247,7 +260,7 @@ class HelpScreen extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ],
           ),
@@ -275,7 +288,7 @@ class HelpScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.1),
+                color: theme.colorScheme.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: theme.colorScheme.primary, size: 20),
@@ -295,7 +308,7 @@ class HelpScreen extends StatelessWidget {
                   Text(
                     subtitle,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -304,7 +317,7 @@ class HelpScreen extends StatelessWidget {
             Icon(
               Icons.arrow_forward_ios,
               size: 16,
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
           ],
         ),

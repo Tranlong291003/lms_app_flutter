@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/status_chip.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/mentors/mentor_detail_bloc.dart';
 import 'package:lms/blocs/mentors/mentors_event.dart';
@@ -82,7 +84,6 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   void _showRoleUpdateDialog(User user) {
     final currentRole = Role.getRoleById(user.role);
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     showDialog(
       context: context,
@@ -109,7 +110,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   return Card(
                     margin: const EdgeInsets.only(bottom: 8),
                     elevation: isSelected ? 2 : 0,
-                    color: isSelected ? role.color.withOpacity(0.1) : null,
+                    color: isSelected ? role.color.withValues(alpha: 0.1) : null,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
@@ -154,7 +155,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: role.color.withOpacity(0.1),
+                                color: role.color.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
@@ -182,7 +183,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color:
                                           isSelected
-                                              ? role.color.withOpacity(0.8)
+                                              ? role.color.withValues(alpha: 0.8)
                                               : theme
                                                   .textTheme
                                                   .bodySmall
@@ -270,8 +271,14 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: user.isActive ? Colors.red : Colors.green,
-                  foregroundColor: Colors.white,
+                  backgroundColor:
+                      user.isActive
+                          ? Theme.of(context).colorScheme.error
+                          : Theme.of(context).colorScheme.secondaryContainer,
+                  foregroundColor:
+                      user.isActive
+                          ? Theme.of(context).colorScheme.onError
+                          : Theme.of(context).colorScheme.onSecondaryContainer,
                 ),
                 child: Text(user.isActive ? 'Vô hiệu hóa' : 'Kích hoạt'),
               ),
@@ -381,7 +388,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? color.withOpacity(0.15) : Colors.grey[100],
+          color: selected ? color.withValues(alpha: 0.15) : Colors.grey[100],
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: selected ? color : Colors.transparent,
@@ -391,7 +398,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               selected
                   ? [
                     BoxShadow(
-                      color: color.withOpacity(0.18),
+                      color: color.withValues(alpha: 0.18),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -635,7 +642,6 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   Widget _buildUserCard(BuildContext context, {required User user}) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
     final bool isActive = user.isActive;
     final avatarUrl = _getAvatarUrl(user.avatarUrl);
     final role = Role.getRoleById(user.role);
@@ -660,7 +666,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: role.color.withOpacity(0.5),
+                        color: role.color.withValues(alpha: 0.5),
                         width: 3,
                       ),
                     ),
@@ -676,7 +682,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                       width: 16,
                       height: 16,
                       decoration: BoxDecoration(
-                        color: isActive ? Colors.green : Colors.red,
+                        color: isActive
+                            ? AppColors.of(context).success
+                            : AppColors.of(context).error,
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: colorScheme.surface,
@@ -723,35 +731,16 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                isActive
-                                    ? Colors.green.withOpacity(0.12)
-                                    : Colors.red.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.check_circle,
-                                size: 16,
-                                color: isActive ? Colors.green : Colors.red,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                isActive ? 'Đang hoạt động' : 'Bị khóa',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: isActive ? Colors.green : Colors.red,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
+                        // Dùng `StatusChip` dùng chung: trạng thái vừa có
+                        // chấm màu vừa có chữ (trước đây chấm ở avatar là tín
+                        // hiệu DUY NHẤT, người khó phân biệt màu sẽ không đọc
+                        // được trạng thái), và màu tự đúng theo sáng/tối.
+                        StatusChip(
+                          label: isActive ? 'Đang hoạt động' : 'Bị khoá',
+                          tone:
+                              isActive
+                                  ? StatusTone.success
+                                  : StatusTone.error,
                         ),
                       ],
                     ),
@@ -776,8 +765,11 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                       isActive ? Icons.lock : Icons.lock_open,
                       size: 22,
                     ),
-                    color: isActive ? Colors.red : Colors.green,
-                    tooltip: isActive ? 'Vô hiệu hóa' : 'Kích hoạt',
+                    color:
+                        isActive
+                            ? colorScheme.error
+                            : AppColors.of(context).success,
+                    tooltip: isActive ? 'Vô hiệu hoá' : 'Kích hoạt',
                   ),
                 ],
               ),

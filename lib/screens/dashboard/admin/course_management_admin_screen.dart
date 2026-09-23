@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_dimens.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_router.dart';
@@ -45,7 +46,6 @@ class _CourseManagementAdminScreenState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
 
     return DefaultTabController(
       length: 3,
@@ -55,7 +55,7 @@ class _CourseManagementAdminScreenState
           bottom: TabBar(
             dividerColor: Colors.transparent,
             labelColor: colorScheme.primary,
-            unselectedLabelColor: colorScheme.onSurface.withOpacity(0.7),
+            unselectedLabelColor: colorScheme.onSurface.withValues(alpha: 0.7),
             labelStyle: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               fontSize: 16,
@@ -282,17 +282,22 @@ class _CourseManagementAdminScreenState
                       message: 'Duyệt khóa học thành công!',
                     );
                   }
-                } catch (e) {
+                } catch (_) {
                   if (context.mounted) {
                     CustomSnackBar.showError(
                       context: context,
-                      message: 'Duyệt khóa học thất bại!',
+                      message: 'Duyệt khoá học thất bại. Vui lòng thử lại.',
                     );
                   }
                 }
                 if (context.mounted) Navigator.pop(context);
               },
-              style: FilledButton.styleFrom(backgroundColor: Colors.green),
+              style: FilledButton.styleFrom(
+                // `secondaryContainer` + `onSecondaryContainer` thay cho
+                // `Colors.green` + chữ trắng (chỉ đạt 2.8:1, dưới ngưỡng 4.5).
+                backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
+              ),
               child: const Text('Duyệt'),
             ),
           ],
@@ -406,17 +411,20 @@ class _CourseManagementAdminScreenState
                           message: 'Từ chối khóa học thành công!',
                         );
                       }
-                    } catch (e) {
+                    } catch (_) {
                       if (context.mounted) {
                         CustomSnackBar.showError(
                           context: context,
-                          message: 'Từ chối khóa học thất bại!',
+                          message: 'Từ chối khoá học thất bại. Vui lòng thử lại.',
                         );
                       }
                     }
                     if (context.mounted) Navigator.pop(context);
                   },
-                  style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                    foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
                   child: const Text('Từ chối'),
                 ),
               ],
@@ -444,12 +452,12 @@ class EmptyListWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 64, color: colorScheme.onSurface.withOpacity(0.2)),
+          Icon(icon, size: 64, color: colorScheme.onSurface.withValues(alpha: 0.2)),
           const SizedBox(height: 16),
           Text(
             message,
             style: theme.textTheme.titleMedium?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.5),
+              color: colorScheme.onSurface.withValues(alpha: 0.5),
             ),
           ),
         ],
@@ -485,7 +493,7 @@ class CourseCardWidget extends StatelessWidget {
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: colorScheme.outline.withOpacity(0.1)),
+          side: BorderSide(color: colorScheme.outline.withValues(alpha: 0.1)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -523,14 +531,17 @@ class CourseCardWidget extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // Rejection reason if applicable
+                  // Khung lý do từ chối: dùng cặp `errorContainer`/
+                  // `onErrorContainer` thay cho `Colors.red.shade50` — ở dark
+                  // mode khung `shade50` là một ô gần như TRẮNG giữa nền tối.
                   if (showRejectReason && course.rejectionReason != null)
                     Container(
                       padding: const EdgeInsets.all(12),
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
-                        color: Colors.red.shade50,
+                        color: colorScheme.errorContainer,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.red.shade200),
+                        border: Border.all(color: colorScheme.error),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -539,14 +550,14 @@ class CourseCardWidget extends StatelessWidget {
                             children: [
                               Icon(
                                 Icons.cancel_outlined,
-                                color: Colors.red,
+                                color: colorScheme.onErrorContainer,
                                 size: 16,
                               ),
                               const SizedBox(width: 8),
                               Text(
                                 'Lý do từ chối:',
                                 style: theme.textTheme.titleSmall?.copyWith(
-                                  color: Colors.red,
+                                  color: colorScheme.onErrorContainer,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -556,7 +567,7 @@ class CourseCardWidget extends StatelessWidget {
                           Text(
                             course.rejectionReason ?? 'Không có lý do',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.red.shade700,
+                              color: colorScheme.onErrorContainer,
                             ),
                           ),
                         ],
@@ -577,7 +588,7 @@ class CourseCardWidget extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: colorScheme.primary,
                         side: BorderSide(
-                          color: colorScheme.primary.withOpacity(0.5),
+                          color: colorScheme.primary.withValues(alpha: 0.5),
                         ),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -638,7 +649,7 @@ class PendingCourseCard extends StatelessWidget {
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: colorScheme.outline.withOpacity(0.1)),
+          side: BorderSide(color: colorScheme.outline.withValues(alpha: 0.1)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -712,7 +723,8 @@ class PendingCourseCard extends StatelessWidget {
                           ),
                           label: const Text('Duyệt'),
                           style: FilledButton.styleFrom(
-                            backgroundColor: Colors.green,
+                            backgroundColor: colorScheme.secondaryContainer,
+                            foregroundColor: colorScheme.onSecondaryContainer,
                             padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
@@ -721,13 +733,17 @@ class PendingCourseCard extends StatelessWidget {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: onReject,
-                          icon: Icon(Icons.close, color: Colors.red, size: 18),
+                          icon: Icon(
+                            Icons.close,
+                            color: colorScheme.error,
+                            size: 18,
+                          ),
                           label: Text(
                             'Từ chối',
-                            style: TextStyle(color: Colors.red),
+                            style: TextStyle(color: colorScheme.error),
                           ),
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.red),
+                            side: BorderSide(color: colorScheme.error),
                             padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
@@ -864,11 +880,11 @@ class CourseThumbnail extends StatelessWidget {
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: colorScheme.primary.withOpacity(0.1),
+                          color: colorScheme.primary.withValues(alpha: 0.1),
                           child: Center(
                             child: Icon(
                               Icons.image_not_supported_outlined,
-                              color: colorScheme.primary.withOpacity(0.4),
+                              color: colorScheme.primary.withValues(alpha: 0.4),
                               size: 40,
                             ),
                           ),
@@ -876,11 +892,11 @@ class CourseThumbnail extends StatelessWidget {
                       },
                     )
                     : Container(
-                      color: colorScheme.primary.withOpacity(0.1),
+                      color: colorScheme.primary.withValues(alpha: 0.1),
                       child: Center(
                         child: Icon(
                           Icons.photo_outlined,
-                          color: colorScheme.primary.withOpacity(0.4),
+                          color: colorScheme.primary.withValues(alpha: 0.4),
                           size: 40,
                         ),
                       ),
@@ -893,13 +909,15 @@ class CourseThumbnail extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: colorScheme.primary,
-                borderRadius: BorderRadius.circular(20),
+                // `primaryContainer`/`onPrimaryContainer`: ở dark mode
+                // `primary` là màu SÁNG nên chữ trắng trên đó không đọc được.
+                color: colorScheme.primaryContainer,
+                borderRadius: AppRadius.borderPill,
               ),
               child: Text(
                 category,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.white,
+                  color: colorScheme.onPrimaryContainer,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -916,13 +934,17 @@ class CourseThumbnail extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: price! > 0 ? colorScheme.tertiary : Colors.green,
-                  borderRadius: BorderRadius.circular(20),
+                  color: price! > 0
+                      ? colorScheme.tertiaryContainer
+                      : colorScheme.secondaryContainer,
+                  borderRadius: AppRadius.borderPill,
                 ),
                 child: Text(
                   price! > 0 ? '${price!.toStringAsFixed(0)} VNĐ' : 'Miễn phí',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white,
+                    color: price! > 0
+                        ? colorScheme.onTertiaryContainer
+                        : colorScheme.onSecondaryContainer,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -958,7 +980,7 @@ class MentorInfo extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 16,
-          backgroundColor: colorScheme.primary.withOpacity(0.1),
+          backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
           backgroundImage:
               avatar != null
                   ? NetworkImage('${ApiConfig.baseUrl}$avatar')
