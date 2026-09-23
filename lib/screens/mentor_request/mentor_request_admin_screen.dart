@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/mentor_request_cubit.dart';
 
@@ -14,6 +15,12 @@ class MentorRequestAdminScreen extends StatefulWidget {
 }
 
 class _MentorRequestAdminScreenState extends State<MentorRequestAdminScreen> {
+  /// Tu khoa loc (o tim kiem tren AppBar).
+  ///
+  /// Truoc day `onSearchChanged` chi la `// TODO` nen go vao khong loc gi:
+  /// nguoi dung go ma danh sach khong doi, tuong tim kiem bi loi.
+  String _searchQuery = '';
+
   @override
   void initState() {
     super.initState();
@@ -118,7 +125,7 @@ class _MentorRequestAdminScreenState extends State<MentorRequestAdminScreen> {
         showBack: true,
         showSearch: true,
         onSearchChanged: (value) {
-          // TODO: Thực hiện tìm kiếm
+          setState(() => _searchQuery = value.trim().toLowerCase());
         },
       ),
       body: BlocBuilder<MentorRequestCubit, MentorRequestState>(
@@ -127,30 +134,47 @@ class _MentorRequestAdminScreenState extends State<MentorRequestAdminScreen> {
             return const Center(child: LoadingIndicator());
           }
           if (state is MentorRequestError) {
-            return Center(
-              child: Text(
-                'Lỗi: ${state.message}',
-                style: textTheme.titleMedium?.copyWith(
-                  color: c.error,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            return EmptyStateWidget(
+              icon: Icons.cloud_off_rounded,
+              title: 'Không tải được danh sách yêu cầu',
+              message: state.message,
+              isError: true,
+              actionLabel: 'Thử lại',
+              onAction: () =>
+                  context.read<MentorRequestCubit>().fetchAllUpgradeRequests(),
             );
           }
           if (state is MentorRequestListLoaded) {
-            final requests = state.requests;
-            if (requests.isEmpty) {
-              return Center(
-                child: Text(
-                  'Không có yêu cầu nào.',
-                  style: textTheme.titleMedium?.copyWith(
-                    color: c.onSurfaceVariant,
-                  ),
-                ),
+            final all = state.requests;
+
+            if (all.isEmpty) {
+              return const EmptyStateWidget(
+                icon: Icons.inbox_outlined,
+                title: 'Chưa có yêu cầu nào',
+                message: 'Yêu cầu đăng ký mentor mới sẽ xuất hiện ở đây.',
               );
             }
+
+            // Loc theo ten/uid nguoi gui (o tim kiem tren AppBar).
+            final requests =
+                _searchQuery.isEmpty
+                    ? all
+                    : all.where((r) {
+                      final name =
+                          (r['user_name'] ?? r['user_uid'] ?? '').toString();
+                      return name.toLowerCase().contains(_searchQuery);
+                    }).toList();
+
+            if (requests.isEmpty) {
+              return EmptyStateWidget(
+                icon: Icons.search_off_rounded,
+                title: 'Không tìm thấy yêu cầu',
+                message: 'Không có yêu cầu nào khớp với "$_searchQuery".',
+              );
+            }
+
             return ListView.separated(
-              padding: const EdgeInsets.all(16),
+              padding: listPaddingWithBottomInset(context),
               itemCount: requests.length,
               separatorBuilder: (_, __) => const SizedBox(height: 14),
               itemBuilder: (context, i) {

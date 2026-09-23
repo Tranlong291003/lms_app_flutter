@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 
+import 'package:lms/apps/config/app_dimens.dart';
+
+/// Ô tìm kiếm dùng chung.
+///
+/// Trước đây widget này có tham số `onFilter` nhưng **không hề vẽ nút lọc**, nên
+/// hai màn hình quản lý khoá học truyền `onFilter: () => _showFilterDialog(...)`
+/// mà bộ lọc không bao giờ mở được — tính năng đã viết xong nhưng vô hình.
+/// Nút lọc giờ được vẽ khi `onFilter != null`.
 class SearchBarWidget extends StatefulWidget {
   final ValueChanged<String>? onChanged;
+
+  /// Nếu != null thì hiện nút lọc ở cuối ô tìm kiếm.
   final VoidCallback? onFilter;
+
   final String? hintText;
   final bool autofocus;
   final TextEditingController? controller;
@@ -26,12 +37,9 @@ class SearchBarWidget extends StatefulWidget {
   State<SearchBarWidget> createState() => _SearchBarWidgetState();
 }
 
-class _SearchBarWidgetState extends State<SearchBarWidget>
-    with SingleTickerProviderStateMixin {
+class _SearchBarWidgetState extends State<SearchBarWidget> {
   late TextEditingController _controller;
   bool _showClearButton = false;
-  late AnimationController _animationController;
-  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -39,19 +47,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget>
     _controller = widget.controller ?? TextEditingController();
     _controller.addListener(_onTextChanged);
 
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
-
     if (_controller.text.isNotEmpty) {
       _showClearButton = true;
-      _animationController.value = 1.0;
     }
   }
 
@@ -61,11 +58,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget>
       setState(() {
         _showClearButton = hasText;
       });
-      if (hasText) {
-        _animationController.forward();
-      } else {
-        _animationController.reverse();
-      }
     }
   }
 
@@ -83,7 +75,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget>
       _controller.dispose();
     }
     _controller.removeListener(_onTextChanged);
-    _animationController.dispose();
     super.dispose();
   }
 
@@ -94,31 +85,31 @@ class _SearchBarWidgetState extends State<SearchBarWidget>
     final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      height: 52,
+      // Chiều cao tối thiểu thay vì cố định 52px: ở cỡ chữ hệ thống lớn, chữ
+      // trong ô cần nhiều chỗ hơn và `height` cứng sẽ cắt mất.
+      constraints: const BoxConstraints(minHeight: 52),
       margin:
           widget.margin ??
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.borderLg,
         color:
-            isDark
-                ? colorScheme.surfaceContainerHighest.withOpacity(0.5)
-                : colorScheme.surface,
+            isDark ? colorScheme.surfaceContainerHighest : colorScheme.surface,
         boxShadow:
             isDark
                 ? null
                 : [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
                 ],
         border: Border.all(
-          color:
-              isDark
-                  ? colorScheme.outline.withOpacity(0.2)
-                  : colorScheme.outline.withOpacity(0.1),
+          color: colorScheme.outline.withValues(alpha: 0.5),
           width: 1,
         ),
       ),
@@ -132,49 +123,57 @@ class _SearchBarWidgetState extends State<SearchBarWidget>
               autofocus: widget.autofocus,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: colorScheme.onSurface,
-                fontSize: 16,
               ),
               cursorColor: colorScheme.primary,
               textAlign: TextAlign.start,
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Icons.search_rounded,
-                  color: colorScheme.primary.withOpacity(0.8),
+                  color: colorScheme.primary,
                   size: 24,
                 ),
                 hintText: widget.hintText ?? 'Tìm kiếm khoá học, chủ đề...',
                 hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.7),
-                  fontSize: 16,
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                filled: false,
                 contentPadding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 8,
+                  vertical: AppSpacing.lg,
+                  horizontal: AppSpacing.sm,
                 ),
                 isDense: true,
                 suffixIcon:
                     _showClearButton
                         ? IconButton(
-                          icon: Icon(
-                            Icons.clear,
-                            color: colorScheme.onSurfaceVariant,
-                            size: 20,
-                          ),
-                          onPressed: _clearSearch,
-                          splashRadius: 20,
-                          visualDensity: VisualDensity.compact,
-                          tooltip: 'Xóa tìm kiếm',
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(
-                            minWidth: 36,
-                            minHeight: 36,
-                          ),
-                        )
+                            icon: Icon(
+                              Icons.clear,
+                              color: colorScheme.onSurfaceVariant,
+                              size: 20,
+                            ),
+                            onPressed: _clearSearch,
+                            tooltip: 'Xoá tìm kiếm',
+                          )
                         : null,
               ),
             ),
           ),
+          // Nút lọc — chỉ hiện khi nơi gọi thực sự truyền `onFilter`.
+          if (widget.onFilter != null) ...[
+            Container(
+              width: 1,
+              height: 28,
+              color: colorScheme.outline.withValues(alpha: 0.5),
+            ),
+            IconButton(
+              icon: Icon(Icons.tune_rounded, color: colorScheme.primary),
+              onPressed: widget.onFilter,
+              tooltip: 'Bộ lọc',
+            ),
+            const SizedBox(width: AppSpacing.xs),
+          ],
         ],
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/quiz/quiz_cubit.dart';
 import 'package:lms/cubits/quiz/quiz_state.dart';
@@ -325,7 +326,16 @@ class _QuizListScreenState extends State<QuizListScreen>
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: isEnrolled ? () => _navigateToQuizDetail(quiz) : null,
+          // Quiz chua ghi danh truoc day dat onTap = null nen bam vao khong co
+          // phan hoi gi; nguoi dung khong biet vi sao. Gio hien thong bao ro.
+          onTap:
+              isEnrolled
+                  ? () => _navigateToQuizDetail(quiz)
+                  : () => CustomSnackBar.showInfo(
+                    context: context,
+                    message:
+                        'Bạn cần ghi danh khoá học trước khi làm bài kiểm tra này.',
+                  ),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -384,8 +394,11 @@ class _QuizListScreenState extends State<QuizListScreen>
                       'Ngày tạo: ${quiz.formattedCreatedAt}',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
+                    // Truoc day hien thang `attemptLimit` voi nhan "So lan lam",
+                    // nen quiz gioi han 3 lan luon hien "So lan lam: 3" du nguoi
+                    // dung chua lam lan nao. Doi nhan cho dung nghia.
                     Text(
-                      'Số lần làm: ${quiz.attemptLimit}',
+                      'Số lần tối đa: ${quiz.attemptLimit}',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],

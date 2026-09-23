@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/config/app_dimens.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/category/category_cubit.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
@@ -20,14 +21,15 @@ class CourseCategoryWidget extends StatelessWidget {
           return const LoadingIndicator();
         }
         if (state is CategoryError) {
+          // Trước đây chỉ hiện một dòng "Lỗi: ..." nghiêng trái, không có cách
+          // thử lại — người dùng phải thoát màn hình mới tải lại được danh mục.
           return SizedBox(
-            height: 40,
+            height: 48,
             child: Center(
-              child: Text(
-                'Lỗi: ${state.message}',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.error,
-                ),
+              child: TextButton.icon(
+                onPressed: () => context.read<CategoryCubit>().fetchAllCategory(),
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: const Text('Không tải được danh mục — Thử lại'),
               ),
             ),
           );
@@ -58,22 +60,27 @@ class CourseCategoryWidget extends StatelessWidget {
                     (selId == null && cat.categoryId == allId) ||
                     (selId != null && cat.categoryId == selId);
 
+                // Danh mục đang chọn: nền `secondaryContainer` (xanh nhạt) và
+                // chữ `onSecondaryContainer` — trước đây là nền primary + chữ
+                // trênPrimary, trùng hệt màu nút hành động nên chip trông như
+                // một nút bấm chứ không phải trạng thái lọc.
+                final selectedBg = theme.colorScheme.secondaryContainer;
+                final selectedFg = theme.colorScheme.onSecondaryContainer;
+
                 Widget iconWidget = const SizedBox.shrink();
                 if (cat.icon?.isNotEmpty == true) {
                   final fullUrl = ApiConfig.getImageUrl(cat.icon);
                   iconWidget = Image.network(
-                    fullUrl ?? '',
+                    fullUrl,
                     width: 16,
                     height: 16,
+                    // Ảnh icon lỗi thì bỏ hẳn, không để lộ khung ảnh vỡ.
                     errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                   );
                 }
 
                 return GestureDetector(
                   onTap: () {
-                    print(
-                      'Chọn danh mục: id=${cat.categoryId}, name=${cat.name}',
-                    );
                     final newSel =
                         (cat.categoryId == allId) ? null : cat.categoryId;
                     context.read<CategoryCubit>().selectCategory(newSel);
@@ -81,34 +88,39 @@ class CourseCategoryWidget extends StatelessWidget {
                     context.read<CourseCubit>().loadCourses(categoryId: newSel);
                   },
                   child: Container(
+                    // Vùng chạm tối thiểu 40px theo chiều cao: chip chỉ có
+                    // padding 8px nên với chữ nhỏ sẽ thấp hơn ngón tay.
+                    constraints: const BoxConstraints(minHeight: 40),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color:
-                          isSelected
-                              ? theme.colorScheme.primary
-                              : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20),
+                      color: isSelected ? selectedBg : Colors.transparent,
+                      borderRadius: AppRadius.borderPill,
                       border: Border.all(
-                        color: theme.colorScheme.primary,
+                        color:
+                            isSelected
+                                ? selectedBg
+                                : theme.colorScheme.outline,
                         width: 1.5,
                       ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (iconWidget is! SizedBox) iconWidget,
-                        if (iconWidget is! SizedBox) const SizedBox(width: 4),
+                        if (iconWidget is! SizedBox) ...[
+                          iconWidget,
+                          const SizedBox(width: 4),
+                        ],
                         Text(
                           cat.name,
                           style: theme.textTheme.labelLarge?.copyWith(
                             fontWeight: FontWeight.w500,
                             color:
                                 isSelected
-                                    ? theme.colorScheme.onPrimary
-                                    : theme.colorScheme.primary,
+                                    ? selectedFg
+                                    : theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
 import 'package:lms/cubits/bookmark/bookmark_state.dart';
@@ -78,7 +79,6 @@ class _BookmarkButtonState extends State<BookmarkButton>
     }
 
     if (widget.userUid.isEmpty) {
-      print('userUid trống, không thể tải bookmark');
       setState(() {
         _isLoading = false;
       });
@@ -93,8 +93,9 @@ class _BookmarkButtonState extends State<BookmarkButton>
       try {
         await _bookmarkCubit!.getBookmarks(widget.userUid);
         _checkBookmarkStatus();
-      } catch (e) {
-        print('Lỗi khi tải bookmark: $e');
+      } catch (_) {
+        // Không tải được danh sách bookmark thì nút vẫn phải hiển thị ở trạng
+        // thái "chưa lưu" thay vì treo vòng xoay.
       }
     }
 
@@ -105,18 +106,8 @@ class _BookmarkButtonState extends State<BookmarkButton>
 
   void _checkBookmarkStatus() {
     if (_bookmarkCubit != null) {
-      final wasBookmarked = _isBookmarked;
       _isBookmarked = _bookmarkCubit!.isBookmarked(widget.courseId);
       _bookmark = _bookmarkCubit!.getBookmarkByCourseId(widget.courseId);
-
-      print(
-        'Trạng thái bookmark của khóa học ${widget.courseId}: $_isBookmarked',
-      );
-      if (wasBookmarked != _isBookmarked) {
-        print(
-          'Trạng thái bookmark đã thay đổi từ $wasBookmarked thành $_isBookmarked',
-        );
-      }
     }
   }
 
@@ -147,7 +138,7 @@ class _BookmarkButtonState extends State<BookmarkButton>
         size: widget.size,
         color:
             widget.inactiveColor ??
-            Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            Theme.of(context).colorScheme.onSurfaceVariant,
       );
     }
 
@@ -197,9 +188,7 @@ class _BookmarkButtonState extends State<BookmarkButton>
                             ? (widget.activeColor ??
                                 Theme.of(context).colorScheme.primary)
                             : (widget.inactiveColor ??
-                                Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withOpacity(0.5)),
+                                Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                   onPressed: _isProcessing ? null : _toggleBookmark,
                   tooltip: _isBookmarked ? 'Bỏ lưu khóa học' : 'Lưu khóa học',
@@ -231,29 +220,20 @@ class _BookmarkButtonState extends State<BookmarkButton>
           userUid: widget.userUid,
         );
 
-        if (success) {
-          print('Đã xóa bookmark thành công');
-        } else {
-          print('Không thể xóa bookmark');
-        }
-
         // Refresh danh sách bookmark
         await _bookmarkCubit!.refreshBookmarks(widget.userUid);
       } else {
         // Thêm bookmark mới
         try {
-          final newBookmark = await _bookmarkCubit!.createBookmark(
+          await _bookmarkCubit!.createBookmark(
             courseId: widget.courseId,
             userUid: widget.userUid,
           );
-
-          print('Bookmark đã được tạo thành công: ${newBookmark.id}');
           success = true;
 
           // Refresh danh sách bookmark
           await _bookmarkCubit!.refreshBookmarks(widget.userUid);
-        } catch (e) {
-          print('Lỗi khi tạo bookmark: $e');
+        } catch (_) {
           success = false;
         }
       }
@@ -268,33 +248,26 @@ class _BookmarkButtonState extends State<BookmarkButton>
         widget.onToggle!(_isBookmarked);
       }
 
-      // Hiển thị thông báo nếu có lỗi
-      if (!success) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Có lỗi xảy ra khi cập nhật bookmark'),
-              backgroundColor: Colors.orange,
-              duration: Duration(seconds: 2),
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      print('Lỗi khi thay đổi trạng thái bookmark: $e');
-      // Hiển thị thông báo lỗi cho người dùng nếu cần
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Không thể cập nhật bookmark: $e'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 2),
-          ),
+      // Chỉ báo khi THẤT BẠI. Thành công đã có phản hồi trực quan ngay trên
+      // nút (icon đổi màu + hiệu ứng nhún), thêm snackbar nữa sẽ thành nhiễu.
+      if (!success && mounted) {
+        CustomSnackBar.showError(
+          context: context,
+          // Nói rõ việc gì thất bại — thông báo cũ "Có lỗi xảy ra" không cho
+          // người dùng biết khoá học vừa rồi có được lưu hay không.
+          message: _isBookmarked
+              ? 'Không bỏ lưu được khoá học. Vui lòng thử lại.'
+              : 'Không lưu được khoá học. Vui lòng thử lại.',
         );
       }
-      setState(() {
-        _isProcessing = false;
-      });
+    } catch (_) {
+      if (mounted) {
+        setState(() => _isProcessing = false);
+        CustomSnackBar.showError(
+          context: context,
+          message: 'Không cập nhật được trạng thái lưu. Vui lòng thử lại.',
+        );
+      }
     }
   }
 }

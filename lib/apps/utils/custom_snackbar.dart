@@ -11,23 +11,30 @@ class CustomSnackBar {
     VoidCallback? onActionPressed,
     String? actionLabel,
   }) {
+    // SnackBar luôn nằm TRÊN nền tối (màu đậm của trạng thái), kể cả khi app ở
+    // light mode — nên chữ/icon phải luôn là màu sáng. Trước đây hardcode
+    // `Colors.white`; khi theme đổi sang tông sáng hơn thì chữ mất tương phản.
+    final onColor = ThemeData.estimateBrightnessForColor(backgroundColor) ==
+            Brightness.dark
+        ? Colors.white
+        : Colors.black87;
     final snackBar = SnackBar(
       content: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: onColor.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: Colors.white),
+            child: Icon(icon, color: onColor),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: onColor,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -44,7 +51,7 @@ class CustomSnackBar {
           actionLabel != null
               ? SnackBarAction(
                 label: actionLabel,
-                textColor: Colors.white,
+                textColor: onColor,
                 onPressed: () {
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   onActionPressed?.call();
@@ -68,7 +75,7 @@ class CustomSnackBar {
       context: context,
       message: message,
       icon: Icons.check_circle,
-      backgroundColor: AppTheme.success,
+      backgroundColor: AppPalette.successFill,
       actionLabel: actionLabel,
       onActionPressed: onActionPressed,
     );
@@ -84,7 +91,7 @@ class CustomSnackBar {
       context: context,
       message: message,
       icon: Icons.error_outline,
-      backgroundColor: AppTheme.error,
+      backgroundColor: AppPalette.errorFill,
       actionLabel: actionLabel,
       onActionPressed: onActionPressed,
     );
@@ -100,7 +107,7 @@ class CustomSnackBar {
       context: context,
       message: message,
       icon: Icons.warning_amber_rounded,
-      backgroundColor: AppTheme.accent,
+      backgroundColor: AppPalette.warningFill,
       actionLabel: actionLabel,
       onActionPressed: onActionPressed,
     );
@@ -116,7 +123,7 @@ class CustomSnackBar {
       context: context,
       message: message,
       icon: Icons.info_outline,
-      backgroundColor: AppTheme.primary,
+      backgroundColor: AppPalette.infoFill,
       actionLabel: actionLabel,
       onActionPressed: onActionPressed,
     );

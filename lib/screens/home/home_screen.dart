@@ -131,9 +131,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
     return Scaffold(
       appBar: AppBarHome(context, 'title'),
       body: RefreshIndicator(
@@ -161,14 +158,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                         arguments: value.trim(),
                       );
                     }
-                  },
-                  onFilter: () {
-                    // TODO: Thêm chức năng lọc nâng cao
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Tính năng đang được phát triển'),
-                      ),
-                    );
                   },
                   hintText: 'Tìm kiếm khóa học...',
                 ),

@@ -27,7 +27,8 @@ class CustomDialog extends StatelessWidget {
     final theme = Theme.of(context);
 
     return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      // Dáng hộp thoại lấy từ `dialogTheme` để mọi hộp thoại trong app đồng
+      // nhất; chỉ ghi đè những gì riêng của widget này.
       title: Row(
         children: [
           if (icon != null) ...[
@@ -61,10 +62,15 @@ class CustomDialog extends StatelessWidget {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: confirmColor ?? theme.colorScheme.primary,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            // `Colors.white` cố định sẽ mất tương phản khi `confirmColor` là
+            // màu sáng (ví dụ `tertiary`); suy ra màu chữ từ chính nền đó.
+            foregroundColor:
+                ThemeData.estimateBrightnessForColor(
+                          confirmColor ?? theme.colorScheme.primary,
+                        ) ==
+                        Brightness.dark
+                    ? Colors.white
+                    : Colors.black87,
           ),
           child: Text(confirmText),
         ),
