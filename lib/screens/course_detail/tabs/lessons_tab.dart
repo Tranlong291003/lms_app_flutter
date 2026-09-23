@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/config/app_dimens.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/config/app_theme.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/lessons/lessons_cubit.dart';
 import 'package:lms/cubits/lessons/lessons_state.dart';
@@ -8,46 +12,60 @@ import 'package:lms/models/lesson_model.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/services/course_service.dart';
 
-class LessonsTab extends StatelessWidget {
+class LessonsTab extends StatefulWidget {
   final int courseId;
   const LessonsTab({super.key, required this.courseId});
 
   @override
-  Widget build(BuildContext context) {
+  State<LessonsTab> createState() => _LessonsTabState();
+}
+
+class _LessonsTabState extends State<LessonsTab> {
+  @override
+  void initState() {
+    super.initState();
+    // Trước đây `loadLessons` được gọi thẳng trong `build()`: mỗi lần widget
+    // dựng lại (đổi tab, mở bàn phím, đổi theme, cha setState…) lại bắn thêm
+    // một request và emit `LessonsLoading` → gọi lại `build` → vòng lặp gọi API
+    // liên tục. Chuyển sang `initState` để mỗi lần vào tab chỉ gọi một lần.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _load();
+    });
+  }
+
+  void _load() {
     final userUid = context.read<AuthCubit>().state.userId ?? '';
-    final cubit = context.read<LessonsCubit>();
+    context.read<LessonsCubit>().loadLessons(
+      courseId: widget.courseId,
+      userUid: userUid,
+    );
+  }
 
-    // Load lessons when widget is built
-    cubit.loadLessons(courseId: courseId, userUid: userUid);
-
+  @override
+  Widget build(BuildContext context) {
     return BlocBuilder<LessonsCubit, LessonsState>(
       builder: (context, state) {
         if (state is LessonsLoading) {
           return const Center(child: LoadingIndicator());
         }
         if (state is LessonsError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Lỗi: ${state.message}'),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed:
-                      () => cubit.loadLessons(
-                        courseId: courseId,
-                        userUid: userUid,
-                      ),
-                  child: const Text('Thử lại'),
-                ),
-              ],
-            ),
+          return EmptyStateWidget(
+            icon: Icons.cloud_off_rounded,
+            title: 'Không tải được danh sách bài học',
+            message: state.message,
+            isError: true,
+            actionLabel: 'Thử lại',
+            onAction: _load,
           );
         }
         if (state is LessonsLoaded) {
-          return _LessonsList(lessons: state.lessons, courseId: courseId);
+          return _LessonsList(
+            lessons: state.lessons,
+            courseId: widget.courseId,
+          );
         }
-        return const SizedBox();
+        return const Center(child: LoadingIndicator());
       },
     );
   }
@@ -62,21 +80,16 @@ class _LessonsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (lessons.isEmpty) {
-      return Align(
-        alignment: Alignment.topCenter,
-        child: Padding(
-          padding: const EdgeInsets.only(top: 24, left: 16, right: 16),
-          child: Text(
-            'Chưa có bài học nào cho khoá học này',
-            style: Theme.of(context).textTheme.titleMedium,
-            textAlign: TextAlign.center,
-          ),
-        ),
+      return const EmptyStateWidget(
+        icon: Icons.play_lesson_outlined,
+        title: 'Chưa có bài học nào',
+        message: 'Giảng viên chưa đăng bài giảng cho khoá học này.',
       );
     }
 
     final userUid = context.read<AuthCubit>().state.userId ?? '';
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return FutureBuilder<bool>(
       future: CourseService().checkEnrollment(
@@ -87,13 +100,13 @@ class _LessonsList extends StatelessWidget {
         final isEnrolled = snapshot.data == true;
 
         return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.md,
+          ),
           itemCount: lessons.length,
           itemBuilder: (context, index) {
             final lesson = lessons[index];
-
-            // Khai báo biến trước khi sử dụng
-            bool isLocked = false;
             bool canTap = false;
             IconData iconData = Icons.lock_open;
             Color iconColor = theme.colorScheme.primary;
@@ -105,108 +118,113 @@ class _LessonsList extends StatelessWidget {
             bool isCurrentCompleted = lesson.isCompleted;
             if (isCurrentCompleted) {
               // Đã học xong
-              isLocked = false;
               canTap = true;
               iconData = Icons.check_circle;
-              iconColor = Colors.green;
+              iconColor = AppColors.of(context).success;
               trailingIcon = Icon(
                 Icons.check_circle,
-                color: Colors.green,
+                color: iconColor,
                 size: 28,
               );
             } else if (index == 0 || prevCompleted) {
               // Được phép học (bài 1 hoặc bài trước đã hoàn thành)
-              isLocked = false;
               canTap = true;
               iconData = Icons.lock_open;
-              iconColor = theme.colorScheme.primary;
+              iconColor = scheme.primary;
               trailingIcon = Icon(
                 Icons.play_circle_fill,
-                color: theme.colorScheme.primary,
+                color: scheme.primary,
                 size: 32,
               );
             } else {
               // Chưa được phép học
-              isLocked = true;
               canTap = false;
               iconData = Icons.lock_outline;
-              iconColor = theme.colorScheme.onSurface.withOpacity(0.5);
+              iconColor = scheme.onSurfaceVariant;
               trailingIcon = Icon(
                 Icons.lock,
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                color: scheme.onSurfaceVariant,
                 size: 28,
               );
             }
 
-            return Opacity(
-              opacity: canTap ? 1.0 : 0.4,
-              child: Card(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                color: theme.colorScheme.surface,
-                child: InkWell(
-                  onTap:
-                      canTap
-                          ? () async {
-                            await Navigator.pushNamed(
-                              context,
-                              AppRouter.lessonDetail,
-                              arguments: {
-                                'lessonId': lesson.lessonId,
-                                'courseId': lesson.courseId,
-                              },
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+              color: scheme.surface,
+              child: InkWell(
+                borderRadius: AppRadius.borderLg,
+                onTap:
+                    canTap
+                        ? () async {
+                          final ctx = context;
+                          await Navigator.pushNamed(
+                            ctx,
+                            AppRouter.lessonDetail,
+                            arguments: {
+                              'lessonId': lesson.lessonId,
+                              'courseId': lesson.courseId,
+                            },
+                          );
+                          // Sau khi quay lại, refresh lại danh sách bài học để
+                          // cập nhật trạng thái hoàn thành và mở khoá bài kế.
+                          if (!ctx.mounted) return;
+                          final userUid =
+                              ctx.read<AuthCubit>().state.userId ?? '';
+                          ctx.read<LessonsCubit>().loadLessons(
+                            courseId: courseId,
+                            userUid: userUid,
+                          );
+                        }
+                        : () {
+                          // Nói rõ VÌ SAO bài bị khoá — trước đây cả hai
+                          // trường hợp dùng chung một snackbar mặc định của
+                          // Material nên nhìn không thuộc về app.
+                          if (!isEnrolled) {
+                            CustomSnackBar.showInfo(
+                              context: context,
+                              message:
+                                  'Bạn cần đăng ký khoá học để học các bài giảng.',
                             );
-                            // Sau khi quay lại, refresh lại danh sách bài học
-                            final userUid =
-                                context.read<AuthCubit>().state.userId ?? '';
-                            context.read<LessonsCubit>().loadLessons(
-                              courseId: courseId,
-                              userUid: userUid,
+                          } else {
+                            CustomSnackBar.showInfo(
+                              context: context,
+                              message:
+                                  'Hoàn thành bài trước để mở khoá bài này.',
                             );
                           }
-                          : () {
-                            if (!isEnrolled) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Bạn cần đăng ký khoá học để học tiếp các bài sau!',
-                                  ),
-                                ),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Hãy hoàn thành bài trước để mở khoá bài này!',
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      children: [
-                        Icon(iconData, color: iconColor, size: 24),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                lesson.title,
-                                style: theme.textTheme.titleMedium,
+                        },
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Row(
+                    children: [
+                      Icon(iconData, color: iconColor, size: 24),
+                      const SizedBox(width: AppSpacing.lg),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              lesson.title,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color:
+                                    canTap
+                                        ? scheme.onSurface
+                                        : scheme.onSurfaceVariant,
                               ),
-                              const SizedBox(height: 4),
+                            ),
+                            if ((lesson.videoDuration ?? '').isNotEmpty) ...[
+                              const SizedBox(height: AppSpacing.xs),
                               Text(
-                                lesson.videoDuration ?? '',
+                                lesson.videoDuration!,
                                 style: theme.textTheme.bodySmall,
                               ),
                             ],
-                          ),
+                          ],
                         ),
-                        trailingIcon,
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      trailingIcon,
+                    ],
                   ),
                 ),
               ),

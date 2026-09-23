@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/config/app_dimens.dart';
+import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
@@ -48,42 +51,23 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     final theme = Theme.of(context);
     return BlocBuilder<CourseDetailCubit, CourseDetailState>(
       builder: (context, state) {
+        // Cả trạng thái lỗi lẫn đang tải trước đây đều trả về một `Scaffold`
+        // KHÔNG có `appBar` — người dùng nhìn thấy màn hình trắng/trống và
+        // không có nút quay lại, chỉ thoát được bằng cử chỉ hệ thống.
         if (state is CourseDetailError) {
           return Scaffold(
             backgroundColor: theme.scaffoldBackgroundColor,
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: theme.colorScheme.error,
+            appBar: const CustomAppBar(title: 'Khoá học', showBack: true),
+            body: EmptyStateWidget(
+              icon: Icons.cloud_off_rounded,
+              title: 'Không tải được khoá học',
+              message: state.message,
+              isError: true,
+              actionLabel: 'Thử lại',
+              onAction:
+                  () => context.read<CourseDetailCubit>().fetchCourseDetail(
+                    widget.courseId,
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Đã xảy ra lỗi khi tải thông tin khóa học',
-                    style: theme.textTheme.titleMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<CourseDetailCubit>().fetchCourseDetail(
-                        widget.courseId,
-                      );
-                    },
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Thử lại'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ),
           );
         }
@@ -115,7 +99,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                         color: theme.scaffoldBackgroundColor,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, -5),
                           ),
@@ -138,7 +122,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                       color: theme.scaffoldBackgroundColor,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, -5),
                         ),
@@ -158,10 +142,11 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           );
         }
 
-        // Default state - show empty scaffold while loading
+        // Đang tải (và mọi trạng thái chưa xác định khác).
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          body: const SizedBox.shrink(),
+          appBar: const CustomAppBar(title: 'Khoá học', showBack: true),
+          body: const Center(child: LoadingIndicator()),
         );
       },
     );
@@ -183,7 +168,7 @@ class CourseAppBarDynamic extends StatelessWidget {
         icon: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: theme.scaffoldBackgroundColor.withOpacity(0.8),
+            color: theme.scaffoldBackgroundColor.withValues(alpha: 0.8),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.arrow_back_ios_new, size: 16),
@@ -228,7 +213,7 @@ class CourseAppBarDynamic extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                    colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)],
                   ),
                 ),
               ),
@@ -255,10 +240,13 @@ class _CourseBody extends StatelessWidget {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.only(
-            top: 24,
-            left: 20,
-            right: 20,
-            bottom: 20,
+            top: AppSpacing.xxl,
+            left: AppSpacing.xl,
+            right: AppSpacing.xl,
+            // Nút "Đăng ký học" nằm trong `bottomNavigationBar`, tức là ĐÈ LÊN
+            // phần cuối của danh sách chứ không đẩy nó lên. Đệm đáy phải chừa
+            // đủ chỗ cho thanh đó, nếu không thẻ cuối cùng sẽ bị che.
+            bottom: AppSpacing.xl * 4,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

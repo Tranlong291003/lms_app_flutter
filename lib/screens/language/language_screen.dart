@@ -1,63 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_dimens.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
-import 'package:lms/apps/utils/custom_snackbar.dart';
 
-class LanguageScreen extends StatefulWidget {
+/// Màn hình chọn ngôn ngữ.
+///
+/// ## Vì sao chỉ còn tiếng Việt
+///
+/// Trước đây màn hình liệt kê 31 ngôn ngữ, nhưng **không có hạ tầng đa ngôn ngữ
+/// nào trong app**: không có `flutter_localizations`, không có file `.arb`, và
+/// không dòng code nào đọc giá trị ngôn ngữ đã chọn. Chọn "English" chỉ hiện
+/// snackbar "Chức năng đang được phát triển" rồi danh sách vẫn đứng yên —
+/// trông như app bị treo.
+///
+/// Danh sách trung thực với những gì app thực sự hỗ trợ. Khi nào thêm được
+/// `AppLocalizations`, việc cần làm là: bật `flutter_localizations`, tạo file
+/// `.arb`, và đọc lại lựa chọn ở đây.
+class LanguageScreen extends StatelessWidget {
   const LanguageScreen({super.key});
-
-  @override
-  State<LanguageScreen> createState() => _LanguageScreenState();
-}
-
-class _LanguageScreenState extends State<LanguageScreen> {
-  final String _selectedLanguage = 'vi';
-
-  final List<Map<String, dynamic>> _languages = [
-    {'code': 'vi', 'name': 'Tiếng Việt', 'flag': '🇻🇳'},
-    {'code': 'en', 'name': 'English', 'flag': '🇬🇧'},
-    {'code': 'zh', 'name': '中文', 'flag': '🇨🇳'},
-    {'code': 'ja', 'name': '日本語', 'flag': '🇯🇵'},
-    {'code': 'ko', 'name': '한국어', 'flag': '🇰🇷'},
-    {'code': 'fr', 'name': 'Français', 'flag': '🇫🇷'},
-    {'code': 'de', 'name': 'Deutsch', 'flag': '🇩🇪'},
-    {'code': 'es', 'name': 'Español', 'flag': '🇪🇸'},
-    {'code': 'it', 'name': 'Italiano', 'flag': '🇮🇹'},
-    {'code': 'ru', 'name': 'Русский', 'flag': '🇷🇺'},
-    {'code': 'ar', 'name': 'العربية', 'flag': '🇸🇦'},
-    {'code': 'pt', 'name': 'Português', 'flag': '🇵🇹'},
-    {'code': 'hi', 'name': 'हिन्दी', 'flag': '🇮🇳'},
-    {'code': 'th', 'name': 'ไทย', 'flag': '🇹🇭'},
-    {'code': 'id', 'name': 'Bahasa Indonesia', 'flag': '🇮🇩'},
-    {'code': 'ms', 'name': 'Bahasa Melayu', 'flag': '🇲🇾'},
-    {'code': 'tr', 'name': 'Türkçe', 'flag': '🇹🇷'},
-    {'code': 'pl', 'name': 'Polski', 'flag': '🇵🇱'},
-    {'code': 'nl', 'name': 'Nederlands', 'flag': '🇳🇱'},
-    {'code': 'sv', 'name': 'Svenska', 'flag': '🇸🇪'},
-    {'code': 'no', 'name': 'Norsk', 'flag': '🇳🇴'},
-    {'code': 'fi', 'name': 'Suomi', 'flag': '🇫🇮'},
-    {'code': 'da', 'name': 'Dansk', 'flag': '🇩🇰'},
-    {'code': 'cs', 'name': 'Čeština', 'flag': '🇨🇿'},
-    {'code': 'ro', 'name': 'Română', 'flag': '🇷🇴'},
-    {'code': 'hu', 'name': 'Magyar', 'flag': '🇭🇺'},
-    {'code': 'el', 'name': 'Ελληνικά', 'flag': '🇬🇷'},
-    {'code': 'he', 'name': 'עברית', 'flag': '🇮🇱'},
-    {'code': 'ur', 'name': 'اردو', 'flag': '🇵🇰'},
-    {'code': 'bn', 'name': 'বাংলা', 'flag': '🇧🇩'},
-    {'code': 'ta', 'name': 'தமிழ்', 'flag': '🇮🇳'},
-  ];
-
-  void _onLanguageSelected(String code) {
-    if (code != _selectedLanguage) {
-      CustomSnackBar.showInfo(
-        context: context,
-        message: 'Chức năng đang được phát triển',
-      );
-      // Nếu muốn update ngay khi chọn:
-      // setState(() {
-      //   _selectedLanguage = code;
-      // });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,83 +24,37 @@ class _LanguageScreenState extends State<LanguageScreen> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: CustomAppBar(title: 'Ngôn ngữ', showBack: true),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: ListView.separated(
-              padding: EdgeInsets.zero,
-              itemCount: _languages.length,
-              separatorBuilder:
-                  (_, __) => Divider(
-                    height: 1,
-                    color: Colors.grey.shade300,
-                    indent: 16,
-                    endIndent: 16,
+      appBar: const CustomAppBar(title: 'Ngôn ngữ', showBack: true),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Card(
+            child: ClipRRect(
+              borderRadius: AppRadius.borderLg,
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.sm,
+                ),
+                title: Text(
+                  'Tiếng Việt',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
-              itemBuilder: (context, index) {
-                final lang = _languages[index];
-                final isSelected = lang['code'] == _selectedLanguage;
-
-                return RadioListTile<String>(
-                  value: lang['code'],
-                  groupValue: _selectedLanguage,
-                  onChanged: (value) {
-                    if (value != null) _onLanguageSelected(value);
-                  },
-                  title: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Text(
-                      lang['name'],
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  secondary: Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: Text(
-                      lang['flag'],
-                      style: const TextStyle(fontSize: 28),
-                    ),
-                  ),
-                  activeColor: colorScheme.primary,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                  toggleable: false,
-                );
-              },
+                ),
+                subtitle: Text(
+                  'Ngôn ngữ duy nhất hiện được hỗ trợ',
+                  style: theme.textTheme.bodySmall,
+                ),
+                leading: const Text('🇻🇳', style: TextStyle(fontSize: 28)),
+                // Chỉ có một lựa chọn nên hiện dấu chọn thay vì nút radio có
+                // thể bấm — nút bấm được mà không đổi gì sẽ gây hiểu sai.
+                trailing: Icon(
+                  Icons.check_circle_rounded,
+                  color: colorScheme.primary,
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        color: theme.scaffoldBackgroundColor,
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-        child: ElevatedButton(
-          onPressed: () {
-            CustomSnackBar.showInfo(
-              context: context,
-              message: 'Chức năng đang được phát triển',
-            );
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colorScheme.primary,
-            foregroundColor: colorScheme.onPrimary,
-            padding: const EdgeInsets.symmetric(vertical: 18),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-            elevation: 4,
-          ),
-          child: const Text(
-            'Áp dụng',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
         ),
       ),

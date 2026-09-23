@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/config/app_dimens.dart';
 import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/utils/course_card.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
 import 'package:lms/cubits/bookmark/bookmark_state.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
-import 'package:lms/models/bookmark_model.dart';
 import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/repositories/bookmark_repository.dart';
 import 'package:lms/repositories/course_repository.dart';
 import 'package:lms/services/bookmark_service.dart';
-import 'package:lms/services/course_service.dart';
-import 'package:lms/apps/utils/bookmark_button.dart';
 
 class BookmarkScreen extends StatefulWidget {
   final String userUid;
@@ -60,7 +58,6 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
 
   Future<void> _initCubits() async {
     if (widget.userUid.isEmpty) {
-      print('userUid trống, không thể tải bookmark');
       setState(() {
         _isLoading = false;
       });
@@ -79,54 +76,68 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
     try {
       // Tải danh sách bookmark
       await _bookmarkCubit.getBookmarks(widget.userUid);
-
-      // Đợi cho course cubit tải xong dữ liệu
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // Lấy thông tin chi tiết các khóa học đã bookmark
-      _fetchBookmarkedCourses();
-    } catch (e) {
-      print('Lỗi khi khởi tạo cubits: $e');
+    } catch (_) {
+      // Không tải được bookmark thì vẫn hiển thị trạng thái rỗng có nút thử
+      // lại, thay vì treo vòng xoay vô hạn.
     }
 
     if (!mounted) return;
     setState(() {
       _isLoading = false;
     });
+
+    // Danh sách khoá học do `CourseCubit` tự nạp trong constructor và có thể
+    // xong SAU khi bookmark tải xong. Trước đây chỗ này `await Future.delayed(
+    // 500ms)` rồi đọc `state` một lần: mạng chậm hơn 500ms là danh sách rỗng
+    // cho tới khi có sự kiện Cubit không liên quan đẩy vào — người dùng thấy
+    // "chưa lưu khoá học nào" dù thực tế có. Giờ ghép lại mỗi khi Cubit đổi.
+    _courseCubit.stream.listen((_) {
+      if (mounted) _fetchBookmarkedCourses();
+    });
+    _fetchBookmarkedCourses();
   }
 
   void _fetchBookmarkedCourses() {
+    if (!mounted) return;
+
     if (_bookmarkCubit.state.bookmarks.isEmpty) {
-      _bookmarkedCourses = [];
-      _filteredCourses = [];
+      setState(() {
+        _bookmarkedCourses = [];
+        _filteredCourses = [];
+      });
       return;
     }
 
-    if (_courseCubit.state is CourseLoaded) {
-      final allCourses = (_courseCubit.state as CourseLoaded).courses;
+    final allCourses =
+        _courseCubit.state is CourseLoaded
+            ? (_courseCubit.state as CourseLoaded).courses
+            : const <Course>[];
 
-      // Lấy danh sách course ID đã bookmark
-      final bookmarkedIds =
-          _bookmarkCubit.state.bookmarks
-              .map((bookmark) => bookmark.courseId)
-              .toList();
+    // Lấy danh sách course ID đã bookmark
+    final bookmarkedIds =
+        _bookmarkCubit.state.bookmarks
+            .map((bookmark) => bookmark.courseId)
+            .toSet();
 
-      // Lọc ra các khóa học đã bookmark
-      _bookmarkedCourses =
-          allCourses
-              .where((course) => bookmarkedIds.contains(course.courseId))
-              .toList();
+    // Lọc ra các khóa học đã bookmark
+    final matched =
+        allCourses
+            .where((course) => bookmarkedIds.contains(course.courseId))
+            .toList();
 
-      // Đánh dấu tất cả là đã bookmark
-      for (var course in _bookmarkedCourses) {
-        course.isBookmarked = true;
-      }
-
-      // Khởi tạo danh sách đã lọc
-      _filteredCourses = _bookmarkedCourses;
-
-      print('Tìm thấy ${_bookmarkedCourses.length} khóa học đã bookmark');
+    // Đánh dấu tất cả là đã bookmark
+    for (final course in matched) {
+      course.isBookmarked = true;
     }
+
+    setState(() {
+      _bookmarkedCourses = matched;
+      if (_searchQuery.isEmpty) {
+        _filteredCourses = matched;
+      } else {
+        _filterCourses(_searchQuery);
+      }
+    });
   }
 
   @override
@@ -174,7 +185,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
         ],
         child: Scaffold(
           appBar: CustomAppBar(
-            title: "Danh sách khoá học yêu thich",
+            title: 'Khoá học đã lưu',
             showBack: true,
             showSearch: true,
             onSearchChanged: _filterCourses,
@@ -186,53 +197,26 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
               }
 
               if (bookmarkState.status == BookmarkStatus.error) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Đã xảy ra lỗi: ${bookmarkState.errorMessage}',
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed:
-                            () => _bookmarkCubit.getBookmarks(widget.userUid),
-                        child: const Text('Thử lại'),
-                      ),
-                    ],
-                  ),
+                return EmptyStateWidget(
+                  icon: Icons.cloud_off_rounded,
+                  title: 'Không tải được danh sách đã lưu',
+                  message: bookmarkState.errorMessage,
+                  isError: true,
+                  actionLabel: 'Thử lại',
+                  onAction: () => _bookmarkCubit.getBookmarks(widget.userUid),
                 );
               }
 
               if (bookmarkState.bookmarks.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.bookmark_border_rounded,
-                        size: 64,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withOpacity(0.5),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Bạn chưa lưu khóa học nào',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.pushNamed(context, AppRouter.listCourse);
-                        },
-                        icon: const Icon(Icons.search),
-                        label: const Text('Tìm khóa học'),
-                      ),
-                    ],
-                  ),
+                return EmptyStateWidget(
+                  icon: Icons.bookmark_border_rounded,
+                  title: 'Bạn chưa lưu khoá học nào',
+                  message:
+                      'Nhấn biểu tượng dấu trang trên thẻ khoá học để lưu lại và xem sau.',
+                  actionLabel: 'Tìm khoá học',
+                  onAction: () {
+                    Navigator.pushNamed(context, AppRouter.listCourse);
+                  },
                 );
               }
 
@@ -244,348 +228,55 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
     );
   }
 
-  Widget _buildBookmarkedCoursesList() {
-    final priceFmt = NumberFormat('#,###');
+  Future<void> _refresh() async {
+    await _bookmarkCubit.refreshBookmarks(widget.userUid);
+    _courseCubit.refreshCourses();
+  }
 
+  Widget _buildBookmarkedCoursesList() {
+    // Tìm kiếm không khớp kết quả nào — nói rõ là do từ khoá, khác hẳn với
+    // "chưa lưu khoá học nào".
     if (_filteredCourses.isEmpty) {
-      return RefreshIndicator(
-        onRefresh: () async {
-          await _bookmarkCubit.refreshBookmarks(widget.userUid);
-          _courseCubit.refreshCourses();
-        },
-        child: ListView.builder(
-          itemCount: _bookmarkCubit.state.bookmarks.length,
-          itemBuilder: (context, index) {
-            final bookmark = _bookmarkCubit.state.bookmarks[index];
-            return _buildSimpleBookmarkItem(bookmark);
-          },
-        ),
+      return EmptyStateWidget(
+        icon: Icons.search_off_rounded,
+        title: 'Không tìm thấy khoá học',
+        message: 'Không có khoá học nào trong danh sách đã lưu khớp "$_searchQuery".',
+        actionLabel: 'Xoá tìm kiếm',
+        onAction: () => _filterCourses(''),
       );
     }
 
     return RefreshIndicator(
-      onRefresh: () async {
-        await _bookmarkCubit.refreshBookmarks(widget.userUid);
-        _courseCubit.refreshCourses();
-      },
+      onRefresh: _refresh,
       child: ListView.separated(
-        padding: const EdgeInsets.all(16),
+        padding: listPaddingWithBottomInset(context),
         itemCount: _filteredCourses.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 16),
+        separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.lg),
         itemBuilder: (context, index) {
           final course = _filteredCourses[index];
-          final bookmark = _bookmarkCubit.getBookmarkByCourseId(
-            course.courseId,
-          );
-          return _buildBookmarkItem(course, bookmark);
-        },
-      ),
-    );
-  }
-
-  Widget _buildSimpleBookmarkItem(BookmarkModel bookmark) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ListTile(
-        leading: Icon(
-          Icons.bookmark,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        title: Text('Khóa học ID: ${bookmark.courseId}'),
-        subtitle: Text(
-          'Đã lưu vào: ${bookmark.createdAt.day}/${bookmark.createdAt.month}/${bookmark.createdAt.year}',
-        ),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete, color: Colors.red),
-          onPressed: () => _showDeleteConfirmation(bookmark),
-        ),
-        onTap: () {
-          Navigator.pushNamed(
-            context,
-            AppRouter.courseDetail,
-            arguments: bookmark.courseId,
+          // Dùng chung `CourseCard` với trang chủ và màn tìm kiếm: trước đây
+          // màn này tự dựng một thẻ riêng, vừa tràn 4px vừa hiển thị nhãn cấp
+          // độ bằng bảng màu khác.
+          return CourseCard(
+            course: course,
+            userUid: widget.userUid,
+            token: widget.token,
+            bookmarkCubit: _bookmarkCubit,
+            onUnbookmarked: (c) {
+              setState(() {
+                _bookmarkedCourses.removeWhere(
+                  (item) => item.courseId == c.courseId,
+                );
+                _filteredCourses.removeWhere(
+                  (item) => item.courseId == c.courseId,
+                );
+              });
+            },
           );
         },
       ),
     );
   }
 
-  Future<void> _showDeleteConfirmation(BookmarkModel bookmark) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Xóa Bookmark'),
-            content: const Text(
-              'Bạn có chắc chắn muốn xóa bookmark này không?',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Hủy'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Xóa'),
-              ),
-            ],
-          ),
-    );
 
-    if (confirmed == true) {
-      await _bookmarkCubit.deleteBookmark(
-        bookmarkId: bookmark.id,
-        userUid: widget.userUid,
-      );
-
-      setState(() {
-        _bookmarkedCourses.removeWhere(
-          (course) => course.courseId == bookmark.courseId,
-        );
-      });
-    }
-  }
-
-  Widget _buildBookmarkItem(Course course, BookmarkModel? bookmark) {
-    final priceFmt = NumberFormat('#,###');
-    final actualPrice =
-        course.discountPrice > 0 ? course.discountPrice : course.price;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          AppRouter.courseDetail,
-          arguments: course.courseId,
-        );
-      },
-      child: Container(
-        height: 140,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
-          ),
-        ),
-        child: Stack(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child:
-                      course.thumbnailUrl != null &&
-                              course.thumbnailUrl!.isNotEmpty
-                          ? Image.network(
-                            ApiConfig.getImageUrl(course.thumbnailUrl),
-                            width: 120,
-                            height: 120,
-                            fit: BoxFit.cover,
-                            errorBuilder:
-                                (_, __, ___) => _buildPlaceholderImage(context),
-                          )
-                          : _buildPlaceholderImage(context),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Tags
-                      Row(
-                        children: [
-                          _tag(
-                            context,
-                            course.categoryName,
-                            Theme.of(context).colorScheme.primaryContainer,
-                            Theme.of(context).colorScheme.onPrimaryContainer,
-                          ),
-                          const SizedBox(width: 8),
-                          _tag(
-                            context,
-                            courseLevelLabel(course.level),
-                            _getLevelColor(context, course.level),
-                            Theme.of(context).colorScheme.onPrimary,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-
-                      // Title
-                      Text(
-                        course.title,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-
-                      // Price
-                      Row(
-                        children: [
-                          Text(
-                            course.displayPrice,
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                          if (course.discountPrice > 0 && course.price > 0) ...[
-                            const SizedBox(width: 8),
-                            Text(
-                              course.price == 0
-                                  ? ''
-                                  : '${course.price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} VND',
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withOpacity(0.6),
-                                decoration: TextDecoration.lineThrough,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-
-                      // Rating & Enroll
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.star,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.secondary,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            course.rating.toStringAsFixed(1),
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          const SizedBox(width: 16),
-                          Icon(
-                            Icons.person,
-                            size: 16,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withOpacity(0.6),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${course.enrollCount} người học',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            // Bookmark button
-            Positioned(
-              top: 0,
-              right: 0,
-              child: Row(
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.surface.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.outline.withOpacity(0.1),
-                      ),
-                    ),
-                    child: BookmarkButton(
-                      courseId: course.courseId,
-                      userUid: widget.userUid,
-                      token: widget.token,
-                      size: 20,
-                      bookmarkCubit: _bookmarkCubit,
-                      onToggle: (isBookmarked) {
-                        if (!isBookmarked) {
-                          setState(() {
-                            _bookmarkedCourses.removeWhere(
-                              (c) => c.courseId == course.courseId,
-                            );
-                            _filteredCourses.removeWhere(
-                              (c) => c.courseId == course.courseId,
-                            );
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPlaceholderImage(BuildContext context) {
-    return Container(
-      width: 120,
-      height: 120,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      child: Icon(
-        Icons.image_not_supported_outlined,
-        size: 32,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-      ),
-    );
-  }
-
-  Widget _tag(
-    BuildContext context,
-    String text,
-    Color backgroundColor,
-    Color textColor,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: textColor,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  Color _getLevelColor(BuildContext context, String level) {
-    switch (level.toLowerCase()) {
-      case 'beginner':
-        return Colors.green;
-      case 'intermediate':
-        return Colors.orange;
-      case 'advanced':
-        return Colors.red;
-      default:
-        return Theme.of(context).colorScheme.primary;
-    }
-  }
 }

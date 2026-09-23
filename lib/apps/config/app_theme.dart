@@ -85,19 +85,6 @@ class AppTheme {
   static const Color textPrimaryDark = AppPalette.textPrimaryDark;
   static const Color textSecondaryDark = AppPalette.textSecondaryDark;
 
-  /// Màu ngữ nghĩa (thành công / cảnh báo / lỗi / thông tin) **của theme hiện
-  /// tại**.
-  ///
-  /// Dùng khi cần tô chữ hoặc icon theo trạng thái:
-  /// ```dart
-  /// Text('Đã lưu', style: TextStyle(color: AppColors.of(context).success))
-  /// ```
-  /// Khác với [AppTheme.success] (màu thương hiệu, cố định, hợp cho *nền* nút):
-  /// lớp này tự đổi sang bản sáng hơn khi app ở dark mode nên chữ luôn đủ
-  /// tương phản.
-  static AppSemanticColors of(BuildContext context) =>
-      AppSemanticColors.from(Theme.of(context));
-
   /// Bảng chữ đầy đủ cho cả hai chế độ.
   ///
   /// Trước đây theme chỉ khai báo 4 style (displayLarge, titleLarge, bodyLarge,
@@ -620,7 +607,7 @@ class AppTheme {
 /// final c = AppColors.of(context);
 /// Icon(Icons.check_circle, color: c.success)
 /// ```
-class AppSemanticColors {
+class AppColors {
   final Color success;
   final Color warning;
   final Color error;
@@ -632,7 +619,7 @@ class AppSemanticColors {
   final Color errorContainer;
   final Color infoContainer;
 
-  const AppSemanticColors({
+  const AppColors({
     required this.success,
     required this.warning,
     required this.error,
@@ -643,9 +630,13 @@ class AppSemanticColors {
     required this.infoContainer,
   });
 
-  factory AppSemanticColors.from(ThemeData theme) {
+  /// Lấy bảng màu ngữ nghĩa của theme đang dùng.
+  static AppColors of(BuildContext context) =>
+      AppColors.from(Theme.of(context));
+
+  factory AppColors.from(ThemeData theme) {
     final isDark = theme.brightness == Brightness.dark;
-    return AppSemanticColors(
+    return AppColors(
       success: isDark ? AppPalette.successOnDark : AppPalette.success,
       warning: isDark ? AppPalette.warningOnDark : AppPalette.accent,
       error: isDark ? AppPalette.errorOnDark : AppPalette.error,
