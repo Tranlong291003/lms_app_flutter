@@ -234,11 +234,16 @@ class AboutTab extends StatelessWidget {
                       size: 32,
                     ),
                     const SizedBox(width: 10),
-                    Text(
-                      'Lưu ý khi học khoá học MindBridge',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
+                    // Phải bọc `Expanded`: tiêu đề dài hơn chỗ còn lại của Row
+                    // nên tràn ngang (hiện dải vàng đen "RIGHT OVERFLOWED BY
+                    // 8.1 PIXELS" trên máy thật).
+                    Expanded(
+                      child: Text(
+                        'Lưu ý khi học khoá học MindBridge',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                        ),
                       ),
                     ),
                   ],

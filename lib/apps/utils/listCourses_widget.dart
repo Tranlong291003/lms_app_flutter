@@ -192,8 +192,8 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                                     ? Image.network(
                                       ApiConfig.getImageUrl(c.thumbnailUrl) ??
                                           '',
-                                      width: 120,
-                                      height: 120,
+                                      width: _thumbSize(context),
+                                      height: _thumbSize(context),
                                       fit: BoxFit.cover,
                                       loadingBuilder: (_, child, progress) {
                                         if (progress == null) return child;
@@ -211,21 +211,30 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Tags
+                                // Tags.
+                                //
+                                // Cả hai tag phải co giãn được: tên danh mục
+                                // dài ("Lập trình Web") cộng với tag cấp độ
+                                // vượt quá bề rộng còn lại của thẻ trên máy nhỏ
+                                // → tràn 131px (đã bắt được bằng test bố cục).
                                 Row(
                                   children: [
-                                    _tag(
-                                      context,
-                                      c.categoryName,
-                                      theme.colorScheme.primaryContainer,
-                                      theme.colorScheme.onPrimaryContainer,
+                                    Flexible(
+                                      child: _tag(
+                                        context,
+                                        c.categoryName,
+                                        theme.colorScheme.primaryContainer,
+                                        theme.colorScheme.onPrimaryContainer,
+                                      ),
                                     ),
                                     const SizedBox(width: 8),
-                                    _tag(
-                                      context,
-                                      courseLevelLabel(c.level),
-                                      _getLevelColor(context, c.level),
-                                      theme.colorScheme.onPrimary,
+                                    Flexible(
+                                      child: _tag(
+                                        context,
+                                        courseLevelLabel(c.level),
+                                        _getLevelColor(context, c.level),
+                                        theme.colorScheme.onPrimary,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -247,13 +256,20 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                                 // Price row
                                 Row(
                                   children: [
-                                    Text(
-                                      c.displayPrice,
-                                      style: theme.textTheme.bodyLarge
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color: theme.colorScheme.primary,
-                                          ),
+                                    // Giá bán cũng phải co giãn: ở chữ lớn (x1.3)
+                                    // trên máy 320px, giá bán + giá gốc vượt bề
+                                    // rộng còn lại nên tràn 40px.
+                                    Flexible(
+                                      child: Text(
+                                        c.displayPrice,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.bodyLarge
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: theme.colorScheme.primary,
+                                            ),
+                                      ),
                                     ),
                                     if (c.discountPrice > 0 && c.price > 0) ...[
                                       const SizedBox(width: 8),
@@ -280,7 +296,11 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                                 ),
                                 const SizedBox(height: 6),
 
-                                // Rating and Enroll count
+                                // Rating and Enroll count.
+                                //
+                                // Bọc `Flexible` cho cả điểm đánh giá: số điểm
+                                // dài (vd "4.3") cộng hai icon và khoảng cách
+                                // vẫn có thể vượt bề rộng thẻ trên máy rất nhỏ.
                                 Row(
                                   children: [
                                     Icon(
@@ -289,9 +309,13 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                                       color: theme.colorScheme.secondary,
                                     ),
                                     const SizedBox(width: 4),
-                                    Text(
-                                      c.rating.toStringAsFixed(1),
-                                      style: theme.textTheme.bodySmall,
+                                    Flexible(
+                                      child: Text(
+                                        c.rating.toStringAsFixed(1),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.bodySmall,
+                                      ),
                                     ),
                                     const SizedBox(width: 16),
                                     Icon(
@@ -363,10 +387,23 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
     (m) => '${m[1]}.',
   );
 
+  /// Kích thước ảnh thu nhỏ của thẻ.
+  ///
+  /// Cố định 120px từng khiến cột chữ chỉ còn ~132px trên máy 320px, không đủ
+  /// cho hàng tag + giá + đánh giá → tràn. Thu nhỏ ảnh trên màn hẹp để nhường
+  /// chỗ cho phần chữ.
+  double _thumbSize(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    if (width < 360) return 88;
+    if (width < 400) return 104;
+    return 120;
+  }
+
   Widget _buildPlaceholderImage(BuildContext context) {
+    final size = _thumbSize(context);
     return Container(
-      width: 120,
-      height: 120,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
@@ -393,6 +430,10 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
       ),
       child: Text(
         text,
+        // Tag bị co lại (Flexible ở hàng tags) phải cắt bằng "..." thay vì
+        // tràn chữ ra ngoài khung.
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(color: fg),
       ),
     );

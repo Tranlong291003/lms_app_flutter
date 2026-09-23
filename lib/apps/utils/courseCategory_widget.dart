@@ -40,11 +40,15 @@ class CourseCategoryWidget extends StatelessWidget {
           final cats = [allCat, ...state.categories];
           final selId = state.selectedId; // null => All
 
-          return SizedBox(
-            height: 40,
+          // Chiều cao cố định 40px sẽ cắt chữ khi người dùng tăng cỡ chữ hệ
+          // thống. Dùng chiều cao suy ra từ nội dung, có chặn trên/dưới.
+          return ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 40, maxHeight: 64),
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              // Đệm thêm bên phải để chip cuối không dính sát mép và khi cuộn
+              // hết vẫn thấy được viền chip.
+              padding: const EdgeInsets.only(left: 16, right: 24),
               separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemCount: cats.length,
               itemBuilder: (_, i) {
