@@ -26,6 +26,19 @@ class CourseTabView extends StatelessWidget {
     required this.instructorUid,
   });
 
+  /// Chiều cao vùng nội dung tab.
+  ///
+  /// Không phải hằng số 50% như trước: tính theo chiều cao thật của màn hình,
+  /// trừ đi phần đã bị ảnh bìa + tiêu đề khoá học + thanh thông số chiếm mất,
+  /// và vẫn giữ một mức tối thiểu để tab ngắn không bị bóp lại.
+  double _contentHeight(BuildContext context) {
+    final media = MediaQuery.of(context);
+    // ảnh bìa (khoảng 220) + tiêu đề/thông số (khoảng 180) + thanh công cụ
+    const occupiedByHeader = 400.0;
+    final available = media.size.height - media.padding.vertical - occupiedByHeader;
+    return available.clamp(320.0, media.size.height * 0.75);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -91,8 +104,13 @@ class CourseTabView extends StatelessWidget {
           ),
 
           // ── Phần nội dung ────────────────────────────────────────────────────
+          //
+          // Widget này nằm trong CustomScrollView nên chiều cao KHÔNG bị chặn —
+          // dùng `Expanded` ở đây sẽ ném lỗi layout. Vì vậy vẫn cần một chiều
+          // cao xác định, nhưng tính theo phần màn hình còn lại (trừ thanh công
+          // cụ và phần đầu trang) thay vì cố định 50%.
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.5,
+            height: _contentHeight(context),
             child: TabBarView(
               children: [
                 AboutTab(

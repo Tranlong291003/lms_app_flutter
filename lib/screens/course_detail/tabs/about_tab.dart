@@ -58,16 +58,26 @@ class AboutTab extends StatelessWidget {
                     ),
                     shape: BoxShape.circle,
                   ),
+                  // `assets/images/mentor.png` không tồn tại trong repo, mà
+                  // `backgroundImage` nhận thẳng AssetImage nên không có chỗ
+                  // gắn errorBuilder — ảnh sẽ lỗi thay vì hiện gì đó. Dùng
+                  // `foregroundImage` cho ảnh mạng và icon dự phòng cho phần
+                  // còn lại.
                   child: CircleAvatar(
                     radius: 32,
-                    backgroundImage:
+                    backgroundColor: theme.colorScheme.primaryContainer,
+                    foregroundImage:
                         (instructorAvatarUrl != null &&
                                 instructorAvatarUrl!.isNotEmpty)
                             ? NetworkImage(
-                              ApiConfig.getImageUrl(instructorAvatarUrl),
-                            )
-                            : const AssetImage('assets/images/mentor.png')
-                                as ImageProvider,
+                                ApiConfig.getImageUrl(instructorAvatarUrl),
+                              )
+                            : null,
+                    child: Icon(
+                      Icons.person_rounded,
+                      size: 34,
+                      color: theme.colorScheme.onPrimaryContainer,
+                    ),
                   ),
                 ),
               ),

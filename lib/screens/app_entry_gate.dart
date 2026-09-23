@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/bottomNavigationBar.dart';
+import 'package:lms/screens/Introduction/cubit/intro_cubit.dart';
 import 'package:lms/screens/Introduction/intro_screen.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/login/cubit/auth_state.dart';
 import 'package:lms/screens/login/login_screen.dart';
 import 'package:lms/screens/splash_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Cổng vào app: quyết định hiển thị Intro / Login / Home.
 ///
@@ -31,9 +31,16 @@ class _AppEntryGateState extends State<AppEntryGate> {
     });
   }
 
+  /// Đã xem intro chưa.
+  ///
+  /// Trước đây hàm này đọc khoá `'isIntroViewed'` trong khi `IntroCubit` (thứ
+  /// thực sự ghi trạng thái) dùng khoá `'intro_seen'`. Hai khoá cho cùng một
+  /// việc nên dù người dùng đã bấm "Bỏ qua"/"Bắt đầu", lần mở sau intro vẫn
+  /// hiện lại. Giờ đọc qua chính `IntroCubit` để chỉ còn một nguồn sự thật.
   Future<bool> _hasSeenIntro() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('isIntroViewed') ?? false;
+    await context.read<IntroCubit>().checkIntroStatus();
+    if (!mounted) return true;
+    return context.read<IntroCubit>().state is IntroViewed;
   }
 
   @override

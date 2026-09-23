@@ -84,7 +84,9 @@ class _BottomNavigationBarExampleState
         BottomNavigationBarItem(
           icon: const Icon(Icons.school_outlined),
           activeIcon: const Icon(Icons.school),
-          label: 'Đăng ký Mentor',
+          // Nhãn cũ "Đăng ký Mentor" quá dài nên bị cắt thành "Đăng ký Me..."
+          // trên máy hẹp (thanh dưới chia đều cho 5 tab).
+          label: 'Mentor',
         ),
       if (dashboardScreen != null)
         BottomNavigationBarItem(

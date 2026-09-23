@@ -1,7 +1,6 @@
 // lib/widgets/list_courses_widget.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/bookmark_button.dart';
@@ -69,8 +68,9 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
       await _bookmarkCubit.getBookmarks(widget.userUid);
 
       _updateCoursesBookmarkStatus();
-    } catch (e) {
-      print('Không thể tải bookmarks: $e');
+    } catch (_) {
+      // Không tải được bookmark thì danh sách khóa học vẫn phải hiển thị:
+      // trạng thái lưu sẽ chỉ ở mức mặc định (chưa lưu).
     } finally {
       if (mounted) {
         setState(() {
@@ -117,7 +117,6 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
     }
 
     final theme = Theme.of(context);
-    final priceFmt = NumberFormat('#,###');
 
     return BlocProvider.value(
       value: widget.bookmarkCubit ?? _bookmarkCubit,
@@ -154,8 +153,6 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
             separatorBuilder: (_, __) => const SizedBox(height: 16),
             itemBuilder: (context, i) {
               final c = coursesToDisplay[i];
-              final actualPrice =
-                  c.discountPrice > 0 ? c.discountPrice : c.price;
 
               final bool isBookmarked = _bookmarkCubit.isBookmarked(c.courseId);
 
@@ -264,7 +261,7 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                                       // không đẩy tràn cả hàng khi giá dài.
                                       Flexible(
                                         child: Text(
-                                          '${priceFmt.format(c.price)} VND',
+                                          '${_formatVnd(c.price)} đ',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: theme.textTheme.bodySmall
@@ -355,6 +352,16 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
       ),
     );
   }
+
+  /// Định dạng tiền theo kiểu Việt Nam (phân cách nghìn bằng dấu chấm).
+  ///
+  /// Trước đây giá gốc gạch ngang dùng `NumberFormat('#,###')` cho ra
+  /// "1,299,000 VND" trong khi giá bán dùng dấu chấm — hai định dạng khác nhau
+  /// nằm cạnh nhau trên cùng một thẻ.
+  static String _formatVnd(int amount) => amount.toString().replaceAllMapped(
+    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+    (m) => '${m[1]}.',
+  );
 
   Widget _buildPlaceholderImage(BuildContext context) {
     return Container(

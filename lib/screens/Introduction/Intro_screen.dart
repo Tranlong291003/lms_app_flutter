@@ -58,9 +58,15 @@ class _IntroScreenState extends State<IntroScreen> {
     );
   }
 
+  /// Đánh dấu đã xem intro rồi quay về cổng vào app.
+  ///
+  /// Trước đây hàm này chỉ ghi `'isIntroViewed'` trong khi `IntroCubit` ghi
+  /// `'intro_seen'`, và `AppEntryGate` chỉ đọc `'isIntroViewed'` — hai hệ khoá
+  /// cho cùng một việc nên intro cứ hiện lại. Giờ ghi qua `IntroCubit` để chỉ
+  /// còn một nguồn sự thật.
   Future<void> setIntroViewedAndNavigate(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isIntroViewed', true);
+    await context.read<IntroCubit>().markIntroAsViewed();
+    if (!context.mounted) return;
     Navigator.pushReplacementNamed(context, '/');
   }
 
@@ -123,15 +129,11 @@ class _IntroScreenState extends State<IntroScreen> {
                 fontSize: 20,
               ),
             ),
-            onSkip: () {
-              context
-                  .read<IntroCubit>()
-                  .markIntroAsViewed(); // Đánh dấu intro đã xem
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-              );
-            },
+            // "Bỏ qua" phải đi qua AppEntryGate (route '/') để còn kiểm tra
+            // phiên đăng nhập. Trước đây nó đẩy thẳng tới LoginScreen, nên
+            // người dùng ĐÃ đăng nhập mà bấm "Bỏ qua" sẽ bị ném về màn đăng
+            // nhập, và còn ghi sai khoá khiến intro hiện lại ở lần mở sau.
+            onSkip: () => setIntroViewedAndNavigate(context),
             onDone: () {
               context
                   .read<IntroCubit>()
