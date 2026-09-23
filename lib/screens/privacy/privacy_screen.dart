@@ -56,60 +56,30 @@ class PrivacyScreen extends StatelessWidget {
             context: context,
             icon: Icons.person_outline,
             title: 'Thông tin cá nhân',
-            onTap: () {
-              CustomSnackBar.showInfo(
-                context: context,
-                message: 'Chức năng đang được phát triển',
-              );
-            },
           ),
 
           _buildPrivacyItem(
             context: context,
             icon: Icons.cookie_outlined,
             title: 'Cookie và dữ liệu',
-            onTap: () {
-              CustomSnackBar.showInfo(
-                context: context,
-                message: 'Chức năng đang được phát triển',
-              );
-            },
           ),
 
           _buildPrivacyItem(
             context: context,
             icon: Icons.security_outlined,
             title: 'Bảo mật dữ liệu',
-            onTap: () {
-              CustomSnackBar.showInfo(
-                context: context,
-                message: 'Chức năng đang được phát triển',
-              );
-            },
           ),
 
           _buildPrivacyItem(
             context: context,
             icon: Icons.share_outlined,
             title: 'Chia sẻ thông tin',
-            onTap: () {
-              CustomSnackBar.showInfo(
-                context: context,
-                message: 'Chức năng đang được phát triển',
-              );
-            },
           ),
 
           _buildPrivacyItem(
             context: context,
             icon: Icons.child_care_outlined,
             title: 'Bảo vệ trẻ em',
-            onTap: () {
-              CustomSnackBar.showInfo(
-                context: context,
-                message: 'Chức năng đang được phát triển',
-              );
-            },
           ),
 
           const SizedBox(height: 24),
@@ -214,49 +184,42 @@ class PrivacyScreen extends StatelessWidget {
     );
   }
 
+  /// Mục chính sách: hiển thị thông tin, KHÔNG phải liên kết.
+  ///
+  /// Trước đây mỗi mục có mũi tên ">" và bấm vào chỉ hiện "Chức năng đang được
+  /// phát triển" — trong khi nội dung chính sách đã có sẵn ở màn này. Giờ các
+  /// mục chỉ là tiêu đề nhóm, không có affordance bấm.
   Widget _buildPrivacyItem({
     required BuildContext context,
     required IconData icon,
     required String title,
-    required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: theme.colorScheme.primary),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+              child: Icon(icon, color: theme.colorScheme.primary),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
