@@ -157,10 +157,10 @@ class _CustomAppBarState extends State<CustomAppBar>
                         color:
                             isDark
                                 ? theme.colorScheme.surface
-                                : theme.colorScheme.surface.withOpacity(0.8),
+                                : theme.colorScheme.surface.withValues(alpha: 0.8),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: theme.colorScheme.primary.withOpacity(0.2),
+                          color: theme.colorScheme.primary.withValues(alpha: 0.2),
                           width: 1,
                         ),
                       ),
@@ -172,11 +172,11 @@ class _CustomAppBarState extends State<CustomAppBar>
                         decoration: InputDecoration(
                           hintText: 'Tìm kiếm...',
                           hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                           prefixIcon: Icon(
                             Icons.search_rounded,
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                             size: 20,
                           ),
                           border: InputBorder.none,
@@ -187,9 +187,7 @@ class _CustomAppBarState extends State<CustomAppBar>
                           suffixIcon: IconButton(
                             icon: Icon(
                               Icons.close_rounded,
-                              color: theme.colorScheme.onSurface.withOpacity(
-                                0.6,
-                              ),
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                               size: 20,
                             ),
                             onPressed: _toggleSearch,
@@ -277,7 +275,7 @@ class _CustomAppBarState extends State<CustomAppBar>
                   color: theme.scaffoldBackgroundColor,
                   border: Border(
                     bottom: BorderSide(
-                      color: theme.colorScheme.outline.withOpacity(0.1),
+                      color: theme.colorScheme.outline.withValues(alpha: 0.1),
                       width: 1,
                     ),
                   ),
@@ -290,9 +288,7 @@ class _CustomAppBarState extends State<CustomAppBar>
                   ),
                   unselectedLabelStyle: theme.textTheme.titleMedium,
                   labelColor: theme.colorScheme.primary,
-                  unselectedLabelColor: theme.colorScheme.onSurface.withOpacity(
-                    0.6,
-                  ),
+                  unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   indicatorColor: theme.colorScheme.primary,
                   indicatorWeight: 3,
                   indicatorSize: TabBarIndicatorSize.label,
@@ -303,7 +299,7 @@ class _CustomAppBarState extends State<CustomAppBar>
             else if (widget.showBottomBorder)
               Container(
                 height: 1,
-                color: theme.colorScheme.outline.withOpacity(0.1),
+                color: theme.colorScheme.outline.withValues(alpha: 0.1),
               ),
           ],
         ),

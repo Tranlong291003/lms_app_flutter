@@ -116,7 +116,7 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
           playedColor: Theme.of(context).colorScheme.primary,
           handleColor: Theme.of(context).colorScheme.primary,
           backgroundColor: Colors.grey[300]!,
-          bufferedColor: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+          bufferedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
         ),
         onEnded: (data) {
           if (widget.hideRelatedVideos) {

@@ -658,7 +658,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                                   if (Theme.of(context).brightness ==
                                       Brightness.light)
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.06),
+                                      color: Colors.black.withValues(alpha: 0.06),
                                       blurRadius: 12,
                                       offset: const Offset(0, 4),
                                     ),
@@ -666,7 +666,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                                 border: Border.all(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.outline.withOpacity(0.08),
+                                  ).colorScheme.outline.withValues(alpha: 0.08),
                                 ),
                               ),
                               child: Row(

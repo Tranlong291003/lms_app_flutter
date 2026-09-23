@@ -101,20 +101,20 @@ class _NotificationSettingScreenState
                   Icon(
                     Icons.notifications_none_rounded,
                     size: 56,
-                    color: colorScheme.onSurface.withOpacity(0.3),
+                    color: colorScheme.onSurface.withValues(alpha: 0.3),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'Xem tất cả thông báo',
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.7),
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Danh sách thông báo của bạn nằm ở màn hình riêng.',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.5),
+                      color: colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -178,7 +178,7 @@ class _NotificationSettingScreenState
                   Text(
                     subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],

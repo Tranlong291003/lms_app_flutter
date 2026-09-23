@@ -222,7 +222,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: colorScheme.shadow.withOpacity(0.1),
+                          color: colorScheme.shadow.withValues(alpha: 0.1),
                           blurRadius: 10,
                           spreadRadius: 0,
                           offset: const Offset(0, 5),
@@ -244,10 +244,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   border: Border.all(
                                     color:
                                         isDark
-                                            ? colorScheme.onSurface.withOpacity(
-                                              0.2,
-                                            )
-                                            : Colors.white.withOpacity(0.8),
+                                            ? colorScheme.onSurface.withValues(alpha: 0.2)
+                                            : Colors.white.withValues(alpha: 0.8),
                                     width: 3,
                                   ),
                                 ),
@@ -256,7 +254,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   backgroundColor:
                                       isDark
                                           ? colorScheme.surfaceContainerHighest
-                                          : Colors.white.withOpacity(0.9),
+                                          : Colors.white.withValues(alpha: 0.9),
                                   backgroundImage:
                                       _imageFile != null
                                           ? FileImage(_imageFile!)
@@ -273,9 +271,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             color:
                                                 isDark
                                                     ? colorScheme.onSurface
-                                                        .withOpacity(0.4)
+                                                        .withValues(alpha: 0.4)
                                                     : colorScheme.primary
-                                                        .withOpacity(0.3),
+                                                        .withValues(alpha: 0.3),
                                           )
                                           : null,
                                 ),
@@ -539,14 +537,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             hintStyle: TextStyle(
               color:
                   isDark
-                      ? colorScheme.onSurface.withOpacity(0.5)
-                      : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                      ? colorScheme.onSurface.withValues(alpha: 0.5)
+                      : colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             filled: true,
             fillColor:
                 isDark
-                    ? colorScheme.surfaceContainerHighest.withOpacity(0.3)
-                    : colorScheme.surfaceContainerHighest.withOpacity(0.1),
+                    ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
+                    : colorScheme.surfaceContainerHighest.withValues(alpha: 0.1),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
@@ -615,8 +613,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             filled: true,
             fillColor:
                 isDark
-                    ? colorScheme.surfaceContainerHighest.withOpacity(0.3)
-                    : colorScheme.surfaceContainerHighest.withOpacity(0.1),
+                    ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
+                    : colorScheme.surfaceContainerHighest.withValues(alpha: 0.1),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
@@ -672,8 +670,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             decoration: BoxDecoration(
               color:
                   isDark
-                      ? colorScheme.surfaceContainerHighest.withOpacity(0.3)
-                      : colorScheme.surfaceContainerHighest.withOpacity(0.1),
+                      ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
+                      : colorScheme.surfaceContainerHighest.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
@@ -685,8 +683,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     color:
                         value == 'Chọn ngày sinh'
                             ? (isDark
-                                ? colorScheme.onSurface.withOpacity(0.5)
-                                : colorScheme.onSurfaceVariant.withOpacity(0.5))
+                                ? colorScheme.onSurface.withValues(alpha: 0.5)
+                                : colorScheme.onSurfaceVariant.withValues(alpha: 0.5))
                             : (isDark
                                 ? colorScheme.onSurface
                                 : colorScheme.onSurfaceVariant),

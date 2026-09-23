@@ -32,7 +32,7 @@ class RecentCourses extends StatelessWidget {
                       ? []
                       : [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -40,7 +40,7 @@ class RecentCourses extends StatelessWidget {
               border:
                   isDark
                       ? Border.all(
-                        color: colorScheme.outline.withOpacity(0.1),
+                        color: colorScheme.outline.withValues(alpha: 0.1),
                         width: 1,
                       )
                       : null,
@@ -101,7 +101,7 @@ class RecentCourses extends StatelessWidget {
                       LinearProgressIndicator(
                         value: course['progress'],
                         backgroundColor: colorScheme.surfaceContainerHighest
-                            .withOpacity(0.3),
+                            .withValues(alpha: 0.3),
                         valueColor: AlwaysStoppedAnimation<Color>(
                           colorScheme.primary,
                         ),

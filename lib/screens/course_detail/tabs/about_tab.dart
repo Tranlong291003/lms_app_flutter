@@ -213,11 +213,11 @@ class AboutTab extends StatelessWidget {
             margin: const EdgeInsets.only(top: 8),
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.7),
+              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(18),
               boxShadow: [
                 BoxShadow(
-                  color: theme.colorScheme.primary.withOpacity(0.07),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.07),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),

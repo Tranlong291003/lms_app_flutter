@@ -49,7 +49,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       decoration: InputDecoration(
         labelText: widget.labelText, // Sử dụng labelText được truyền vào
         labelStyle: TextStyle(
-          color: theme.colorScheme.onSurface.withOpacity(0.7),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
         ),
         // Trước đây không truyền `prefixAsset` thì mặc định gắn icon PHONG BÌ
         // cho mọi ô — kể cả ô mật khẩu — nên icon vô nghĩa và gây nhầm lẫn.
@@ -64,12 +64,12 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 : widget.prefixIcon != null
                     ? Icon(
                       widget.prefixIcon,
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     )
                     : widget.obscureText
                         ? Icon(
                           Icons.lock_outline_rounded,
-                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                         )
                         : null,
         border: OutlineInputBorder(
@@ -89,7 +89,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12), // Bo góc khi bình thường
           borderSide: BorderSide(
-            color: theme.colorScheme.outline.withOpacity(0.5), // Màu viền mờ
+            color: theme.colorScheme.outline.withValues(alpha: 0.5), // Màu viền mờ
             width: 1, // Độ dày viền khi bình thường
           ),
         ),
@@ -109,7 +109,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     _isObscure
                         ? Icons.visibility_off
                         : Icons.visibility, // Icon thay đổi khi nhấn
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                   onPressed: () {
                     setState(() {

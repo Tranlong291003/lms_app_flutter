@@ -47,12 +47,12 @@ class LoadingIndicator extends StatelessWidget {
             padding: EdgeInsets.all(effective * 0.42),
             decoration: BoxDecoration(
               color: theme.brightness == Brightness.dark
-                  ? theme.colorScheme.surface.withOpacity(0.7)
-                  : Colors.white.withOpacity(0.85),
+                  ? theme.colorScheme.surface.withValues(alpha: 0.7)
+                  : Colors.white.withValues(alpha: 0.85),
               borderRadius: BorderRadius.circular(effective),
               boxShadow: [
                 BoxShadow(
-                  color: theme.shadowColor.withOpacity(0.12),
+                  color: theme.shadowColor.withValues(alpha: 0.12),
                   blurRadius: 24,
                   offset: const Offset(0, 8),
                 ),

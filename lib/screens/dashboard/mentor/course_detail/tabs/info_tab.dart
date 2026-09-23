@@ -27,7 +27,7 @@ class InfoTab extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
+                  color: Colors.black.withValues(alpha: 0.08),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -63,7 +63,7 @@ class InfoTab extends StatelessWidget {
                         child: Icon(
                           Icons.image_outlined,
                           size: 60,
-                          color: colors.primary.withOpacity(0.5),
+                          color: colors.primary.withValues(alpha: 0.5),
                         ),
                       ),
             ),
@@ -95,7 +95,7 @@ class InfoTab extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: colors.onSurface.withOpacity(0.8),
+                      color: colors.onSurface.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -218,7 +218,7 @@ class InfoTab extends StatelessWidget {
                           .map(
                             (tag) => Chip(
                               label: Text(tag.trim()),
-                              backgroundColor: colors.primary.withOpacity(.1),
+                              backgroundColor: colors.primary.withValues(alpha: .1),
                               labelStyle: textTheme.labelSmall,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
@@ -267,7 +267,7 @@ class InfoTab extends StatelessWidget {
             '${NumberFormat.decimalPattern().format(price)}đ',
             style: TextStyle(
               decoration: TextDecoration.lineThrough,
-              color: colors.onSurface.withOpacity(0.6),
+              color: colors.onSurface.withValues(alpha: 0.6),
               fontSize: 12,
             ),
           ),
@@ -304,9 +304,9 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(50),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -343,20 +343,20 @@ class _InfoTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
             spreadRadius: 0,
           ),
         ],
-        border: Border.all(color: colors.outlineVariant.withOpacity(0.1)),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: colors.primary.withOpacity(0.1),
+              color: colors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, size: 16, color: colors.primary),
@@ -426,19 +426,19 @@ class _InfoStatCard extends StatelessWidget {
               isDark
                   ? [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 5,
                       offset: const Offset(0, 1),
                     ),
                   ]
                   : [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
                   ],
-          border: Border.all(color: color.withOpacity(0.08)),
+          border: Border.all(color: color.withValues(alpha: 0.08)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

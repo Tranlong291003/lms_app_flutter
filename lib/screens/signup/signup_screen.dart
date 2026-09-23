@@ -137,10 +137,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             height: 160,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: AppTheme.primary.withOpacity(0.08),
+                              color: AppTheme.primary.withValues(alpha: 0.08),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppTheme.primary.withOpacity(0.10),
+                                  color: AppTheme.primary.withValues(alpha: 0.10),
                                   blurRadius: 24,
                                   offset: const Offset(0, 8),
                                 ),

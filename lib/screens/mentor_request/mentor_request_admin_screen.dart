@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/empty_state_widget.dart';
+import 'package:lms/apps/utils/status_chip.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/mentor_request_cubit.dart';
 
@@ -183,25 +185,19 @@ class _MentorRequestAdminScreenState extends State<MentorRequestAdminScreen> {
                     (req['user_name'] ?? req['user_uid'] ?? 'Không rõ')
                         .toString();
                 final status = (req['status'] ?? '').toString();
-                final statusColor =
-                    status == 'approved'
-                        ? Colors.green.shade600
-                        : status == 'rejected'
-                        ? Colors.red.shade600
-                        : Colors.orange.shade700;
-                final statusLabel =
-                    status == 'approved'
-                        ? 'Đã duyệt'
-                        : status == 'rejected'
-                        ? 'Đã từ chối'
-                        : 'Chờ duyệt';
+                // `StatusChip` tự lo màu theo sáng/tối và phân biệt trạng thái
+                // bằng cả chấm màu lẫn chữ — trước đây chip dùng
+                // `Colors.green/red/orange` với chữ trắng (2.2–2.9:1) nên gần
+                // như không đọc được.
+                final tone = StatusChip.toneFor(status);
+                final statusLabel = switch (status) {
+                  'approved' => 'Đã duyệt',
+                  'rejected' => 'Đã từ chối',
+                  _ => 'Chờ duyệt',
+                };
 
                 return Card(
                   elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  shadowColor: statusColor.withOpacity(0.4),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -252,20 +248,7 @@ class _MentorRequestAdminScreenState extends State<MentorRequestAdminScreen> {
                                 ),
                               ),
                               const SizedBox(height: 6),
-                              Chip(
-                                label: Text(
-                                  statusLabel,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                backgroundColor: statusColor,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                              ),
+                              StatusChip(label: statusLabel, tone: tone),
                             ],
                           ),
                         ),
@@ -276,19 +259,19 @@ class _MentorRequestAdminScreenState extends State<MentorRequestAdminScreen> {
                               IconButton(
                                 icon: Icon(
                                   Icons.check_circle_rounded,
-                                  color: Colors.green.shade700,
+                                  color: AppColors.of(context).success,
                                   size: 28,
                                 ),
-                                tooltip: 'Duyệt',
+                                tooltip: 'Duyệt yêu cầu',
                                 onPressed: () => _handleApprove(req['id']),
                               ),
                               IconButton(
                                 icon: Icon(
                                   Icons.cancel_rounded,
-                                  color: Colors.red.shade700,
+                                  color: AppColors.of(context).error,
                                   size: 28,
                                 ),
-                                tooltip: 'Từ chối',
+                                tooltip: 'Từ chối yêu cầu',
                                 onPressed: () => _handleReject(req['id']),
                               ),
                             ],

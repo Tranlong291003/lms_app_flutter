@@ -35,7 +35,7 @@ class CourseDetailScreen extends StatelessWidget {
           bottom: TabBar(
             dividerColor: Colors.transparent,
             labelColor: cs.primary,
-            unselectedLabelColor: cs.onSurface.withOpacity(0.7),
+            unselectedLabelColor: cs.onSurface.withValues(alpha: 0.7),
             labelStyle: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               fontSize: 16,

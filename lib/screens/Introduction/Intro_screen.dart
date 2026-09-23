@@ -87,9 +87,9 @@ class _IntroScreenState extends State<IntroScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.black.withOpacity(0.4),
-                  Colors.black.withOpacity(0.2),
-                  Colors.black.withOpacity(0.4),
+                  Colors.black.withValues(alpha: 0.4),
+                  Colors.black.withValues(alpha: 0.2),
+                  Colors.black.withValues(alpha: 0.4),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,

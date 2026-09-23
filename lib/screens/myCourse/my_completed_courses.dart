@@ -111,7 +111,7 @@ class _MyCompletedCoursesScreenState extends State<MyCompletedCoursesScreen> {
                         size: 64,
                         color: Theme.of(
                           context,
-                        ).colorScheme.primary.withOpacity(0.3),
+                        ).colorScheme.primary.withValues(alpha: 0.3),
                       ),
                       const SizedBox(height: 20),
                       Text(
@@ -122,7 +122,7 @@ class _MyCompletedCoursesScreenState extends State<MyCompletedCoursesScreen> {
                           fontWeight: FontWeight.bold,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.8),
+                          ).colorScheme.onSurface.withValues(alpha: 0.8),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -132,7 +132,7 @@ class _MyCompletedCoursesScreenState extends State<MyCompletedCoursesScreen> {
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.6),
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                         textAlign: TextAlign.center,
                       ),

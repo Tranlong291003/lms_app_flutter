@@ -223,7 +223,7 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
             end: Alignment.bottomCenter,
             colors: [
               colorScheme.surface,
-              colorScheme.surfaceContainerHighest.withOpacity(0.3),
+              colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             ],
           ),
         ),
@@ -241,7 +241,7 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: colorScheme.shadow.withOpacity(0.1),
+                          color: colorScheme.shadow.withValues(alpha: 0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -309,7 +309,7 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: colorScheme.shadow.withOpacity(0.05),
+                        color: colorScheme.shadow.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -498,7 +498,7 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: colorScheme.primary.withOpacity(0.3),
+                        color: colorScheme.primary.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -547,7 +547,7 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
           Icon(
             Icons.broken_image_outlined,
             size: 48,
-            color: colorScheme.primary.withOpacity(0.7),
+            color: colorScheme.primary.withValues(alpha: 0.7),
           ),
           const SizedBox(height: 12),
           Text(
@@ -580,11 +580,11 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
         prefixIcon: Icon(icon, color: colorScheme.primary),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.5)),
+          borderSide: BorderSide(color: colorScheme.outline.withValues(alpha: 0.5)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.5)),
+          borderSide: BorderSide(color: colorScheme.outline.withValues(alpha: 0.5)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -628,11 +628,11 @@ class _CourseFormScreenState extends State<CourseFormScreen> {
         prefixIcon: Icon(icon, color: colorScheme.primary),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.5)),
+          borderSide: BorderSide(color: colorScheme.outline.withValues(alpha: 0.5)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.5)),
+          borderSide: BorderSide(color: colorScheme.outline.withValues(alpha: 0.5)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),

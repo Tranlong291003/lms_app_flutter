@@ -1,71 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_dimens.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/empty_state_widget.dart';
-import 'package:lms/apps/utils/custom_snackbar.dart';
+import 'package:lms/apps/utils/status_chip.dart';
 
+/// Màn hình thanh toán.
+///
+/// App chưa có API thanh toán nào, nên màn này KHÔNG giả vờ là dùng được:
+/// trước đây ba "phương thức thanh toán" là ba thẻ bấm được nhưng chỉ hiện
+/// "Chức năng đang được phát triển", và ô nhập mã giảm giá thì **không có
+/// controller** nên gõ vào xong bấm "Áp dụng" là mất sạch nội dung.
+///
+/// Giờ các phương thức hiển thị ở trạng thái chờ, không bấm được, để người
+/// dùng không mất thời gian thử.
 class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key});
+
+  static const _methods = <(String, IconData)>[
+    ('Thẻ tín dụng/Ghi nợ', Icons.credit_card),
+    ('Ví điện tử', Icons.account_balance_wallet),
+    ('Chuyển khoản ngân hàng', Icons.account_balance),
+  ];
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: CustomAppBar(title: 'Thanh toán', showBack: true),
+      appBar: const CustomAppBar(title: 'Thanh toán', showBack: true),
       body: ListView(
-        // Cong them vung an toan day: muc cuoi tung nam duoi home indicator.
+        // Cộng thêm vùng an toàn đáy: mục cuối từng nằm dưới home indicator.
         padding: listPaddingWithBottomInset(context),
         children: [
-          _buildSectionTitle('Phương thức thanh toán', theme),
+          _SectionTitle('Phương thức thanh toán'),
 
-          // Danh sách phương thức thanh toán
-          _buildPaymentMethod(
-            context: context,
-            title: 'Thẻ tín dụng/Ghi nợ',
-            icon: Icons.credit_card,
-            onTap: () {
-              CustomSnackBar.showInfo(
-                context: context,
-                message: 'Chức năng đang được phát triển',
-              );
-            },
-          ),
+          for (final (title, icon) in _methods)
+            _PaymentMethodTile(title: title, icon: icon),
 
-          _buildPaymentMethod(
-            context: context,
-            title: 'Ví điện tử',
-            icon: Icons.account_balance_wallet,
-            onTap: () {
-              CustomSnackBar.showInfo(
-                context: context,
-                message: 'Chức năng đang được phát triển',
-              );
-            },
-          ),
+          const SizedBox(height: AppSpacing.xxl),
+          _SectionTitle('Lịch sử giao dịch'),
 
-          _buildPaymentMethod(
-            context: context,
-            title: 'Chuyển khoản ngân hàng',
-            icon: Icons.account_balance,
-            onTap: () {
-              CustomSnackBar.showInfo(
-                context: context,
-                message: 'Chức năng đang được phát triển',
-              );
-            },
-          ),
-
-          const SizedBox(height: 24),
-          _buildSectionTitle('Lịch sử giao dịch', theme),
-
-          // Lịch sử giao dịch.
-          //
           // Khối này trước đây vẽ CỨNG "Chưa có giao dịch nào" mà không gọi API
           // nào cả — nên người dùng ĐÃ có giao dịch vẫn thấy thông báo trống,
-          // tức là thông tin sai. App chưa có API thanh toán, nên nói rõ tính
-          // năng chưa có thay vì khẳng định sai về dữ liệu.
+          // tức là thông tin sai.
           const EmptyStateWidget(
             icon: Icons.receipt_long_outlined,
             title: 'Lịch sử giao dịch chưa được hỗ trợ',
@@ -73,57 +50,24 @@ class PaymentScreen extends StatelessWidget {
                 'Tính năng thanh toán chưa hoàn thiện nên chưa có lịch sử giao dịch.',
           ),
 
-          const SizedBox(height: 24),
-          _buildSectionTitle('Mã giảm giá', theme),
+          const SizedBox(height: AppSpacing.xxl),
+          _SectionTitle('Mã giảm giá'),
 
-          // Form nhập mã giảm giá
           Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
             child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Row(
                 children: [
-                  Text('Nhập mã giảm giá', style: theme.textTheme.titleSmall),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Nhập mã giảm giá',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      ElevatedButton(
-                        onPressed: () {
-                          CustomSnackBar.showInfo(
-                            context: context,
-                            message: 'Chức năng đang được phát triển',
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text('Áp dụng'),
-                      ),
-                    ],
+                  Icon(
+                    Icons.local_offer_outlined,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Text(
+                      'Mã giảm giá sẽ khả dụng khi tính năng thanh toán hoàn thiện.',
+                      style: theme.textTheme.bodyMedium,
+                    ),
                   ),
                 ],
               ),
@@ -133,63 +77,68 @@ class PaymentScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildSectionTitle(String title, ThemeData theme) {
+/// Tiêu đề một nhóm nội dung trong màn cài đặt.
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  const _SectionTitle(this.title);
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.only(
+        top: AppSpacing.lg,
+        bottom: AppSpacing.md,
+      ),
       child: Text(
         title,
-        style: theme.textTheme.titleMedium?.copyWith(
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.bold,
-          color: theme.colorScheme.primary,
+          color: Theme.of(context).colorScheme.primary,
         ),
       ),
     );
   }
+}
 
-  Widget _buildPaymentMethod({
-    required BuildContext context,
-    required String title,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
+/// Một phương thức thanh toán ở trạng thái *chờ hỗ trợ*.
+///
+/// Không dùng `InkWell`: thẻ không bấm được thì không nên có hiệu ứng bấm.
+class _PaymentMethodTile extends StatelessWidget {
+  final String title;
+  final IconData icon;
+
+  const _PaymentMethodTile({required this.title, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: theme.colorScheme.primary),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: scheme.surfaceContainerHighest,
+                shape: BoxShape.circle,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+              child: Icon(icon, color: scheme.onSurfaceVariant),
+            ),
+            const SizedBox(width: AppSpacing.lg),
+            Expanded(
+              child: Text(
+                title,
+                style: theme.textTheme.titleMedium,
               ),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
-              ),
-            ],
-          ),
+            ),
+            const StatusChip(label: 'Sắp ra mắt', tone: StatusTone.neutral),
+          ],
         ),
       ),
     );

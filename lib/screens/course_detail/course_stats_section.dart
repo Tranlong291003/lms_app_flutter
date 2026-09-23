@@ -20,11 +20,9 @@ class CourseStatsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final Color boxColor =
-        theme.colorScheme.surfaceContainerHighest ??
-        theme.colorScheme.surface.withOpacity(
-          theme.brightness == Brightness.dark ? 0.7 : 0.96,
-        );
+    // `surfaceContainerHighest` không bao giờ null (ColorScheme có giá trị mặc
+    // định), nên nhánh dự phòng cũ là code chết.
+    final Color boxColor = theme.colorScheme.surfaceContainerHighest;
     final bool isLight = theme.brightness == Brightness.light;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -46,13 +44,13 @@ class CourseStatsSection extends StatelessWidget {
               border:
                   isLight
                       ? Border.all(
-                        color: theme.colorScheme.outline.withOpacity(0.18),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.18),
                         width: 1.2,
                       )
                       : null,
               boxShadow: [
                 BoxShadow(
-                  color: theme.colorScheme.onSurface.withOpacity(0.06),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.06),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -98,7 +96,7 @@ class CourseStatsSection extends StatelessWidget {
   Widget _chip(BuildContext context, String label) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(20),
     ),
     child: Text(

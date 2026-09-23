@@ -322,8 +322,8 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                         color:
                             isDark
                                 ? colorScheme.surfaceContainerHighest
-                                    .withOpacity(0.3)
-                                : colorScheme.primary.withOpacity(0.05),
+                                    .withValues(alpha: 0.3)
+                                : colorScheme.primary.withValues(alpha: 0.05),
                         borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(24),
                           bottomRight: Radius.circular(24),
@@ -354,7 +354,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.green.withOpacity(0.1),
+                                    color: Colors.green.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Row(
@@ -432,12 +432,12 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                               color:
                                   isDark
                                       ? colorScheme.primaryContainer
-                                          .withOpacity(0.3)
+                                          .withValues(alpha: 0.3)
                                       : colorScheme.primaryContainer
-                                          .withOpacity(0.2),
+                                          .withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: colorScheme.primary.withOpacity(0.2),
+                                color: colorScheme.primary.withValues(alpha: 0.2),
                                 width: 1,
                               ),
                             ),
@@ -472,7 +472,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                                       ? []
                                       : [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
+                                          color: Colors.black.withValues(alpha: 0.05),
                                           blurRadius: 10,
                                           offset: const Offset(0, 4),
                                         ),
@@ -480,9 +480,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                               border:
                                   isDark
                                       ? Border.all(
-                                        color: colorScheme.outline.withOpacity(
-                                          0.1,
-                                        ),
+                                        color: colorScheme.outline.withValues(alpha: 0.1),
                                         width: 1,
                                       )
                                       : null,
@@ -590,8 +588,8 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
       decoration: BoxDecoration(
         color:
             isDark
-                ? colorScheme.surfaceContainerHighest.withOpacity(0.3)
-                : colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
+                : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -663,14 +661,14 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
       decoration: BoxDecoration(
         color:
             isDark
-                ? colorScheme.surfaceContainerHighest.withOpacity(0.2)
-                : colorScheme.surfaceContainerHighest.withOpacity(0.1),
+                ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.2)
+                : colorScheme.surfaceContainerHighest.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color:
               isDark
-                  ? colorScheme.outline.withOpacity(0.1)
-                  : colorScheme.outline.withOpacity(0.05),
+                  ? colorScheme.outline.withValues(alpha: 0.1)
+                  : colorScheme.outline.withValues(alpha: 0.05),
         ),
       ),
       child: Row(
@@ -678,7 +676,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
+              color: iconColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(fileIcon, color: iconColor, size: 24),

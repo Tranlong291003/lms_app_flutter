@@ -57,21 +57,21 @@ class CourseTabView extends StatelessWidget {
               ),
               border: Border(
                 top: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.18),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.18),
                   width: 1.2,
                 ),
                 left: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.18),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.18),
                   width: 1.2,
                 ),
                 right: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.18),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.18),
                   width: 1.2,
                 ),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: theme.colorScheme.onSurface.withOpacity(0.03),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.03),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -86,9 +86,7 @@ class CourseTabView extends StatelessWidget {
               ),
               indicatorSize: TabBarIndicatorSize.label,
               labelColor: theme.colorScheme.primary,
-              unselectedLabelColor: theme.colorScheme.onSurface.withOpacity(
-                0.6,
-              ),
+              unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               labelStyle: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),

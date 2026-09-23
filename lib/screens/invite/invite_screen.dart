@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_dimens.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
@@ -55,14 +56,24 @@ class InviteScreen extends StatelessWidget {
 
   Widget _buildHeader(ThemeData theme) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.xxl),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [theme.primaryColor.withOpacity(0.8), theme.primaryColor],
+          // Dùng `colorScheme.primary` + bản đậm hơn của chính nó. Trước đây
+          // dùng `theme.primaryColor` (màu thương hiệu CỐ ĐỊNH) trong khi chữ
+          // là `colorScheme.onPrimary` — ở dark mode `onPrimary` là màu navy
+          // đậm nên chữ trên nền xanh chỉ đạt ~2:1, gần như không đọc được.
+          colors: [
+            theme.colorScheme.primary,
+            Color.alphaBlend(
+              Colors.black.withValues(alpha: 0.25),
+              theme.colorScheme.primary,
+            ),
+          ],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.borderLg,
       ),
       child: Column(
         children: [
@@ -84,15 +95,15 @@ class InviteScreen extends StatelessWidget {
             'Nhận ưu đãi đặc biệt khi mời bạn bè tham gia',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onPrimary.withOpacity(0.8),
+              color: theme.colorScheme.onPrimary.withValues(alpha: 0.8),
             ),
           ),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: theme.colorScheme.onPrimary.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
+              color: theme.colorScheme.onPrimary.withValues(alpha: 0.2),
+              borderRadius: AppRadius.borderPill,
             ),
             child: Text(
               'Nhận 50% giá trị khóa học',
@@ -113,7 +124,7 @@ class InviteScreen extends StatelessWidget {
       child: Text(
         title,
         style: theme.textTheme.titleMedium?.copyWith(
-          color: theme.textTheme.titleMedium?.color?.withOpacity(0.7),
+          color: theme.textTheme.titleMedium?.color?.withValues(alpha: 0.7),
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -136,7 +147,7 @@ class InviteScreen extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: theme.primaryColor.withOpacity(0.1),
+            color: theme.primaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, size: 24, color: theme.primaryColor),
@@ -150,13 +161,13 @@ class InviteScreen extends StatelessWidget {
         subtitle: Text(
           subtitle,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
+            color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
           ),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,
           size: 16,
-          color: theme.textTheme.bodyMedium?.color?.withOpacity(0.5),
+          color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
         ),
         onTap: onTap,
       ),

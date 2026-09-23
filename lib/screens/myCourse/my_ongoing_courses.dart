@@ -110,7 +110,7 @@ class _MyOngoingCoursesScreenState extends State<MyOngoingCoursesScreen> {
                         size: 64,
                         color: Theme.of(
                           context,
-                        ).colorScheme.primary.withOpacity(0.3),
+                        ).colorScheme.primary.withValues(alpha: 0.3),
                       ),
                       const SizedBox(height: 20),
                       Text(
@@ -121,7 +121,7 @@ class _MyOngoingCoursesScreenState extends State<MyOngoingCoursesScreen> {
                           fontWeight: FontWeight.bold,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.8),
+                          ).colorScheme.onSurface.withValues(alpha: 0.8),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -131,7 +131,7 @@ class _MyOngoingCoursesScreenState extends State<MyOngoingCoursesScreen> {
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.6),
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                         textAlign: TextAlign.center,
                       ),

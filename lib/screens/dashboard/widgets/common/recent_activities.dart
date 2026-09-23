@@ -31,7 +31,7 @@ class RecentActivities extends StatelessWidget {
                     ? []
                     : [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -39,7 +39,7 @@ class RecentActivities extends StatelessWidget {
             border:
                 isDark
                     ? Border.all(
-                      color: colorScheme.outline.withOpacity(0.1),
+                      color: colorScheme.outline.withValues(alpha: 0.1),
                       width: 1,
                     )
                     : null,
@@ -49,7 +49,7 @@ class RecentActivities extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: activity['color'].withOpacity(0.1),
+                  color: activity['color'].withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(

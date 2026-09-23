@@ -285,7 +285,7 @@ class _ReviewsTabState extends State<ReviewsTab> {
                                   radius: 20,
                                   backgroundColor: Theme.of(
                                     context,
-                                  ).colorScheme.primary.withOpacity(0.12),
+                                  ).colorScheme.primary.withValues(alpha: 0.12),
                                   backgroundImage: NetworkImage(avatarUrl),
                                   onBackgroundImageError: (_, __) {},
                                 ),
@@ -441,7 +441,7 @@ class _ReviewCard extends StatelessWidget {
                   radius: 20,
                   backgroundColor: Theme.of(
                     context,
-                  ).colorScheme.primary.withOpacity(0.12),
+                  ).colorScheme.primary.withValues(alpha: 0.12),
                   backgroundImage: NetworkImage(avatarUrl),
                   onBackgroundImageError: (_, __) {},
                 ),
@@ -461,7 +461,7 @@ class _ReviewCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.5),
+                          ).colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
                       ),
                     ],

@@ -57,7 +57,7 @@ class _MyCourseScreenState extends State<MyCourseScreen> {
               labelColor: Theme.of(context).colorScheme.primary,
               unselectedLabelColor: Theme.of(
                 context,
-              ).colorScheme.onSurface.withOpacity(0.7),
+              ).colorScheme.onSurface.withValues(alpha: 0.7),
               labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 fontSize: 16,

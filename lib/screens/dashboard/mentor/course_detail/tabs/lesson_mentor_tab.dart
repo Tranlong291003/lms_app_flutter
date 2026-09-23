@@ -600,7 +600,7 @@ class _LessonFormDialogState extends State<LessonFormDialog> {
                 gradient: LinearGradient(
                   colors: [
                     theme.primaryColor,
-                    theme.primaryColor.withOpacity(0.8),
+                    theme.primaryColor.withValues(alpha: 0.8),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -635,7 +635,7 @@ class _LessonFormDialogState extends State<LessonFormDialog> {
                           Text(
                             'ID: ${widget.lesson!.lessonId}',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                             ),
                           ),
                         ],
@@ -665,10 +665,10 @@ class _LessonFormDialogState extends State<LessonFormDialog> {
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surfaceContainerHighest
-                                .withOpacity(0.3),
+                                .withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: theme.colorScheme.outline.withOpacity(0.2),
+                              color: theme.colorScheme.outline.withValues(alpha: 0.2),
                             ),
                           ),
                           child: Column(
@@ -776,13 +776,13 @@ class _LessonFormDialogState extends State<LessonFormDialog> {
                                   : 'Nhập nội dung bài học',
                           hintStyle: TextStyle(
                             color: theme.colorScheme.onSurfaceVariant
-                                .withOpacity(0.7),
+                                .withValues(alpha: 0.7),
                           ),
                           prefixIcon: Padding(
                             padding: const EdgeInsets.only(left: 16, right: 12),
                             child: Icon(
                               Icons.description_outlined,
-                              color: theme.colorScheme.primary.withOpacity(0.8),
+                              color: theme.colorScheme.primary.withValues(alpha: 0.8),
                               size: 22,
                             ),
                           ),
@@ -792,13 +792,13 @@ class _LessonFormDialogState extends State<LessonFormDialog> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
-                              color: theme.colorScheme.outline.withOpacity(0.5),
+                              color: theme.colorScheme.outline.withValues(alpha: 0.5),
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
-                              color: theme.colorScheme.outline.withOpacity(0.5),
+                              color: theme.colorScheme.outline.withValues(alpha: 0.5),
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
@@ -910,7 +910,7 @@ class _LessonFormDialogState extends State<LessonFormDialog> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),

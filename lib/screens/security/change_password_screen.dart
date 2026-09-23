@@ -224,7 +224,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             color:
                 isMet
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface.withOpacity(0.6),
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
           const SizedBox(width: 8),
           Text(
@@ -233,7 +233,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               color:
                   isMet
                       ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurface.withOpacity(0.6),
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],

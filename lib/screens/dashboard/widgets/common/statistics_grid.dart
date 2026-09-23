@@ -36,7 +36,7 @@ class StatisticsGrid extends StatelessWidget {
                     ? []
                     : [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -44,7 +44,7 @@ class StatisticsGrid extends StatelessWidget {
             border:
                 isDark
                     ? Border.all(
-                      color: colorScheme.outline.withOpacity(0.1),
+                      color: colorScheme.outline.withValues(alpha: 0.1),
                       width: 1,
                     )
                     : null,
@@ -57,7 +57,7 @@ class StatisticsGrid extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: stat['color'].withOpacity(0.1),
+                      color: stat['color'].withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(stat['icon'], color: stat['color'], size: 24),

@@ -61,8 +61,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     decoration: BoxDecoration(
                       color:
                           isDark
-                              ? Colors.black.withOpacity(0.3)
-                              : Colors.white.withOpacity(0.7),
+                              ? Colors.black.withValues(alpha: 0.3)
+                              : Colors.white.withValues(alpha: 0.7),
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
@@ -82,7 +82,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                colorScheme.primary.withOpacity(0.8),
+                                colorScheme.primary.withValues(alpha: 0.8),
                                 colorScheme.primary,
                                 colorScheme.primary.withBlue(
                                   colorScheme.primary.blue + 20,
@@ -110,7 +110,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                             height: 150,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                             ),
                           ),
                         ),
@@ -122,7 +122,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                             height: 200,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                             ),
                           ),
                         ),
@@ -137,7 +137,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                               gradient: LinearGradient(
                                 colors: [
                                   Colors.transparent,
-                                  Colors.black.withOpacity(0.5),
+                                  Colors.black.withValues(alpha: 0.5),
                                 ],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
@@ -263,10 +263,10 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                         color:
                             mentor.isActive
                                 ? (isDark
-                                    ? Colors.green.shade900.withOpacity(0.2)
+                                    ? Colors.green.shade900.withValues(alpha: 0.2)
                                     : Colors.green.shade50)
                                 : (isDark
-                                    ? Colors.red.shade900.withOpacity(0.2)
+                                    ? Colors.red.shade900.withValues(alpha: 0.2)
                                     : Colors.red.shade50),
                         borderRadius: BorderRadius.circular(30),
                         border: Border.all(
@@ -333,12 +333,12 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                         border: Border.all(
                           color:
                               isDark
-                                  ? colorScheme.outline.withOpacity(0.1)
-                                  : colorScheme.outline.withOpacity(0.05),
+                                  ? colorScheme.outline.withValues(alpha: 0.1)
+                                  : colorScheme.outline.withValues(alpha: 0.05),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.03),
+                            color: Colors.black.withValues(alpha: 0.03),
                             blurRadius: 10,
                             spreadRadius: 0,
                           ),
@@ -352,7 +352,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: colorScheme.primary.withOpacity(0.1),
+                                  color: colorScheme.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Icon(
@@ -397,7 +397,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                           color:
                               isDark
                                   ? Colors.black12
-                                  : Colors.black.withOpacity(0.05),
+                                  : Colors.black.withValues(alpha: 0.05),
                           blurRadius: 3,
                           spreadRadius: 0,
                           offset: const Offset(0, 5),
@@ -414,7 +414,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: colorScheme.primary.withOpacity(0.1),
+                                  color: colorScheme.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Icon(
@@ -593,7 +593,7 @@ class _InfoItem extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: colorScheme.primary.withOpacity(0.1),
+                  color: colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: colorScheme.primary, size: 20),

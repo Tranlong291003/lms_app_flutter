@@ -42,8 +42,8 @@ class CourseCard extends StatelessWidget {
               BoxShadow(
                 color:
                     isDark
-                        ? Colors.black.withOpacity(0.03)
-                        : theme.shadowColor.withOpacity(0.08),
+                        ? Colors.black.withValues(alpha: 0.03)
+                        : theme.shadowColor.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -51,8 +51,8 @@ class CourseCard extends StatelessWidget {
             border: Border.all(
               color:
                   isDark
-                      ? theme.dividerColor.withOpacity(0.12)
-                      : theme.dividerColor.withOpacity(0.18),
+                      ? theme.dividerColor.withValues(alpha: 0.12)
+                      : theme.dividerColor.withValues(alpha: 0.18),
               width: 1,
             ),
           ),
@@ -92,21 +92,21 @@ class CourseCard extends StatelessWidget {
                     Text(
                       duration,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                     const SizedBox(height: 8),
                     LinearProgressIndicator(
                       value: percent,
                       minHeight: 8,
-                      backgroundColor: theme.dividerColor.withOpacity(0.12),
+                      backgroundColor: theme.dividerColor.withValues(alpha: 0.12),
                       color: theme.colorScheme.primary,
                     ),
                     const SizedBox(height: 6),
                     Text(
                       '$completedLessons/$totalLessons bài học',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -127,7 +127,7 @@ class CourseCard extends StatelessWidget {
       color: theme.colorScheme.surfaceContainerHighest,
       child: Icon(
         Icons.image,
-        color: theme.colorScheme.onSurface.withOpacity(0.25),
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
         size: 32,
       ),
     );

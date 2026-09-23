@@ -109,7 +109,7 @@ class _BottomNavigationBarExampleState
         currentIndex: safeIndex,
         onTap: (idx) => setState(() => _selectedIndex = idx),
         selectedItemColor: theme.colorScheme.primary,
-        unselectedItemColor: theme.colorScheme.onSurface.withOpacity(0.6),
+        unselectedItemColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
         selectedFontSize: 14,
         unselectedFontSize: 12,
         selectedLabelStyle: theme.textTheme.labelLarge?.copyWith(

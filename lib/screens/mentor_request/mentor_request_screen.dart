@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_state.dart';
@@ -93,17 +94,17 @@ class _MentorRequestScreenState extends State<MentorRequestScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [c.primary, c.primaryContainer],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        // Nền là `primaryContainer` (đậm ở cả hai chế độ) nên
+                        // icon phải dùng `onPrimaryContainer`, không phải màu
+                        // trắng cứng — ở light mode `primaryContainer` là màu
+                        // nhạt nên icon trắng gần như biến mất.
+                        color: c.primaryContainer,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.school_rounded,
                         size: 44,
-                        color: Colors.white,
+                        color: c.onPrimaryContainer,
                       ),
                     ),
                   ),
@@ -128,7 +129,7 @@ class _MentorRequestScreenState extends State<MentorRequestScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: c.primaryContainer.withOpacity(0.13),
+                      color: c.primaryContainer.withValues(alpha: 0.13),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -141,10 +142,10 @@ class _MentorRequestScreenState extends State<MentorRequestScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        _benefitRow('Tạo & quản lý khoá học'),
-                        _benefitRow('Nhận thu nhập từ học viên'),
-                        _benefitRow('Xây dựng thương hiệu cá nhân'),
-                        _benefitRow('Kết nối cộng đồng chuyên gia'),
+                        _benefitRow(context, 'Tạo & quản lý khoá học'),
+                        _benefitRow(context, 'Nhận thu nhập từ học viên'),
+                        _benefitRow(context, 'Xây dựng thương hiệu cá nhân'),
+                        _benefitRow(context, 'Kết nối cộng đồng chuyên gia'),
                       ],
                     ),
                   ),
@@ -244,12 +245,16 @@ class _MentorRequestScreenState extends State<MentorRequestScreen> {
     );
   }
 
-  Widget _benefitRow(String text) {
+  Widget _benefitRow(BuildContext context, String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          const Icon(Icons.check_circle, color: Colors.green, size: 18),
+          Icon(
+            Icons.check_circle,
+            color: AppColors.of(context).success,
+            size: 18,
+          ),
           const SizedBox(width: 8),
           Expanded(child: Text(text)),
         ],

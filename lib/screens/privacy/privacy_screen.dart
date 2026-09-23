@@ -24,11 +24,13 @@ class PrivacyScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color:
                   isDark
-                      ? colorScheme.surfaceContainerHighest.withOpacity(0.3)
-                      : colorScheme.surfaceContainerHighest.withOpacity(0.1),
+                      ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
+                      : colorScheme.surfaceContainerHighest.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                // Viền lấy từ theme: `Colors.grey.shade300` ở dark mode là
+                // đường kẻ sáng chói cắt ngang nền tối.
+                color: colorScheme.outlineVariant,
                 width: 1,
               ),
             ),
@@ -188,7 +190,7 @@ class PrivacyScreen extends StatelessWidget {
               child: Text(
                 'Phiên bản chính sách: 1.0.0\nCập nhật lần cuối: 01/06/2024',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -234,7 +236,7 @@ class PrivacyScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: theme.colorScheme.primary),
@@ -251,7 +253,7 @@ class PrivacyScreen extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ],
           ),

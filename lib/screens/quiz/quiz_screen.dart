@@ -96,7 +96,7 @@ class QuizScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -122,8 +122,8 @@ class QuizScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              quizColor.withOpacity(0.2),
-                              quizColor.withOpacity(0.1),
+                              quizColor.withValues(alpha: 0.2),
+                              quizColor.withValues(alpha: 0.1),
                             ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
@@ -156,7 +156,7 @@ class QuizScreen extends StatelessWidget {
                                 fontSize: 13,
                                 color: Theme.of(
                                   context,
-                                ).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                               ),
                             ),
                           ],
@@ -165,7 +165,7 @@ class QuizScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: quizColor.withOpacity(0.1),
+                          color: quizColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(

@@ -164,8 +164,8 @@ class SecurityScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color:
                       isDestructive
-                          ? colorScheme.error.withOpacity(0.1)
-                          : colorScheme.primary.withOpacity(0.1),
+                          ? colorScheme.error.withValues(alpha: 0.1)
+                          : colorScheme.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -192,8 +192,8 @@ class SecurityScreen extends StatelessWidget {
                       style: theme.textTheme.bodySmall?.copyWith(
                         color:
                             isDestructive
-                                ? colorScheme.error.withOpacity(0.8)
-                                : colorScheme.onSurface.withOpacity(0.7),
+                                ? colorScheme.error.withValues(alpha: 0.8)
+                                : colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -204,8 +204,8 @@ class SecurityScreen extends StatelessWidget {
                 size: 16,
                 color:
                     isDestructive
-                        ? colorScheme.error.withOpacity(0.5)
-                        : colorScheme.onSurface.withOpacity(0.5),
+                        ? colorScheme.error.withValues(alpha: 0.5)
+                        : colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ],
           ),

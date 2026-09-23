@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/config/app_dimens.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/blocs/theme/theme_bloc.dart';
@@ -42,7 +43,7 @@ class ProfileScreen extends StatelessWidget {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  theme.primaryColor.withOpacity(0.8),
+                                  theme.primaryColor.withValues(alpha: 0.8),
                                   theme.primaryColor,
                                 ],
                               ),
@@ -88,7 +89,7 @@ class ProfileScreen extends StatelessWidget {
                                   boxShadow: [
                                     BoxShadow(
                                       color: theme.colorScheme.shadow
-                                          .withOpacity(0.1),
+                                          .withValues(alpha: 0.1),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
@@ -115,7 +116,7 @@ class ProfileScreen extends StatelessWidget {
                       Text(
                         state.user.email ?? 'Chưa cập nhật email',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -133,7 +134,7 @@ class ProfileScreen extends StatelessWidget {
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                theme.primaryColor.withOpacity(0.8),
+                                theme.primaryColor.withValues(alpha: 0.8),
                                 theme.primaryColor,
                               ],
                             ),
@@ -157,9 +158,7 @@ class ProfileScreen extends StatelessWidget {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: theme.colorScheme.shadow.withOpacity(
-                                    0.1,
-                                  ),
+                                  color: theme.colorScheme.shadow.withValues(alpha: 0.1),
                                   blurRadius: 4,
                                   offset: const Offset(0, 2),
                                 ),
@@ -185,7 +184,7 @@ class ProfileScreen extends StatelessWidget {
                     Text(
                       'Đang tải...',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -281,8 +280,9 @@ class ProfileScreen extends StatelessWidget {
                   iconPath: "assets/icons/logout.png",
                   title: "Đăng xuất",
                   context: context,
-                  titleColor: Colors.red,
-                  iconColor: Colors.red,
+                  // Màu nguy hiểm lấy từ theme để đúng ở cả hai chế độ.
+                  titleColor: theme.colorScheme.error,
+                  iconColor: theme.colorScheme.error,
                   onTap: () async {
                     final parentContext = context;
                     final confirm = await showModalBottomSheet<bool>(
@@ -303,7 +303,9 @@ class ProfileScreen extends StatelessWidget {
                                 width: 40,
                                 height: 4,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey[300],
+                                  // Tay nắm của bottom sheet: dùng màu viền của
+                                  // theme thay vì xám cố định.
+                                  color: theme.colorScheme.outlineVariant,
                                   borderRadius: BorderRadius.circular(2),
                                 ),
                               ),
@@ -311,7 +313,7 @@ class ProfileScreen extends StatelessWidget {
                               Text(
                                 'Đăng xuất',
                                 style: theme.textTheme.titleLarge?.copyWith(
-                                  color: Colors.red,
+                                  color: theme.colorScheme.error,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -330,10 +332,8 @@ class ProfileScreen extends StatelessWidget {
                                         padding: const EdgeInsets.symmetric(
                                           vertical: 14,
                                         ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            30,
-                                          ),
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: AppRadius.borderPill,
                                         ),
                                       ),
                                       onPressed: () {
@@ -349,10 +349,8 @@ class ProfileScreen extends StatelessWidget {
                                         padding: const EdgeInsets.symmetric(
                                           vertical: 14,
                                         ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            30,
-                                          ),
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: AppRadius.borderPill,
                                         ),
                                       ),
                                       onPressed: () {
@@ -394,7 +392,7 @@ class ProfileScreen extends StatelessWidget {
       child: Text(
         title,
         style: theme.textTheme.titleMedium?.copyWith(
-          color: theme.colorScheme.onSurface.withOpacity(0.7),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -435,7 +433,7 @@ class ProfileScreen extends StatelessWidget {
             Icon(
               Icons.arrow_forward_ios,
               size: 16,
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
         onTap: onTap,
       ),
