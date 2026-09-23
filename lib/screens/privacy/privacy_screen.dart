@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
 
 class PrivacyScreen extends StatelessWidget {
@@ -14,7 +15,8 @@ class PrivacyScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(title: 'Chính sách bảo mật', showBack: true),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        // Cong them vung an toan day: muc cuoi tung nam duoi home indicator.
+        padding: listPaddingWithBottomInset(context),
         children: [
           // Thông tin về chính sách
           Container(

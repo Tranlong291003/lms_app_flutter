@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
 
 class SecurityScreen extends StatelessWidget {
@@ -14,7 +15,8 @@ class SecurityScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(title: 'Bảo mật', showBack: true),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        // Cong them vung an toan day: muc cuoi tung nam duoi home indicator.
+        padding: listPaddingWithBottomInset(context),
         children: [
           _buildSectionTitle('Bảo mật tài khoản', theme),
 

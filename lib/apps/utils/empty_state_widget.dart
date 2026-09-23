@@ -80,3 +80,13 @@ class EmptyStateWidget extends StatelessWidget {
     );
   }
 }
+
+/// Đệm cho `ListView` trong màn hình cuộn được.
+///
+/// `EdgeInsets.all(16)` không tính tới vùng an toàn dưới đáy, nên mục cuối cùng
+/// có thể nằm dưới thanh home indicator và khó chạm. Hàm này trả về đệm 16px
+/// như cũ, nhưng cộng thêm phần đáy bị hệ thống chiếm (nếu có).
+EdgeInsets listPaddingWithBottomInset(BuildContext context, {double all = 16}) {
+  final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+  return EdgeInsets.fromLTRB(all, all, all, all + bottomInset);
+}

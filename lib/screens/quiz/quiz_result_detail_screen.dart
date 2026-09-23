@@ -124,7 +124,7 @@ class _QuizResultDetailView extends StatelessWidget {
                             _buildStat(
                               context,
                               icon: Icons.help_outline,
-                              color: Colors.grey,
+                              color: Theme.of(context).colorScheme.outline,
                               label: 'Chưa trả lời',
                               value: unanswered,
                             ),
@@ -284,16 +284,20 @@ class _QuizResultDetailView extends StatelessWidget {
                         ? Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.person,
                               size: 16,
-                              color: Colors.blueGrey,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               'Bạn chọn: ',
                               style: TextStyle(
-                                color: Colors.blueGrey,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                                 fontSize: 13,
                               ),
                             ),

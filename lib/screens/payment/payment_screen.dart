@@ -15,7 +15,8 @@ class PaymentScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(title: 'Thanh toán', showBack: true),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        // Cong them vung an toan day: muc cuoi tung nam duoi home indicator.
+        padding: listPaddingWithBottomInset(context),
         children: [
           _buildSectionTitle('Phương thức thanh toán', theme),
 
