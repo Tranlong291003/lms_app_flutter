@@ -124,17 +124,13 @@ class HelpScreen extends StatelessWidget {
                   // Email và điện thoại là hành động THẬT — trước đây cả hai
                   // đều chỉ hiện "Chức năng đang được phát triển" dù địa chỉ và
                   // số đã hiển thị ngay bên dưới. Giờ mở ứng dụng tương ứng.
+                  // Chat trực tuyến chưa có kênh nào để nối vào — hiện nhãn
+                  // "Sắp ra mắt" thay vì bấm được rồi báo "đang phát triển".
                   _buildContactMethod(
                     context: context,
                     icon: Icons.chat_outlined,
                     title: 'Chat trực tuyến',
-                    subtitle: 'Chat với đội ngũ hỗ trợ',
-                    onTap: () {
-                      CustomSnackBar.showInfo(
-                        context: context,
-                        message: 'Chức năng đang được phát triển',
-                      );
-                    },
+                    subtitle: 'Sắp ra mắt',
                   ),
 
                   const Divider(height: 24),
@@ -209,7 +205,7 @@ class HelpScreen extends StatelessWidget {
     required IconData icon,
     required String title,
     required String subtitle,
-    required VoidCallback onTap,
+    VoidCallback? onTap,
   }) {
     final theme = Theme.of(context);
 
@@ -249,11 +245,14 @@ class HelpScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-            ),
+            // Mục chưa nối được kênh nào thì không vẽ mũi tên ">" (mũi tên
+            // ngụ ý bấm được).
+            if (onTap != null)
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
           ],
         ),
       ),
