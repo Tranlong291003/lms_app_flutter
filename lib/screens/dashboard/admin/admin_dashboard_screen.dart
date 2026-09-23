@@ -245,7 +245,7 @@ class _QuickActionsList extends StatelessWidget {
           onTap: () {
             CustomSnackBar.showInfo(
               context: context,
-              message: 'Chức năng đang được phát triền',
+              message: 'Chức năng đang được phát triển',
             );
           },
         ),
@@ -258,7 +258,7 @@ class _QuickActionsList extends StatelessWidget {
           onTap: () {
             CustomSnackBar.showInfo(
               context: context,
-              message: 'Chức năng đang được phát triền',
+              message: 'Chức năng đang được phát triển',
             );
           },
         ),

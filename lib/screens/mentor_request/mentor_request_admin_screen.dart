@@ -21,13 +21,28 @@ class _MentorRequestAdminScreenState extends State<MentorRequestAdminScreen> {
   }
 
   void _handleApprove(int id) async {
-    await context.read<MentorRequestCubit>().updateUpgradeRequestStatus(
+    // `updateUpgradeRequestStatus` tự `catch` lỗi và emit `MentorRequestError`,
+    // KHÔNG ném ra ngoài — nên `await` luôn hoàn tất bình thường. Trước đây chỉ
+    // cần vậy là báo "Duyệt thành công!", kể cả khi server lỗi: admin tưởng đã
+    // duyệt trong khi yêu cầu vẫn "Chờ duyệt". Phải kiểm tra trạng thái thật.
+    final cubit = context.read<MentorRequestCubit>();
+    await cubit.updateUpgradeRequestStatus(
       id: id,
       status: 'approved',
       reason: null,
     );
+    if (!mounted) return;
+
+    if (cubit.state is MentorRequestError) {
+      CustomSnackBar.showError(
+        context: context,
+        message: 'Duyệt thất bại. Vui lòng thử lại.',
+      );
+      return;
+    }
+
     CustomSnackBar.showSuccess(context: context, message: 'Duyệt thành công!');
-    context.read<MentorRequestCubit>().fetchAllUpgradeRequests();
+    cubit.fetchAllUpgradeRequests();
   }
 
   void _handleReject(int id) async {
@@ -67,16 +82,28 @@ class _MentorRequestAdminScreenState extends State<MentorRequestAdminScreen> {
       },
     );
     if (reason != null && reason.trim().isNotEmpty) {
-      await context.read<MentorRequestCubit>().updateUpgradeRequestStatus(
+      final cubit = context.read<MentorRequestCubit>();
+      await cubit.updateUpgradeRequestStatus(
         id: id,
         status: 'rejected',
         reason: reason.trim(),
       );
+      if (!mounted) return;
+
+      // Cùng lý do như `_handleApprove`: cubit nuốt lỗi nên phải tự kiểm tra.
+      if (cubit.state is MentorRequestError) {
+        CustomSnackBar.showError(
+          context: context,
+          message: 'Từ chối thất bại. Vui lòng thử lại.',
+        );
+        return;
+      }
+
       CustomSnackBar.showSuccess(
         context: context,
         message: 'Từ chối thành công!',
       );
-      context.read<MentorRequestCubit>().fetchAllUpgradeRequests();
+      cubit.fetchAllUpgradeRequests();
     }
   }
 

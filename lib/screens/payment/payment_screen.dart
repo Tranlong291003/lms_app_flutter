@@ -26,7 +26,7 @@ class PaymentScreen extends StatelessWidget {
             onTap: () {
               CustomSnackBar.showInfo(
                 context: context,
-                message: 'Chức năng đang được phát triền',
+                message: 'Chức năng đang được phát triển',
               );
             },
           ),
@@ -38,7 +38,7 @@ class PaymentScreen extends StatelessWidget {
             onTap: () {
               CustomSnackBar.showInfo(
                 context: context,
-                message: 'Chức năng đang được phát triền',
+                message: 'Chức năng đang được phát triển',
               );
             },
           ),
@@ -50,7 +50,7 @@ class PaymentScreen extends StatelessWidget {
             onTap: () {
               CustomSnackBar.showInfo(
                 context: context,
-                message: 'Chức năng đang được phát triền',
+                message: 'Chức năng đang được phát triển',
               );
             },
           ),
@@ -136,7 +136,7 @@ class PaymentScreen extends StatelessWidget {
                         onPressed: () {
                           CustomSnackBar.showInfo(
                             context: context,
-                            message: 'Chức năng đang được phát triền',
+                            message: 'Chức năng đang được phát triển',
                           );
                         },
                         style: ElevatedButton.styleFrom(

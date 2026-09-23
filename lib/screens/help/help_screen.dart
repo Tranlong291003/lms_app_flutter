@@ -16,15 +16,18 @@ class HelpScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Tìm kiếm câu hỏi
+          // Tìm kiếm câu hỏi.
+          //
+          // Trước đây `onChanged` hiện một SnackBar cho MỖI ký tự gõ vào: gõ
+          // "khóa học" là 7 thông báo xếp chồng, che gần hết màn hình. Chỉ báo
+          // một lần khi người dùng thực sự gõ, và không lặp lại liên tục.
           TextField(
-            onChanged: (value) {
-              if (value.isNotEmpty) {
-                CustomSnackBar.showInfo(
-                  context: context,
-                  message: 'Chức năng đang được phát triển',
-                );
-              }
+            onSubmitted: (value) {
+              if (value.trim().isEmpty) return;
+              CustomSnackBar.showInfo(
+                context: context,
+                message: 'Tìm kiếm câu hỏi đang được phát triển',
+              );
             },
             decoration: InputDecoration(
               hintText: 'Tìm kiếm câu hỏi',

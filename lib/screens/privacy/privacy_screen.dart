@@ -55,7 +55,7 @@ class PrivacyScreen extends StatelessWidget {
             onTap: () {
               CustomSnackBar.showInfo(
                 context: context,
-                message: 'Chức năng đang được phát triền',
+                message: 'Chức năng đang được phát triển',
               );
             },
           ),
@@ -67,7 +67,7 @@ class PrivacyScreen extends StatelessWidget {
             onTap: () {
               CustomSnackBar.showInfo(
                 context: context,
-                message: 'Chức năng đang được phát triền',
+                message: 'Chức năng đang được phát triển',
               );
             },
           ),
@@ -79,7 +79,7 @@ class PrivacyScreen extends StatelessWidget {
             onTap: () {
               CustomSnackBar.showInfo(
                 context: context,
-                message: 'Chức năng đang được phát triền',
+                message: 'Chức năng đang được phát triển',
               );
             },
           ),
@@ -91,7 +91,7 @@ class PrivacyScreen extends StatelessWidget {
             onTap: () {
               CustomSnackBar.showInfo(
                 context: context,
-                message: 'Chức năng đang được phát triền',
+                message: 'Chức năng đang được phát triển',
               );
             },
           ),
@@ -103,7 +103,7 @@ class PrivacyScreen extends StatelessWidget {
             onTap: () {
               CustomSnackBar.showInfo(
                 context: context,
-                message: 'Chức năng đang được phát triền',
+                message: 'Chức năng đang được phát triển',
               );
             },
           ),
@@ -137,7 +137,7 @@ class PrivacyScreen extends StatelessWidget {
                           onPressed: () {
                             CustomSnackBar.showInfo(
                               context: context,
-                              message: 'Chức năng đang được phát triền',
+                              message: 'Chức năng đang được phát triển',
                             );
                           },
                           icon: const Icon(Icons.feedback_outlined),
@@ -156,7 +156,7 @@ class PrivacyScreen extends StatelessWidget {
                           onPressed: () {
                             CustomSnackBar.showInfo(
                               context: context,
-                              message: 'Chức năng đang được phát triền',
+                              message: 'Chức năng đang được phát triển',
                             );
                           },
                           icon: const Icon(Icons.support_agent),

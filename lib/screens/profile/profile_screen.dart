@@ -19,10 +19,10 @@ class ProfileScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: CustomAppBar(
-        title: 'Hồ sơ cá nhân',
-        showBack: true,
-      ),
+      // Không hiện nút back: màn này là một TAB trong `IndexedStack` của route
+      // gốc, `CustomAppBar` gọi `Navigator.maybePop` trên route đầu nên nút
+      // luôn trả về false — bấm không có phản hồi gì.
+      appBar: CustomAppBar(title: 'Hồ sơ cá nhân'),
       body: Column(
         children: [
           const SizedBox(height: 16),

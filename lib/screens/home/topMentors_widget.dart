@@ -45,11 +45,14 @@ class _TopMentorsState extends State<TopMentors> {
   @override
   Widget build(BuildContext context) {
     const defaultAvatar = 'https://www.gravatar.com/avatar/?d=mp';
+    final theme = Theme.of(context);
 
     return SizedBox(
+      // Danh sách cuộn ngang: đệm phải để avatar cuối không dính mép khi cuộn hết.
       height: 90,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.only(right: 16),
         itemCount: _randomizedMentors.length,
         separatorBuilder: (_, __) => const SizedBox(width: 16),
         itemBuilder: (context, index) {
@@ -88,13 +91,9 @@ class _TopMentorsState extends State<TopMentors> {
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color:
-                          Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white
-                              : Colors.black,
-                      fontSize: 12,
-                    ),
+                    // Lấy màu từ theme thay vì hardcode đen/trắng: hardcode sẽ
+                    // lệch khi đổi tông màu hoặc dùng theme khác.
+                    style: theme.textTheme.bodySmall?.copyWith(fontSize: 12),
                   ),
                 ),
               ],

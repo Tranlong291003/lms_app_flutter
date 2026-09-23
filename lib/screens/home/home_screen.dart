@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/courseCategory_widget.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/listCourses_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/apps/utils/route_observer.dart';
@@ -183,7 +184,16 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                       } else if (state is MentorsLoaded) {
                         return TopMentors(mentors: state.mentors);
                       } else if (state is MentorsError) {
-                        return Center(child: Text('Lỗi: ${state.message}'));
+                        return EmptyStateWidget(
+                          icon: Icons.cloud_off_rounded,
+                          title: 'Không tải được danh sách giảng viên',
+                          message: state.message,
+                          isError: true,
+                          actionLabel: 'Thử lại',
+                          onAction: () => context.read<MentorsBloc>().add(
+                            RefreshMentorsEvent(),
+                          ),
+                        );
                       }
                       return const SizedBox.shrink();
                     },
@@ -221,40 +231,20 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                             }
 
                             if (list.isEmpty) {
-                              return SizedBox(
-                                height: 200,
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.school_outlined,
-                                        size: 64,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.primary.withOpacity(0.5),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        'Chưa có khóa học nào',
-                                        style:
-                                            Theme.of(
-                                              context,
-                                            ).textTheme.titleMedium,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      TextButton(
-                                        onPressed: () {
-                                          context
-                                              .read<CategoryCubit>()
-                                              .selectCategory(null);
-                                          _loadCourses();
-                                        },
-                                        child: const Text('Làm mới'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                              return EmptyStateWidget(
+                                icon: Icons.school_outlined,
+                                title: 'Chưa có khoá học nào',
+                                message: categoryState is CategoryLoaded &&
+                                        categoryState.selectedId != null
+                                    ? 'Danh mục này chưa có khoá học. Thử chọn danh mục khác.'
+                                    : 'Các khoá học mới sẽ xuất hiện ở đây.',
+                                actionLabel: 'Làm mới',
+                                onAction: () {
+                                  context
+                                      .read<CategoryCubit>()
+                                      .selectCategory(null);
+                                  _loadCourses();
+                                },
                               );
                             }
 
@@ -264,39 +254,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                   context.read<AuthCubit>().state.userId ?? '',
                             );
                           } else if (courseState is CourseError) {
-                            return SizedBox(
-                              height: 200,
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.error_outline,
-                                      size: 48,
-                                      color:
-                                          Theme.of(context).colorScheme.error,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'Lỗi: ${courseState.message}',
-                                      textAlign: TextAlign.center,
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodyMedium?.copyWith(
-                                        color:
-                                            Theme.of(context).colorScheme.error,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    TextButton(
-                                      onPressed: () {
-                                        _loadCourses();
-                                      },
-                                      child: const Text('Thử lại'),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                            return EmptyStateWidget(
+                              icon: Icons.cloud_off_rounded,
+                              title: 'Không tải được danh sách khoá học',
+                              message: courseState.message,
+                              isError: true,
+                              actionLabel: 'Thử lại',
+                              onAction: _loadCourses,
                             );
                           }
                           return const SizedBox(height: 200);

@@ -483,7 +483,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                               ? () {
                                 CustomSnackBar.showInfo(
                                   context: context,
-                                  message: 'Chức năng đang được phát triền',
+                                  message: 'Chức năng đang được phát triển',
                                 );
                               }
                               : null,
