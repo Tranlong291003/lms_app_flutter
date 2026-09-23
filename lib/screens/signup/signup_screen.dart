@@ -59,7 +59,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             title: Column(
               children: [
-                Icon(Icons.check_circle, color: AppTheme.success, size: 56),
+                Icon(Icons.check_circle, color: AppColors.of(context).success, size: 56),
                 const SizedBox(height: 12),
                 const Text(
                   'Đăng ký thành công!',
@@ -255,7 +255,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       padding: const EdgeInsets.only(top: 16),
                                       child: Text(
                                         state.message,
-                                        style: TextStyle(color: AppTheme.error),
+                                        style: TextStyle(color: AppColors.of(context).error),
                                       ),
                                     ),
                                 ],

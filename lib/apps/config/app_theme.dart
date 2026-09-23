@@ -21,7 +21,7 @@ abstract final class AppPalette {
   static const Color secondary = Color(0xFF10B981); // Xanh lá
   static const Color accent = Color(0xFFFF9800); // Cam
   static const Color success = Color(0xFF22C55E); // Xanh lá đậm
-  static const Color error = Color(0xFFEF4444); // Đỏ
+  static const Color error = Color(0xFFDC2626); // Đỏ
   static const Color warning = accent;
 
   // ── Bản sáng hơn, dùng cho chữ/icon trên NỀN TỐI ────────────────────────
@@ -31,14 +31,21 @@ abstract final class AppPalette {
   static const Color errorOnDark = Color(0xFFFCA5A5);
   static const Color warningOnDark = Color(0xFFFFC266);
 
-  // ── Nền ĐẬM cho thành phần "đổ màu" (snackbar, badge) ───────────────────
+  // ── Bản ĐẬM cho nền "đổ màu" và cho CHỮ trên nền sáng ──────────────────
   //
-  // Màu thương hiệu ở trên là màu *tươi*, hợp làm điểm nhấn nhưng quá sáng để
-  // làm nền có chữ trắng: đo được `success` chỉ 2.3:1 và `accent` 2.2:1 — dưới
-  // xa ngưỡng 4.5:1. Các màu dưới đây là cùng tông nhưng tối hơn, cho tương
-  // phản 6.5–8.3:1 với chữ trắng.
+  // Màu thương hiệu ở trên là màu *tươi*, hợp làm điểm nhấn nhưng không dùng
+  // được cho hai việc:
+  //  - làm NỀN có chữ trắng: `success` chỉ 2.3:1, `accent` 2.2:1;
+  //  - làm CHỮ trên nền sáng: `success` #22C55E trên nền trắng chỉ 2.3:1.
+  //
+  // Ba màu dưới đây đạt >= 4.8:1 theo cả hai chiều (đã kiểm bằng
+  // `test/design_consistency_test.dart`).
+  static const Color successText = Color(0xFF15803D);
+  static const Color warningText = Color(0xFFB45309);
+  static const Color errorText = Color(0xFFDC2626);
+
   static const Color successFill = Color(0xFF166534);
-  static const Color warningFill = Color(0xFFB45309);
+  static const Color warningFill = warningText;
   static const Color errorFill = Color(0xFFB91C1C);
   static const Color infoFill = primary;
 
@@ -641,9 +648,12 @@ class AppColors {
   factory AppColors.from(ThemeData theme) {
     final isDark = theme.brightness == Brightness.dark;
     return AppColors(
-      success: isDark ? AppPalette.successOnDark : AppPalette.success,
-      warning: isDark ? AppPalette.warningOnDark : AppPalette.accent,
-      error: isDark ? AppPalette.errorOnDark : AppPalette.error,
+      // Ở light mode dùng bản ĐẬM: màu thương hiệu (`success` #22C55E,
+      // `accent` #FF9800, `error` #EF4444) khi làm CHỮ trên nền trắng chỉ đạt
+      // 2.3–3.8:1, dưới ngưỡng 4.5:1.
+      success: isDark ? AppPalette.successOnDark : AppPalette.successText,
+      warning: isDark ? AppPalette.warningOnDark : AppPalette.warningText,
+      error: isDark ? AppPalette.errorOnDark : AppPalette.errorText,
       info: theme.colorScheme.primary,
       neutral: theme.colorScheme.onSurfaceVariant,
       successContainer: theme.colorScheme.secondaryContainer,

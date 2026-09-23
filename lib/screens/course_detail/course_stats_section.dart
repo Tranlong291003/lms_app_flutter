@@ -80,7 +80,7 @@ class CourseStatsSection extends StatelessWidget {
                 IconText(
                   icon: Icons.verified,
                   text: 'Có chứng chỉ',
-                  iconColor: AppTheme.success,
+                  iconColor: AppColors.of(context).success,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
