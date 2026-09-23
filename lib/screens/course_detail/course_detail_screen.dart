@@ -190,43 +190,50 @@ class CourseAppBarDynamic extends StatelessWidget {
         ),
         onPressed: () => Navigator.of(context).pop(),
       ),
+      // Ảnh bìa phải chừa vùng tai thỏ/status bar: nếu để `FlexibleSpaceBar`
+      // tràn lên trên thì nút back chồng lên đồng hồ hệ thống và ảnh bị thanh
+      // trạng thái cắt mất phần trên.
       flexibleSpace: FlexibleSpaceBar(
-        background: Stack(
-          fit: StackFit.expand,
-          children: [
-            if (imageUrl != null && imageUrl!.isNotEmpty)
-              Image.network(
-                imageUrl!,
-                fit: BoxFit.cover,
-                errorBuilder:
-                    (_, __, ___) => Container(
-                      color: theme.scaffoldBackgroundColor,
-                      child: Icon(
-                        Icons.broken_image,
-                        size: 60,
-                        color: theme.colorScheme.primary,
+        background: SafeArea(
+          top: true,
+          bottom: false,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (imageUrl != null && imageUrl!.isNotEmpty)
+                Image.network(
+                  imageUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder:
+                      (_, __, ___) => Container(
+                        color: theme.scaffoldBackgroundColor,
+                        child: Icon(
+                          Icons.broken_image,
+                          size: 60,
+                          color: theme.colorScheme.primary,
+                        ),
                       ),
-                    ),
-              )
-            else
+                )
+              else
+                Container(
+                  color: theme.scaffoldBackgroundColor,
+                  child: Icon(
+                    Icons.image,
+                    size: 60,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
               Container(
-                color: theme.scaffoldBackgroundColor,
-                child: Icon(
-                  Icons.image,
-                  size: 60,
-                  color: theme.colorScheme.primary,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                  ),
                 ),
               ),
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
