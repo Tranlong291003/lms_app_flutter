@@ -2,6 +2,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:lms/apps/config/api_config.dart';
@@ -30,6 +31,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final semantic = AppColors.of(context);
     final theme = Theme.of(context);
     final dateFmt = DateFormat('dd MMMM yyyy', 'vi_VN');
     final colorScheme = theme.colorScheme;
@@ -84,9 +86,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                               colors: [
                                 colorScheme.primary.withValues(alpha: 0.8),
                                 colorScheme.primary,
-                                colorScheme.primary.withBlue(
-                                  colorScheme.primary.blue + 20,
-                                ),
+                                Color.alphaBlend(Colors.white.withValues(alpha: 0.15), colorScheme.primary),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
@@ -185,21 +185,17 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                         fadeOutDuration: Duration.zero,
                                         placeholder:
                                             (_, __) => Shimmer.fromColors(
+                                              // Màu shimmer lấy từ theme: bộ
+                                              // `grey.shade100…900` cố định
+                                              // không khớp tông nền app.
                                               baseColor:
-                                                  isDark
-                                                      ? Colors.grey.shade800
-                                                      : Colors.grey.shade300,
+                                                  colorScheme.surfaceContainerHighest,
                                               highlightColor:
-                                                  isDark
-                                                      ? Colors.grey.shade700
-                                                      : Colors.grey.shade100,
+                                                  colorScheme.surfaceContainerHigh,
                                               child: Container(
                                                 width: 140,
                                                 height: 140,
-                                                color:
-                                                    isDark
-                                                        ? Colors.grey.shade900
-                                                        : Colors.white,
+                                                color: colorScheme.surface,
                                               ),
                                             ),
                                         errorWidget:
@@ -207,16 +203,14 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                                               width: 140,
                                               height: 140,
                                               color:
-                                                  isDark
-                                                      ? Colors.grey.shade800
-                                                      : Colors.grey.shade200,
+                                                  colorScheme
+                                                      .surfaceContainerHighest,
                                               child: Icon(
                                                 Icons.person,
                                                 size: 70,
                                                 color:
-                                                    isDark
-                                                        ? Colors.grey.shade600
-                                                        : Colors.grey.shade400,
+                                                    colorScheme
+                                                        .onSurfaceVariant,
                                               ),
                                             ),
                                       ),
@@ -262,22 +256,14 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                       decoration: BoxDecoration(
                         color:
                             mentor.isActive
-                                ? (isDark
-                                    ? Colors.green.shade900.withValues(alpha: 0.2)
-                                    : Colors.green.shade50)
-                                : (isDark
-                                    ? Colors.red.shade900.withValues(alpha: 0.2)
-                                    : Colors.red.shade50),
+                                ? semantic.successContainer
+                                : semantic.errorContainer,
                         borderRadius: BorderRadius.circular(30),
                         border: Border.all(
                           color:
                               mentor.isActive
-                                  ? (isDark
-                                      ? Colors.green.shade400
-                                      : Colors.green.shade300)
-                                  : (isDark
-                                      ? Colors.red.shade400
-                                      : Colors.red.shade300),
+                                  ? semantic.success
+                                  : semantic.error,
                         ),
                       ),
                       child: Row(
@@ -290,11 +276,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                             color:
                                 mentor.isActive
                                     ? (isDark
-                                        ? Colors.green.shade400
-                                        : Colors.green.shade700)
-                                    : (isDark
-                                        ? Colors.red.shade400
-                                        : Colors.red.shade700),
+                                        ? semantic.success
+                                        : semantic.success)
+                                    : semantic.error,
                             size: 18,
                           ),
                           const SizedBox(width: 8),
@@ -307,11 +291,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                               color:
                                   mentor.isActive
                                       ? (isDark
-                                          ? Colors.green.shade400
-                                          : Colors.green.shade700)
-                                      : (isDark
-                                          ? Colors.red.shade400
-                                          : Colors.red.shade700),
+                                          ? semantic.success
+                                          : semantic.success)
+                                      : semantic.error,
                             ),
                           ),
                         ],
@@ -327,7 +309,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                       margin: const EdgeInsets.fromLTRB(16, 24, 16, 8),
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: isDark ? colorScheme.surface : Colors.white,
+                        color: colorScheme.surface,
 
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
@@ -390,7 +372,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   child: Container(
                     margin: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                     decoration: BoxDecoration(
-                      color: isDark ? colorScheme.surface : Colors.white,
+                      color: colorScheme.surface,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
@@ -606,10 +588,7 @@ class _InfoItem extends StatelessWidget {
                     Text(
                       label,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color:
-                            theme.brightness == Brightness.dark
-                                ? Colors.grey.shade400
-                                : Colors.grey.shade600,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 6),

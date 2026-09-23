@@ -91,7 +91,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           (context) => AlertDialog(
             title: Row(
               children: [
-                Icon(currentRole.icon, color: currentRole.color),
+                Icon(currentRole.icon, color: currentRole.colorOf(context)),
                 const SizedBox(width: 12),
                 const Text('Cập nhật vai trò'),
               ],
@@ -110,11 +110,11 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   return Card(
                     margin: const EdgeInsets.only(bottom: 8),
                     elevation: isSelected ? 2 : 0,
-                    color: isSelected ? role.color.withValues(alpha: 0.1) : null,
+                    color: isSelected ? role.colorOf(context).withValues(alpha: 0.1) : null,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
-                        color: isSelected ? role.color : Colors.transparent,
+                        color: isSelected ? role.colorOf(context) : Colors.transparent,
                         width: 2,
                       ),
                     ),
@@ -155,12 +155,12 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: role.color.withValues(alpha: 0.1),
+                                color: role.colorOf(context).withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 role.icon,
-                                color: role.color,
+                                color: role.colorOf(context),
                                 size: 24,
                               ),
                             ),
@@ -174,7 +174,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                     style: theme.textTheme.titleMedium
                                         ?.copyWith(
                                           fontWeight: FontWeight.bold,
-                                          color: isSelected ? role.color : null,
+                                          color: isSelected ? role.colorOf(context) : null,
                                         ),
                                   ),
                                   const SizedBox(height: 4),
@@ -183,7 +183,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color:
                                           isSelected
-                                              ? role.color.withValues(alpha: 0.8)
+                                              ? role.colorOf(context).withValues(alpha: 0.8)
                                               : theme
                                                   .textTheme
                                                   .bodySmall
@@ -194,7 +194,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                               ),
                             ),
                             if (isSelected)
-                              Icon(Icons.check_circle, color: role.color),
+                              Icon(Icons.check_circle, color: role.colorOf(context)),
                           ],
                         ),
                       ),
@@ -338,7 +338,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     (role) => _buildRoleFilterButton(
                       icon: role.icon,
                       label: role.name,
-                      color: role.color,
+                      color: role.colorOf(context),
                       selected: _selectedRole == role.id,
                       onTap: () {
                         setState(() => _selectedRole = role.id);
@@ -666,7 +666,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: role.color.withValues(alpha: 0.5),
+                        color: role.colorOf(context).withValues(alpha: 0.5),
                         width: 3,
                       ),
                     ),
@@ -755,7 +755,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   IconButton(
                     onPressed: () => _showRoleUpdateDialog(user),
                     icon: Icon(role.icon, size: 22),
-                    color: role.color,
+                    color: role.colorOf(context),
                     tooltip: 'Thay đổi vai trò',
                   ),
                   const SizedBox(height: 8),
