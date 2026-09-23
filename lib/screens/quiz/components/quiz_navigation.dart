@@ -9,6 +9,10 @@ class QuizNavigation extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onSubmit;
 
+  /// Lần nộp trước thất bại (thường do mạng) — mở lại nút "Nộp bài" để thử lại
+  /// thay vì khoá cứng vì đã hết giờ.
+  final bool submitFailed;
+
   const QuizNavigation({
     super.key,
     required this.currentQuestionIndex,
@@ -18,6 +22,7 @@ class QuizNavigation extends StatelessWidget {
     required this.onPrevious,
     required this.onNext,
     required this.onSubmit,
+    this.submitFailed = false,
   });
 
   @override
@@ -82,7 +87,8 @@ class QuizNavigation extends StatelessWidget {
               // Next/Submit button
               if (isLastQuestion)
                 ElevatedButton.icon(
-                  onPressed: isTimeUp || isSubmitted ? null : onSubmit,
+                  onPressed:
+                      isSubmitted || (isTimeUp && !submitFailed) ? null : onSubmit,
                   icon: const Icon(Icons.check),
                   label: const Text('Nộp bài'),
                   style: ElevatedButton.styleFrom(

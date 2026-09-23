@@ -35,6 +35,8 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
   Timer? _timer;
   int _remainingSeconds = 0;
   bool _isTimeUp = false;
+  /// Nộp bài tự động thất bại — cho phép người dùng thử lại.
+  bool _submitFailed = false;
   bool _isLoading = true;
   String _explanationText = '';
   bool _hasLoadedQuestions = false;
@@ -153,6 +155,8 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
   Future<void> _submitQuizAuto() async {
     setState(() {
       _isLoading = true;
+      // Xoá cờ thất bại trước mỗi lần thử để không giữ trạng thái cũ.
+      _submitFailed = false;
     });
     try {
       final userUid =
@@ -184,11 +188,8 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
         if (result['success'] == true) {
           _showResult();
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(result['message'] ?? 'Có lỗi xảy ra khi nộp bài'),
-              backgroundColor: Colors.red,
-            ),
+          _showAutoSubmitFailed(
+            result['message'] ?? 'Có lỗi xảy ra khi nộp bài',
           );
         }
       }
@@ -197,14 +198,28 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi khi nộp bài: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        _showAutoSubmitFailed('Lỗi khi nộp bài: $e');
       }
     }
+  }
+
+  /// Nộp bài (thường là do hết giờ) thất bại.
+  ///
+  /// Trước đây chỉ hiện SnackBar rồi để `_isTimeUp = true` nguyên trạng:
+  /// `QuizNavigation` vô hiệu hoá MỌI nút khi hết giờ, nên người dùng không còn
+  /// cách chuyển câu hay nộp lại — mất trắng lượt làm chỉ vì lỗi mạng một lần.
+  /// Giờ mở khoá nút "Nộp bài" để thử lại, kèm thông báo rõ ràng.
+  void _showAutoSubmitFailed(String message) {
+    setState(() {
+      _submitFailed = true;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$message\nNhấn "Nộp bài" để thử lại.'),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 6),
+      ),
+    );
   }
 
   String _formatRemainingTime() {
@@ -568,6 +583,8 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
 
               setState(() {
                 _isLoading = true;
+                // Xoa co that bai: nguoi dung dang chu dong nop lai.
+                _submitFailed = false;
               });
 
               try {
@@ -637,8 +654,18 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    // Dùng `PopScope` thay cho `WillPopScope` (đã deprecated từ Flutter 3.12).
+    //
+    // AndroidManifest bật `android:enableOnBackInvokedCallback="true"`, mà với
+    // predictive back thì `onWillPop` của `WillPopScope` KHÔNG được gọi — người
+    // dùng vuốt back sẽ thoát thẳng khỏi bài thi, không hiện cảnh báo và mất
+    // toàn bộ đáp án.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        if (!mounted) return;
+
         if (!_questionCubit.state.isQuizSubmitted && !_isTimeUp) {
           final shouldSubmit = await showDialog<bool>(
             context: context,
@@ -666,11 +693,12 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
           );
           if (shouldSubmit == true) {
             await _submitQuizAuto();
-            return true;
+            if (!mounted) return;
+            Navigator.of(context).pop();
           }
-          return false;
+          return;
         }
-        return true;
+        Navigator.of(context).pop();
       },
       child: BlocProvider.value(
         value: _questionCubit,
@@ -950,6 +978,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                                   state.selectedQuestionIndex ?? 0,
                               totalQuestions: state.questions.length,
                               isTimeUp: _isTimeUp,
+                              submitFailed: _submitFailed,
                               isSubmitted: state.isQuizSubmitted,
                               onPrevious: () {
                                 _questionCubit.previousQuestion();
