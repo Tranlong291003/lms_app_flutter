@@ -6,6 +6,7 @@ class CustomTextField extends StatefulWidget {
   final TextEditingController controller; // Điều khiển giá trị của TextField
   final bool showVisibilityIcon; // Xác định có hiển thị icon ẩn/hiện không
   final String? prefixAsset; // Asset phía trước trường nhập liệu
+  final IconData? prefixIcon; // Icon phía trước trường nhập liệu
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
 
@@ -16,6 +17,7 @@ class CustomTextField extends StatefulWidget {
     required this.controller,
     this.showVisibilityIcon = false, // Mặc định không hiển thị icon ẩn/hiện
     this.prefixAsset, // Cho phép người dùng truyền asset prefix
+    this.prefixIcon, // Cho phép người dùng truyền icon prefix
     this.validator,
     this.keyboardType,
   });
@@ -49,17 +51,27 @@ class _CustomTextFieldState extends State<CustomTextField> {
         labelStyle: TextStyle(
           color: theme.colorScheme.onSurface.withOpacity(0.7),
         ),
-        // Nếu không truyền prefixAsset thì mặc định dùng icon email cho trường email hoặc icon khóa cho mật khẩu
+        // Trước đây không truyền `prefixAsset` thì mặc định gắn icon PHONG BÌ
+        // cho mọi ô — kể cả ô mật khẩu — nên icon vô nghĩa và gây nhầm lẫn.
+        // Giờ: ưu tiên ảnh truyền vào, rồi tới `prefixIcon`, cuối cùng là icon
+        // suy ra từ ngữ cảnh (ô mật khẩu → ổ khoá).
         prefixIcon:
             widget.prefixAsset != null
                 ? Image.asset(
                   widget.prefixAsset!,
                   color: theme.colorScheme.onSurface,
                 )
-                : Icon(
-                  Icons.email,
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
-                ), // Mặc định dùng icon email nếu không có asset
+                : widget.prefixIcon != null
+                    ? Icon(
+                      widget.prefixIcon,
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    )
+                    : widget.obscureText
+                        ? Icon(
+                          Icons.lock_outline_rounded,
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        )
+                        : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12), // Bo góc
           borderSide: BorderSide(

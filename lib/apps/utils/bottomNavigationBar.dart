@@ -116,10 +116,9 @@ class _BottomNavigationBarExampleState
         unselectedLabelStyle: theme.textTheme.labelMedium?.copyWith(
           fontWeight: FontWeight.w400,
         ),
-        backgroundColor:
-            theme.brightness == Brightness.dark
-                ? const Color(0xFF181A20)
-                : const Color(0xFFF8FAFC),
+        // Lấy từ theme để khi đổi tông màu app không phải sửa hai nơi.
+        // Trước đây hardcode trùng giá trị với AppTheme nên sửa theme sẽ lệch.
+        backgroundColor: theme.colorScheme.surface,
         elevation: 8,
         items: items,
       ),

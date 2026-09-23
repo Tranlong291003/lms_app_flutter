@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/bookmark_button.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/bookmark/bookmark_cubit.dart';
 import 'package:lms/cubits/bookmark/bookmark_state.dart';
@@ -99,8 +100,6 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
     if (hasChanges) {
       setState(() {});
     }
-
-    print('Cập nhật trạng thái bookmark cho ${widget.courses.length} khóa học');
   }
 
   @override
@@ -138,8 +137,14 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
 
           final List<Course> coursesToDisplay = widget.courses;
 
+          // Trước đây trả `SizedBox.shrink()` → người dùng chỉ thấy màn hình
+          // trắng, không phân biệt được "đang rỗng" với "đang lỗi".
           if (coursesToDisplay.isEmpty) {
-            return const SizedBox.shrink();
+            return const EmptyStateWidget(
+              icon: Icons.menu_book_outlined,
+              title: 'Chưa có khoá học nào',
+              message: 'Các khoá học mới sẽ xuất hiện ở đây.',
+            );
           }
 
           return ListView.separated(
@@ -164,7 +169,11 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                   );
                 },
                 child: Container(
-                  height: 140,
+                  // Dùng ràng buộc chiều cao tối thiểu thay vì `height` cố định:
+                  // card cũ cao đúng 140px trong khi ảnh đã 120px + padding 24px
+                  // → tràn 4px; và khi người dùng tăng cỡ chữ hệ thống thì phần
+                  // chữ bên phải còn tràn nhiều hơn.
+                  constraints: const BoxConstraints(minHeight: 144),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surface,
@@ -189,6 +198,10 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                                       width: 120,
                                       height: 120,
                                       fit: BoxFit.cover,
+                                      loadingBuilder: (_, child, progress) {
+                                        if (progress == null) return child;
+                                        return _buildPlaceholderImage(context);
+                                      },
                                       errorBuilder:
                                           (_, __, ___) =>
                                               _buildPlaceholderImage(context),
@@ -227,8 +240,10 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                                   style: theme.textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.clip,
+                                  maxLines: 2,
+                                  // `clip` cắt ngang giữa chữ mà không có dấu
+                                  // "..." nên người dùng không biết tên bị cụt.
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                                 const SizedBox(height: 6),
 
@@ -245,17 +260,23 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                                     ),
                                     if (c.discountPrice > 0 && c.price > 0) ...[
                                       const SizedBox(width: 8),
-                                      Text(
-                                        c.price == 0
-                                            ? ''
-                                            : '${c.price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} VND',
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(
-                                              color: theme.colorScheme.onSurface
-                                                  .withOpacity(0.6),
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                            ),
+                                      // `Flexible` để giá gạch ngang thu nhỏ chứ
+                                      // không đẩy tràn cả hàng khi giá dài.
+                                      Flexible(
+                                        child: Text(
+                                          '${priceFmt.format(c.price)} VND',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                                color: theme
+                                                    .colorScheme
+                                                    .onSurface
+                                                    .withOpacity(0.6),
+                                                decoration:
+                                                    TextDecoration.lineThrough,
+                                              ),
+                                        ),
                                       ),
                                     ],
                                   ],
@@ -283,9 +304,13 @@ class _ListCoursesWidgetState extends State<ListCoursesWidget> {
                                           .withOpacity(0.6),
                                     ),
                                     const SizedBox(width: 4),
-                                    Text(
-                                      '${c.enrollCount} người học',
-                                      style: theme.textTheme.bodySmall,
+                                    Flexible(
+                                      child: Text(
+                                        '${c.enrollCount} người học',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.bodySmall,
+                                      ),
                                     ),
                                   ],
                                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 
 class CustomSnackBar {
   static void show({
@@ -55,6 +56,8 @@ class CustomSnackBar {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  // Màu lấy từ bảng màu của app thay vì Colors.green/red/orange/blue:
+  // các màu Material mặc định quá chói và lệch hẳn tông xanh của app.
   static void showSuccess({
     required BuildContext context,
     required String message,
@@ -65,7 +68,7 @@ class CustomSnackBar {
       context: context,
       message: message,
       icon: Icons.check_circle,
-      backgroundColor: Colors.green,
+      backgroundColor: AppTheme.success,
       actionLabel: actionLabel,
       onActionPressed: onActionPressed,
     );
@@ -81,7 +84,7 @@ class CustomSnackBar {
       context: context,
       message: message,
       icon: Icons.error_outline,
-      backgroundColor: Colors.red,
+      backgroundColor: AppTheme.error,
       actionLabel: actionLabel,
       onActionPressed: onActionPressed,
     );
@@ -97,7 +100,7 @@ class CustomSnackBar {
       context: context,
       message: message,
       icon: Icons.warning_amber_rounded,
-      backgroundColor: Colors.orange,
+      backgroundColor: AppTheme.accent,
       actionLabel: actionLabel,
       onActionPressed: onActionPressed,
     );
@@ -113,7 +116,7 @@ class CustomSnackBar {
       context: context,
       message: message,
       icon: Icons.info_outline,
-      backgroundColor: Colors.blue,
+      backgroundColor: AppTheme.primary,
       actionLabel: actionLabel,
       onActionPressed: onActionPressed,
     );

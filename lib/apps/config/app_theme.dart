@@ -23,6 +23,57 @@ class AppTheme {
   static const Color textPrimaryDark = Color(0xFFF1F5F9); // Trắng nhạt
   static const Color textSecondaryDark = Color(0xFF94A3B8); // Xám nhạt
 
+  /// Bảng chữ đầy đủ cho cả hai chế độ.
+  ///
+  /// Trước đây theme chỉ khai báo 4 style (displayLarge, titleLarge, bodyLarge,
+  /// bodyMedium) trong khi app dùng `titleMedium` 104 lần, `bodySmall` 42 lần…
+  /// Những style thiếu sẽ rơi về mặc định của Material: cỡ chữ lệch nhau giữa
+  /// các màn hình và ở dark mode chữ có thể ra màu đen trên nền tối.
+  static TextTheme _buildTextTheme(Color primary, Color secondary) {
+    return TextTheme(
+      displayLarge: TextStyle(
+        color: primary,
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+      ),
+      headlineMedium: TextStyle(
+        color: primary,
+        fontSize: 26,
+        fontWeight: FontWeight.bold,
+      ),
+      headlineSmall: TextStyle(
+        color: primary,
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        color: primary,
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+      ),
+      titleMedium: TextStyle(
+        color: primary,
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+      ),
+      titleSmall: TextStyle(
+        color: primary,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
+      bodyLarge: TextStyle(color: primary, fontSize: 16),
+      bodyMedium: TextStyle(color: secondary, fontSize: 14),
+      bodySmall: TextStyle(color: secondary, fontSize: 12),
+      labelLarge: TextStyle(
+        color: primary,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
+      labelMedium: TextStyle(color: secondary, fontSize: 12),
+      labelSmall: TextStyle(color: secondary, fontSize: 11),
+    );
+  }
+
   /// Theme cho Light Mode
   static final ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
@@ -114,20 +165,7 @@ class AppTheme {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       hintStyle: const TextStyle(color: textSecondaryLight),
     ),
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(
-        color: textPrimaryLight,
-        fontSize: 32,
-        fontWeight: FontWeight.bold,
-      ),
-      titleLarge: TextStyle(
-        color: textPrimaryLight,
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-      ),
-      bodyLarge: TextStyle(color: textPrimaryLight, fontSize: 16),
-      bodyMedium: TextStyle(color: textSecondaryLight, fontSize: 14),
-    ),
+    textTheme: _buildTextTheme(textPrimaryLight, textSecondaryLight),
     iconTheme: const IconThemeData(color: textPrimaryLight),
     dividerTheme: const DividerThemeData(
       color: Color(0xFFE2E8F0),
@@ -228,20 +266,7 @@ class AppTheme {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       hintStyle: const TextStyle(color: textSecondaryDark),
     ),
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(
-        color: textPrimaryDark,
-        fontSize: 32,
-        fontWeight: FontWeight.bold,
-      ),
-      titleLarge: TextStyle(
-        color: textPrimaryDark,
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-      ),
-      bodyLarge: TextStyle(color: textPrimaryDark, fontSize: 16),
-      bodyMedium: TextStyle(color: textSecondaryDark, fontSize: 14),
-    ),
+    textTheme: _buildTextTheme(textPrimaryDark, textSecondaryDark),
     iconTheme: const IconThemeData(color: textPrimaryDark),
     dividerTheme: const DividerThemeData(
       color: Color(0xFF334155),

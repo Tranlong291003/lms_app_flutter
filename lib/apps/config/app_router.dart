@@ -22,6 +22,7 @@ import 'package:lms/screens/listMentor/listMentor_screen.dart';
 import 'package:lms/screens/login/loginWithPassword_screen.dart';
 import 'package:lms/screens/login/login_screen.dart';
 import 'package:lms/screens/notification/notification_setting_screen.dart';
+import 'package:lms/screens/notification/notifications_screen.dart';
 import 'package:lms/screens/payment/payment_screen.dart';
 import 'package:lms/screens/privacy/privacy_screen.dart';
 import 'package:lms/screens/profile/editprofile_screen.dart';
@@ -50,6 +51,7 @@ class AppRouter {
   static const String listMentor = '/listmentor';
   static const String listCourse = '/listcourse';
   static const String notificationSetting = '/notificationSetting';
+  static const String notifications = '/notifications';
   static const String bookmark = '/bookmark';
   static const String profile = '/profile';
   static const String editProfile = '/editprofile';
@@ -121,6 +123,9 @@ class AppRouter {
         break;
       case notificationSetting:
         page = NotificationSettingScreen();
+        break;
+      case notifications:
+        page = NotificationsScreen();
         break;
       case bookmark:
         page = BookmarkScreen(userUid: settings.arguments as String);

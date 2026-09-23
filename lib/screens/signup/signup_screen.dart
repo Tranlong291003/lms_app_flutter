@@ -4,6 +4,7 @@ import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/ElevatedButtonsocial.dart';
 import 'package:lms/apps/utils/botton.dart';
 import 'package:lms/apps/utils/customTextField.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/screens/login/loginWithPassword_screen.dart';
 import 'package:lms/screens/signup/cubit/sign_up_cubit.dart';
 import 'package:lms/services/auth_service.dart';
@@ -18,6 +19,14 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  void _showSocialUnsupported(BuildContext context) {
+    CustomSnackBar.showInfo(
+      context: context,
+      message: 'Đăng ký bằng mạng xã hội chưa được hỗ trợ. '
+          'Vui lòng dùng email và mật khẩu.',
+    );
+  }
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
@@ -264,18 +273,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              // Chưa nối được vào backend (đã bỏ Firebase Auth).
+                              // Bấm sẽ báo rõ thay vì im lặng như trước.
                               SocialLoginButton(
                                 width: 70,
                                 context: context,
                                 assetPath: 'assets/icons/facebook.png',
-                                onPressed: () {},
+                                onPressed: () => _showSocialUnsupported(context),
                               ),
                               const SizedBox(width: 16),
                               SocialLoginButton(
                                 width: 70,
                                 context: context,
                                 assetPath: 'assets/icons/google.png',
-                                onPressed: () {},
+                                onPressed: () => _showSocialUnsupported(context),
                               ),
                               const SizedBox(width: 16),
                               SocialLoginButton(
@@ -284,7 +295,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 width: 70,
                                 context: context,
                                 assetPath: 'assets/icons/apple.png',
-                                onPressed: () {},
+                                onPressed: () => _showSocialUnsupported(context),
                               ),
                             ],
                           ),

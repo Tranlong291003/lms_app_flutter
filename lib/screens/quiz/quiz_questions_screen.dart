@@ -937,9 +937,14 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                             ),
                           ),
                           const SizedBox(height: 18),
-                          // Thanh điều hướng
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+                          // Thanh điều hướng.
+                          //
+                          // Bọc SafeArea vì nút "Nộp bài" nằm sát đáy: trên máy
+                          // có home indicator (iPhone X trở lên) nút bị thanh
+                          // vuốt che, chạm rất khó hoặc không chạm được.
+                          SafeArea(
+                            top: false,
+                            minimum: const EdgeInsets.fromLTRB(16, 0, 16, 18),
                             child: QuizNavigation(
                               currentQuestionIndex:
                                   state.selectedQuestionIndex ?? 0,

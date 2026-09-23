@@ -5,6 +5,7 @@ import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/ElevatedButtonsocial.dart';
 import 'package:lms/apps/utils/botton.dart';
 import 'package:lms/apps/utils/customTextField.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/login/cubit/auth_state.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -13,6 +14,14 @@ class LoginWithPasswordScreen extends StatelessWidget {
   LoginWithPasswordScreen({super.key});
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  void _showSocialUnsupported(BuildContext context) {
+    CustomSnackBar.showInfo(
+      context: context,
+      message: 'Đăng nhập bằng mạng xã hội chưa được hỗ trợ. '
+          'Vui lòng dùng email và mật khẩu.',
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -196,18 +205,22 @@ class LoginWithPasswordScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          // Backend đã bỏ Firebase Auth nên các nút này chưa nối
+                          // được vào đâu. Trước đây `onPressed` rỗng nên bấm
+                          // không có phản hồi gì; giờ báo rõ để người dùng biết
+                          // là chưa hỗ trợ thay vì tưởng app bị treo.
                           SocialLoginButton(
                             width: 70,
                             context: context,
                             assetPath: 'assets/icons/facebook.png',
-                            onPressed: () {},
+                            onPressed: () => _showSocialUnsupported(context),
                           ),
                           const SizedBox(width: 16),
                           SocialLoginButton(
                             width: 70,
                             context: context,
                             assetPath: 'assets/icons/google.png',
-                            onPressed: () {},
+                            onPressed: () => _showSocialUnsupported(context),
                           ),
                           const SizedBox(width: 16),
                           SocialLoginButton(
@@ -216,7 +229,7 @@ class LoginWithPasswordScreen extends StatelessWidget {
                             assetPath: 'assets/icons/apple.png',
                             finalIconColor:
                                 isDark ? Colors.white : Colors.black,
-                            onPressed: () {},
+                            onPressed: () => _showSocialUnsupported(context),
                           ),
                         ],
                       ),

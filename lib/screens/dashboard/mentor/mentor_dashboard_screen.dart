@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/admin/app_stats_cubit.dart';
 import 'package:lms/repositories/app_stats_repository.dart';
@@ -188,6 +189,13 @@ class MentorDashboardScreen extends StatelessWidget {
 
 // Widget hiển thị danh sách các thao tác nhanh
 class _QuickActionsList extends StatelessWidget {
+  void _showUnavailable(BuildContext context, String feature) {
+    CustomSnackBar.showInfo(
+      context: context,
+      message: '$feature chưa được hỗ trợ trên phiên bản này.',
+    );
+  }
+
   final VoidCallback onCourseManagement;
 
   const _QuickActionsList({required this.onCourseManagement});
@@ -207,12 +215,15 @@ class _QuickActionsList extends StatelessWidget {
           onTap: onCourseManagement,
         ),
         const SizedBox(height: 12),
+        // Hai thẻ dưới đây chưa có màn hình tương ứng trong app. Trước đây
+        // `onTap` rỗng nên bấm không có phản hồi; giờ báo rõ để người dùng
+        // không tưởng app bị treo.
         _QuickActionCard(
           icon: Icons.people,
           title: 'Quản lý học viên',
           subtitle: 'Xem danh sách và tiến độ học viên',
           color: Colors.orange,
-          onTap: () {},
+          onTap: () => _showUnavailable(context, 'Quản lý học viên'),
         ),
         const SizedBox(height: 12),
         _QuickActionCard(
@@ -220,7 +231,7 @@ class _QuickActionsList extends StatelessWidget {
           title: 'Báo cáo và phân tích',
           subtitle: 'Thống kê và đánh giá khóa học',
           color: Colors.green,
-          onTap: () {},
+          onTap: () => _showUnavailable(context, 'Báo cáo và phân tích'),
         ),
       ],
     );

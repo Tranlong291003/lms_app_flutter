@@ -49,12 +49,17 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.actions,
   });
 
-  @override
-  Size get preferredSize {
-    final base = kToolbarHeight;
-    final extra = (tabs != null && tabs!.isNotEmpty) ? kTextTabBarHeight : 0;
-    return Size.fromHeight(base + extra);
+  /// Chiều cao thanh công cụ thực tế (khớp `toolbarHeight` trong `build`).
+  static const double toolbarHeight = 64;
+
+  /// Chiều cao phần `bottom` (TabBar hoặc đường kẻ 1px).
+  double get _bottomHeight {
+    if (tabs != null && tabs!.isNotEmpty) return kTextTabBarHeight;
+    return showBottomBorder ? 1 : 0;
   }
+
+  @override
+  Size get preferredSize => Size.fromHeight(toolbarHeight + _bottomHeight);
 
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
@@ -113,7 +118,7 @@ class _CustomAppBarState extends State<CustomAppBar>
       automaticallyImplyLeading: false,
       centerTitle: widget.centerTitle,
       titleSpacing: 0,
-      toolbarHeight: 64,
+      toolbarHeight: CustomAppBar.toolbarHeight,
 
       // back button
       leading:
@@ -235,53 +240,34 @@ class _CustomAppBarState extends State<CustomAppBar>
             ),
           ),
 
-        // icon 3-chấm luôn hiện nếu showMenu = true
-        if (widget.showMenu)
+        // Icon 3-chấm chỉ hiện khi THỰC SỰ có menu.
+        // Trước đây `showMenu: true` không kèm `menuItems` vẫn vẽ nút nhưng
+        // `onPressed` rỗng nên bấm vào không có gì xảy ra.
+        if (widget.showMenu &&
+            widget.menuItems != null &&
+            widget.menuItems!.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child:
-                widget.menuItems != null
-                    ? PopupMenuButton<String>(
-                      icon: Icon(
-                        Icons.more_vert_rounded,
-                        color: theme.colorScheme.onSurface,
-                        size: 22,
-                      ),
-                      onSelected: widget.onMenuSelected,
-                      itemBuilder: (_) => widget.menuItems!,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 2,
-                      position: PopupMenuPosition.under,
-                    )
-                    : IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        Icons.more_vert_rounded,
-                        color: theme.colorScheme.onSurface,
-                        size: 22,
-                      ),
-                      onPressed: () {},
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
+            child: PopupMenuButton<String>(
+              icon: Icon(
+                Icons.more_vert_rounded,
+                color: theme.colorScheme.onSurface,
+                size: 22,
+              ),
+              onSelected: widget.onMenuSelected,
+              itemBuilder: (_) => widget.menuItems!,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 2,
+              position: PopupMenuPosition.under,
+            ),
           ),
       ],
 
       // TabBar hoặc bottom border
       bottom: PreferredSize(
-        preferredSize: Size.fromHeight(
-          (widget.tabs != null && widget.tabs!.isNotEmpty)
-              ? kTextTabBarHeight
-              : widget.showBottomBorder
-              ? 1
-              : 0,
-        ),
+        preferredSize: Size.fromHeight(widget._bottomHeight),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -1,10 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
-import 'package:lms/apps/utils/custom_snackbar.dart';
+import 'package:lms/services/notification_preferences.dart';
 
-class NotificationSettingScreen extends StatelessWidget {
+class NotificationSettingScreen extends StatefulWidget {
   const NotificationSettingScreen({super.key});
+
+  @override
+  State<NotificationSettingScreen> createState() =>
+      _NotificationSettingScreenState();
+}
+
+class _NotificationSettingScreenState
+    extends State<NotificationSettingScreen> {
+  bool _course = NotificationPreferences.defaultCourse;
+  bool _message = NotificationPreferences.defaultMessage;
+  bool _promotion = NotificationPreferences.defaultPromotion;
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final course = await NotificationPreferences.getCourse();
+    final message = await NotificationPreferences.getMessage();
+    final promotion = await NotificationPreferences.getPromotion();
+    if (!mounted) return;
+    setState(() {
+      _course = course;
+      _message = message;
+      _promotion = promotion;
+      _loaded = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,93 +48,82 @@ class NotificationSettingScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           _buildSectionTitle('Cài đặt thông báo', theme),
-          _buildNotificationOption(
-            context: context,
-            title: 'Thông báo khóa học',
-            subtitle: 'Nhận thông báo về các khóa học mới, cập nhật bài học',
-            isEnabled: true,
-            onChanged: (value) {
-              // Đây là chức năng chưa phát triển
-              CustomSnackBar.showInfo(
-                context: context,
-                message: 'Chức năng đang được phát triển',
-              );
-            },
-          ),
-          _buildNotificationOption(
-            context: context,
-            title: 'Thông báo tin nhắn',
-            subtitle: 'Nhận thông báo khi có tin nhắn mới từ giảng viên',
-            isEnabled: false,
-            onChanged: (value) {
-              CustomSnackBar.showInfo(
-                context: context,
-                message: 'Chức năng đang được phát triển',
-              );
-            },
-          ),
-          _buildNotificationOption(
-            context: context,
-            title: 'Thông báo khuyến mãi',
-            subtitle: 'Nhận thông báo về các chương trình khuyến mãi, ưu đãi',
-            isEnabled: true,
-            onChanged: (value) {
-              CustomSnackBar.showInfo(
-                context: context,
-                message: 'Chức năng đang được phát triển',
-              );
-            },
-          ),
+          if (!_loaded)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 32),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else ...[
+            _buildNotificationOption(
+              context: context,
+              title: 'Thông báo khóa học',
+              subtitle: 'Nhận thông báo về các khóa học mới, cập nhật bài học',
+              isEnabled: _course,
+              onChanged: (value) {
+                setState(() => _course = value);
+                NotificationPreferences.setCourse(value);
+              },
+            ),
+            _buildNotificationOption(
+              context: context,
+              title: 'Thông báo tin nhắn',
+              subtitle: 'Nhận thông báo khi có tin nhắn mới từ giảng viên',
+              isEnabled: _message,
+              onChanged: (value) {
+                setState(() => _message = value);
+                NotificationPreferences.setMessage(value);
+              },
+            ),
+            _buildNotificationOption(
+              context: context,
+              title: 'Thông báo khuyến mãi',
+              subtitle: 'Nhận thông báo về các chương trình khuyến mãi, ưu đãi',
+              isEnabled: _promotion,
+              onChanged: (value) {
+                setState(() => _promotion = value);
+                NotificationPreferences.setPromotion(value);
+              },
+            ),
+          ],
 
           const SizedBox(height: 24),
           _buildSectionTitle('Lịch sử thông báo', theme),
 
-          // Danh sách thông báo trống
+          // Trước đây chỗ này vẽ một khối "Chưa có thông báo nào" CỨNG kèm nút
+          // "Làm mới" chỉ báo "đang phát triển" — dù app đã có màn hình thông
+          // báo thật (NotificationsScreen + NotificationCubit) và API đọc được
+          // dữ liệu. Người dùng bị dẫn tới kết luận sai là không có thông báo.
           Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 40),
+              padding: const EdgeInsets.symmetric(vertical: 32),
               child: Column(
                 children: [
                   Icon(
-                    Icons.notifications_off_outlined,
-                    size: 64,
+                    Icons.notifications_none_rounded,
+                    size: 56,
                     color: colorScheme.onSurface.withOpacity(0.3),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Chưa có thông báo nào',
+                    'Xem tất cả thông báo',
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Thông báo của bạn sẽ xuất hiện ở đây',
+                    'Danh sách thông báo của bạn nằm ở màn hình riêng.',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurface.withOpacity(0.5),
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      CustomSnackBar.showInfo(
-                        context: context,
-                        message: 'Chức năng đang được phát triển',
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: const Text('Làm mới'),
+                  const SizedBox(height: 20),
+                  OutlinedButton.icon(
+                    onPressed: () =>
+                        Navigator.pushNamed(context, AppRouter.notifications),
+                    icon: const Icon(Icons.list_alt_rounded, size: 20),
+                    label: const Text('Mở danh sách thông báo'),
                   ),
                 ],
               ),
@@ -176,144 +196,3 @@ class NotificationSettingScreen extends StatelessWidget {
   }
 }
 
-class _NotificationCard extends StatelessWidget {
-  final Map<String, dynamic> notification;
-
-  const _NotificationCard({required this.notification});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outline.withOpacity(0.1)),
-      ),
-      child: InkWell(
-        onTap: () {
-          // TODO: Handle notification tap
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Icon
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: _getIconColor(
-                    theme,
-                    notification['type'],
-                  ).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  _getIcon(notification['type']),
-                  color: _getIconColor(theme, notification['type']),
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              // Content
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            notification['title'],
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color:
-                                  notification['isRead']
-                                      ? theme.colorScheme.onSurface.withOpacity(
-                                        0.7,
-                                      )
-                                      : theme.colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        if (!notification['isRead'])
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primary,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      notification['message'],
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _formatTime(notification['createdAt']),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.5),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  IconData _getIcon(String type) {
-    switch (type) {
-      case 'course':
-        return Icons.school_rounded;
-      case 'promotion':
-        return Icons.local_offer_rounded;
-      case 'update':
-        return Icons.update_rounded;
-      default:
-        return Icons.notifications_rounded;
-    }
-  }
-
-  Color _getIconColor(ThemeData theme, String type) {
-    switch (type) {
-      case 'course':
-        return theme.colorScheme.primary;
-      case 'promotion':
-        return theme.colorScheme.tertiary;
-      case 'update':
-        return theme.colorScheme.secondary;
-      default:
-        return theme.colorScheme.primary;
-    }
-  }
-
-  String _formatTime(DateTime time) {
-    final now = DateTime.now();
-    final difference = now.difference(time);
-
-    if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} phút trước';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours} giờ trước';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays} ngày trước';
-    } else {
-      return DateFormat('dd/MM/yyyy').format(time);
-    }
-  }
-}

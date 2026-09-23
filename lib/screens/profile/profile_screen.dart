@@ -21,7 +21,6 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         title: 'Hồ sơ cá nhân',
-        showMenu: true,
         showBack: true,
       ),
       body: Column(
@@ -241,15 +240,11 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 _buildSectionTitle('Cài đặt', theme),
-                _buildMenuItem(
-                  iconPath: "assets/icons/language.png",
-                  title: "Ngôn ngữ",
-                  trailing: const Text("Tiếng Việt"),
-                  context: context,
-                  onTap: () {
-                    Navigator.pushNamed(context, AppRouter.language);
-                  },
-                ),
+                // Mục "Ngôn ngữ" đã được gỡ: màn hình đó liệt kê 31 ngôn ngữ
+                // nhưng không chọn được (`_selectedLanguage` là `final`) và cả
+                // radio lẫn nút "Áp dụng" đều chỉ báo "Chức năng đang được phát
+                // triển". App cũng chưa có hạ tầng dịch (không có l10n/), nên
+                // giữ lại chỉ gây hiểu nhầm là đã đổi được ngôn ngữ.
                 _buildMenuItem(
                   iconPath:
                       Theme.of(context).brightness == Brightness.dark

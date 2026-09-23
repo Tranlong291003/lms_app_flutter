@@ -136,7 +136,8 @@ class _BookmarkButtonState extends State<BookmarkButton>
       return SizedBox(
         width: widget.size,
         height: widget.size,
-        child: const LoadingIndicator(),
+        // `plain` để không vẽ nền + đổ bóng — ô chỉ rộng bằng `size`.
+        child: const LoadingIndicator(plain: true),
       );
     }
 
