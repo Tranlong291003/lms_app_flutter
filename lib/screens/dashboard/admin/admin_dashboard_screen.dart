@@ -8,6 +8,7 @@ import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
+import 'package:lms/apps/utils/stat_grid.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/admin/app_stats_cubit.dart';
 import 'package:lms/repositories/app_stats_repository.dart';
@@ -111,31 +112,31 @@ class AdminDashboardScreen extends StatelessWidget {
                           // đó không nằm trong bảng màu app và khi dùng làm màu
                           // CHỮ số liệu trên nền tối chỉ đạt ~2.1:1.
                           final c = AppColors.of(context);
-                          return _StatsGrid(
+                          return StatGrid(
                             stats: [
-                              _Stat(
-                                'Tổng khoá học',
-                                stats.totalCourses.toString(),
-                                Icons.school,
-                                c.info,
+                              StatItem(
+                                title: 'Tổng khoá học',
+                                value: stats.totalCourses.toString(),
+                                icon: Icons.school,
+                                color: c.info,
                               ),
-                              _Stat(
-                                'Tổng người dùng',
-                                stats.totalUsers?.toString() ?? '-',
-                                Icons.people,
-                                c.success,
+                              StatItem(
+                                title: 'Tổng người dùng',
+                                value: stats.totalUsers?.toString() ?? '-',
+                                icon: Icons.people,
+                                color: c.success,
                               ),
-                              _Stat(
-                                'Số bài kiểm tra',
-                                stats.totalQuizzes?.toString() ?? '-',
-                                Icons.quiz,
-                                c.warning,
+                              StatItem(
+                                title: 'Số bài kiểm tra',
+                                value: stats.totalQuizzes?.toString() ?? '-',
+                                icon: Icons.quiz,
+                                color: c.warning,
                               ),
-                              _Stat(
-                                'Lượt đánh giá',
-                                stats.totalReviews?.toString() ?? '-',
-                                Icons.star_rate,
-                                c.error,
+                              StatItem(
+                                title: 'Lượt đánh giá',
+                                value: stats.totalReviews?.toString() ?? '-',
+                                icon: Icons.star_rate,
+                                color: c.error,
                               ),
                             ],
                           );
@@ -397,108 +398,4 @@ class _SectionTitle extends StatelessWidget {
       ),
     );
   }
-}
-
-class _StatsGrid extends StatelessWidget {
-  final List<_Stat> stats;
-  const _StatsGrid({required this.stats});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final colors = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: stats.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.2,
-      ),
-      itemBuilder: (_, i) {
-        final s = stats[i];
-        return Material(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  isDark
-                      ? colors.surfaceContainerHighest
-                      : s.color.withValues(alpha: 0.05),
-                  isDark
-                      ? colors.surfaceContainerHigh
-                      : s.color.withValues(alpha: 0.15),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color:
-                    isDark
-                        ? Colors.white.withValues(alpha: 0.15)
-                        : s.color.withValues(alpha: 0.1),
-                width: 0.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color:
-                      isDark
-                          ? Colors.white.withValues(alpha: 0.05)
-                          : Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 5,
-                  spreadRadius: 0,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: s.color.withValues(alpha: isDark ? .25 : .15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(s.icon, color: s.color, size: 24),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  s.value,
-                  style: textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: s.color,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  s.title,
-                  textAlign: TextAlign.center,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colors.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _Stat {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
-  _Stat(this.title, this.value, this.icon, this.color);
 }

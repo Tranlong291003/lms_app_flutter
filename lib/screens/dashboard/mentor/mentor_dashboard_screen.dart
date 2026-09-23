@@ -7,6 +7,7 @@ import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
+import 'package:lms/apps/utils/stat_grid.dart';
 import 'package:lms/cubits/admin/app_stats_cubit.dart';
 import 'package:lms/repositories/app_stats_repository.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
@@ -119,31 +120,32 @@ class MentorDashboardScreen extends StatelessWidget {
                           // Cùng bảng màu với dashboard admin để hai vai trò
                           // nhìn như cùng một app.
                           final c = AppColors.of(context);
-                          return _StatsGrid(
+                          return StatGrid(
                             stats: [
-                              _Stat(
-                                'Khoá học đang dạy',
-                                stats.totalCourses.toString(),
-                                Icons.school,
-                                c.info,
+                              StatItem(
+                                title: 'Khoá học đang dạy',
+                                value: stats.totalCourses.toString(),
+                                icon: Icons.school,
+                                color: c.info,
                               ),
-                              _Stat(
-                                'Học viên',
-                                stats.totalStudents?.toString() ?? '-',
-                                Icons.people,
-                                c.success,
+                              StatItem(
+                                title: 'Học viên',
+                                value: stats.totalStudents?.toString() ?? '-',
+                                icon: Icons.people,
+                                color: c.success,
                               ),
-                              _Stat(
-                                'Bài giảng',
-                                stats.totalLessons?.toString() ?? '-',
-                                Icons.menu_book,
-                                c.warning,
+                              StatItem(
+                                title: 'Bài giảng',
+                                value: stats.totalLessons?.toString() ?? '-',
+                                icon: Icons.menu_book,
+                                color: c.warning,
                               ),
-                              _Stat(
-                                'Đánh giá TB',
-                                stats.avgRating?.toStringAsFixed(1) ?? '-',
-                                Icons.star,
-                                c.error,
+                              StatItem(
+                                title: 'Đánh giá TB',
+                                value:
+                                    stats.avgRating?.toStringAsFixed(1) ?? '-',
+                                icon: Icons.star,
+                                color: c.error,
                               ),
                             ],
                           );
@@ -368,109 +370,4 @@ class _SectionTitle extends StatelessWidget {
       ),
     );
   }
-}
-
-class _StatsGrid extends StatelessWidget {
-  final List<_Stat> stats;
-
-  const _StatsGrid({required this.stats});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final colors = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: stats.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.2,
-      ),
-      itemBuilder: (_, i) {
-        final s = stats[i];
-        return Material(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  isDark
-                      ? colors.surfaceContainerHighest
-                      : s.color.withValues(alpha: 0.05),
-                  isDark
-                      ? colors.surfaceContainerHigh
-                      : s.color.withValues(alpha: 0.15),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color:
-                    isDark
-                        ? Colors.white.withValues(alpha: 0.15)
-                        : s.color.withValues(alpha: 0.1),
-                width: 0.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color:
-                      isDark
-                          ? Colors.white.withValues(alpha: 0.05)
-                          : Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 5,
-                  spreadRadius: 0,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: s.color.withValues(alpha: isDark ? .25 : .15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(s.icon, color: s.color, size: 24),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  s.value,
-                  style: textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: s.color,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  s.title,
-                  textAlign: TextAlign.center,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colors.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _Stat {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
-  _Stat(this.title, this.value, this.icon, this.color);
 }
