@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
@@ -8,6 +9,9 @@ import 'package:lms/models/quiz/quiz_model.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/quiz/quiz_question_list_screen.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
+
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
 
 class QuizTab extends StatelessWidget {
   final int courseId;
@@ -83,7 +87,7 @@ class QuizTab extends StatelessWidget {
                                 courseId: courseId,
                               ),
                           backgroundColor: colors.primary,
-                          foregroundColor: Colors.white,
+                          foregroundColor: colors.onPrimary,
                           icon: Icons.edit,
                           label: '',
                           borderRadius: BorderRadius.circular(12),
@@ -401,7 +405,7 @@ class _QuizCard extends StatelessWidget {
                   child: Text(
                     type,
                     style: textTheme.labelSmall?.copyWith(
-                      color: Colors.white,
+                      color: colors.onPrimary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -436,7 +440,7 @@ class _QuizCard extends StatelessWidget {
                   icon: Icons.check_circle_outline,
                   label: 'Điểm đạt',
                   value: '$passingScore%',
-                  color: Colors.green,
+                  color: _c(context).success,
                 ),
               ],
             ),

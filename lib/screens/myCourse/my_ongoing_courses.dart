@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_router.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
@@ -79,72 +81,29 @@ class _MyOngoingCoursesScreenState extends State<MyOngoingCoursesScreen> {
           if (state is EnrolledCourseLoading) {
             return const Center(child: LoadingIndicator());
           } else if (state is EnrolledCourseError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Đã xảy ra lỗi',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(state.message),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _loadEnrolledCourses,
-                    child: const Text('Thử lại'),
-                  ),
-                ],
-              ),
+            return EmptyStateWidget(
+              icon: Icons.cloud_off_rounded,
+              title: 'Không tải được danh sách khoá học',
+              message: state.message,
+              isError: true,
+              actionLabel: 'Thử lại',
+              onAction: _loadEnrolledCourses,
             );
           } else if (state is EnrolledCourseLoaded) {
             if (state.ongoingCourses.isEmpty) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.menu_book_outlined,
-                        size: 64,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.3),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Bạn chưa có khóa học nào đang học',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.8),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Hãy bắt đầu một khóa học mới để nâng cao kiến thức của bạn!',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.6),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
+              return EmptyStateWidget(
+                icon: Icons.menu_book_outlined,
+                title: 'Bạn chưa có khoá học nào đang học',
+                message: 'Các khoá học bạn đăng ký sẽ xuất hiện ở đây.',
+                actionLabel: 'Tìm khoá học',
+                onAction: () => Navigator.pushNamed(context, AppRouter.listCourse),
               );
             }
 
             return RefreshIndicator(
               onRefresh: () async => _loadEnrolledCourses(),
               child: ListView.separated(
-                padding: const EdgeInsets.all(16),
+                padding: listPaddingWithBottomInset(context),
                 itemCount: state.ongoingCourses.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
@@ -167,22 +126,12 @@ class _MyOngoingCoursesScreenState extends State<MyOngoingCoursesScreen> {
             );
           }
 
-          return const SizedBox();
+          // Trạng thái chưa xác định: hiện vòng xoay thay vì khung trắng —
+          // trước đây trả `SizedBox()` rỗng nên người dùng thấy màn hình trống
+          // không biết là đang tải hay đã hỏng.
+          return const Center(child: LoadingIndicator());
         },
       ),
     );
-  }
-
-  Color _getProgressColor(int index) {
-    final colors = [
-      Colors.pink,
-      Colors.orange,
-      Colors.teal,
-      Colors.amber,
-      Colors.purple,
-      Colors.blue,
-    ];
-
-    return colors[index % colors.length];
   }
 }

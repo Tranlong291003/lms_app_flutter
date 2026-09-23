@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/config/app_dimens.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
@@ -9,6 +10,9 @@ import 'package:lms/apps/utils/searchBarWidget.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
+
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
 
 class CourseManagementAdminScreen extends StatefulWidget {
   const CourseManagementAdminScreen({super.key});
@@ -807,13 +811,13 @@ class CourseStatsRow extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.menu_book_outlined, size: 16, color: Colors.blue),
+            Icon(Icons.menu_book_outlined, size: 16, color: _c(context).info),
             const SizedBox(width: 4),
             Text(
               "$lessons",
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.blue,
+                color: _c(context).info,
               ),
             ),
             const SizedBox(width: 4),
@@ -828,13 +832,13 @@ class CourseStatsRow extends StatelessWidget {
         const SizedBox(width: 16),
         Row(
           children: [
-            Icon(Icons.access_time, size: 16, color: Colors.blue),
+            Icon(Icons.access_time, size: 16, color: _c(context).info),
             const SizedBox(width: 4),
             Text(
               _formatDuration(duration),
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.blue,
+                color: _c(context).info,
               ),
             ),
           ],
@@ -999,7 +1003,7 @@ class MentorInfo extends StatelessWidget {
         ),
         if (rating != null && rating! > 0) ...[
           const Spacer(),
-          Icon(Icons.star, color: Colors.amber, size: 16),
+          Icon(Icons.star, color: _c(context).warning, size: 16),
           const SizedBox(width: 4),
           Text(
             rating.toString(),

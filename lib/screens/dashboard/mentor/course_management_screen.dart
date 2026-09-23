@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:lms/apps/config/api_config.dart';
@@ -11,6 +12,9 @@ import 'package:lms/screens/login/cubit/auth_cubit.dart';
 
 import 'course_detail/course_detail_screen.dart';
 import 'course_form_screen.dart';
+
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
 
 class CourseManagementScreen extends StatefulWidget {
   const CourseManagementScreen({super.key});
@@ -193,7 +197,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
               ),
               TextButton(
                 onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('Xoá', style: TextStyle(color: Colors.red)),
+                child: Text('Xoá', style: TextStyle(color: _c(context).error)),
               ),
             ],
           ),
@@ -401,7 +405,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
           SlidableAction(
             onPressed: (_) => _editCourse(course),
             backgroundColor: colors.primary,
-            foregroundColor: Colors.white,
+            foregroundColor: colors.onPrimary,
             icon: Icons.edit_outlined,
             borderRadius: BorderRadius.circular(12),
             padding: const EdgeInsets.all(8),
@@ -412,7 +416,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
           SlidableAction(
             onPressed: (_) => _deleteCourse(course),
             backgroundColor: colors.error,
-            foregroundColor: Colors.white,
+            foregroundColor: colors.onError,
             icon: Icons.delete_outline_rounded,
             borderRadius: BorderRadius.circular(12),
             padding: const EdgeInsets.all(8),
@@ -593,7 +597,7 @@ class _CourseManagementScreenState extends State<CourseManagementScreen>
                         icon: const Icon(Icons.send_rounded, size: 16),
                         label: const Text('Gửi lại duyệt'),
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
+                          foregroundColor: colors.onPrimary,
                           backgroundColor: colors.primary,
                           elevation: 0,
                           textStyle: const TextStyle(
@@ -805,6 +809,13 @@ class _PriceTag extends StatelessWidget {
       txt = '${_fmt(price)}đ';
     }
 
+    // Màu chữ suy ra từ chính nền của nhãn: ở dark mode `colorScheme.primary`
+    // là màu SÁNG nên chữ trắng cứng sẽ không đọc được.
+    final onColor =
+        ThemeData.estimateBrightnessForColor(bgColor) == Brightness.dark
+        ? Colors.white
+        : Colors.black87;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -813,8 +824,8 @@ class _PriceTag extends StatelessWidget {
       ),
       child: Text(
         txt,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: onColor,
           fontWeight: FontWeight.bold,
           fontSize: 12,
         ),

@@ -13,6 +13,9 @@ import 'package:lms/models/role_model.dart';
 import 'package:lms/models/user_model.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
 
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
+
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});
 
@@ -308,7 +311,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: Colors.grey[400],
+                    color: _c(context).neutral,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -388,7 +391,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? color.withValues(alpha: 0.15) : Colors.grey[100],
+          color: selected ? color.withValues(alpha: 0.15) : _c(context).neutral,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: selected ? color : Colors.transparent,
@@ -616,7 +619,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 (context, error, stackTrace) => Icon(
                   Icons.person_off,
                   size: 80,
-                  color: Colors.grey.shade400,
+                  color: _c(context).neutral,
                 ),
           ),
           const SizedBox(height: 20),

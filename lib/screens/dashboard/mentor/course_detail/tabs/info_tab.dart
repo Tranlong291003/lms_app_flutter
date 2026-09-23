@@ -1,7 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:intl/intl.dart';
 import 'package:lms/apps/config/api_config.dart';
+
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
 
 class InfoTab extends StatelessWidget {
   final Map<String, dynamic> course;
@@ -254,8 +258,8 @@ class InfoTab extends StatelessWidget {
                 : price == null || price == 0
                 ? 'Miễn phí'
                 : '${NumberFormat.decimalPattern().format(price)}đ',
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: colors.onPrimary,
               fontWeight: FontWeight.bold,
               fontSize: 14,
             ),
@@ -392,10 +396,10 @@ class _Stars extends StatelessWidget {
 
     List<Widget> icons = [
       for (int i = 0; i < full; i++)
-        const Icon(Icons.star, size: 16, color: Colors.amber),
-      if (half) const Icon(Icons.star_half, size: 16, color: Colors.amber),
+        Icon(Icons.star, size: 16, color: _c(context).warning),
+      if (half) Icon(Icons.star_half, size: 16, color: _c(context).warning),
       for (int i = 0; i < empty; i++)
-        const Icon(Icons.star_border, size: 16, color: Colors.amber),
+        Icon(Icons.star_border, size: 16, color: _c(context).warning),
     ];
     return Row(children: icons);
   }

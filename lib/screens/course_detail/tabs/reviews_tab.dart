@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/lessons/lessons_cubit.dart';
 import 'package:lms/cubits/lessons/lessons_state.dart';
@@ -68,7 +69,7 @@ class _ReviewsTabState extends State<ReviewsTab> {
                           return IconButton(
                             icon: Icon(
                               index < rating ? Icons.star : Icons.star_border,
-                              color: Colors.amber,
+                              color: AppColors.of(context).warning,
                               size: 32,
                             ),
                             onPressed: () {
@@ -149,7 +150,7 @@ class _ReviewsTabState extends State<ReviewsTab> {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: AppColors.of(context).error,
                   foregroundColor: Colors.white,
                 ),
                 child: const Text('Xóa'),
@@ -180,7 +181,7 @@ class _ReviewsTabState extends State<ReviewsTab> {
               children: [
                 Text(
                   state.message,
-                  style: const TextStyle(color: Colors.red),
+                  style: TextStyle(color: AppColors.of(context).error),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
@@ -226,13 +227,13 @@ class _ReviewsTabState extends State<ReviewsTab> {
 
                     final canReview = snapshot.data ?? false;
                     if (!canReview) {
-                      return const Padding(
-                        padding: EdgeInsets.all(16.0),
+                      return Padding(
+                        padding: const EdgeInsets.all(16),
                         child: Text(
-                          'Bạn cần hoàn thành tất cả bài học để đánh giá khóa học này',
+                          'Hoàn thành tất cả bài học để đánh giá khoá học này.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.grey,
+                            color: AppColors.of(context).neutral,
                             fontStyle: FontStyle.italic,
                           ),
                         ),
@@ -310,7 +311,7 @@ class _ReviewsTabState extends State<ReviewsTab> {
                                               index < review.rating
                                                   ? Icons.star
                                                   : Icons.star_border,
-                                              color: Colors.amber,
+                                              color: AppColors.of(context).warning,
                                               size: 16,
                                             );
                                           }),
@@ -319,8 +320,8 @@ class _ReviewsTabState extends State<ReviewsTab> {
                                             review.createdAt.toString().split(
                                               ' ',
                                             )[0],
-                                            style: const TextStyle(
-                                              color: Colors.grey,
+                                            style: TextStyle(
+                                              color: AppColors.of(context).neutral,
                                               fontSize: 12,
                                             ),
                                           ),
@@ -361,20 +362,20 @@ class _ReviewsTabState extends State<ReviewsTab> {
                                               ],
                                             ),
                                           ),
-                                          const PopupMenuItem(
+                                          PopupMenuItem(
                                             value: 'delete',
                                             child: Row(
                                               children: [
                                                 Icon(
                                                   Icons.delete,
                                                   size: 20,
-                                                  color: Colors.red,
+                                                  color: AppColors.of(context).error,
                                                 ),
                                                 SizedBox(width: 8),
                                                 Text(
                                                   'Xóa',
                                                   style: TextStyle(
-                                                    color: Colors.red,
+                                                    color: AppColors.of(context).error,
                                                   ),
                                                 ),
                                               ],
@@ -474,7 +475,7 @@ class _ReviewCard extends StatelessWidget {
                       padding: const EdgeInsets.only(left: 2),
                       child: Icon(
                         Icons.star,
-                        color: Theme.of(context).colorScheme.secondary,
+                        color: AppColors.of(context).warning,
                         size: 18,
                       ),
                     ),

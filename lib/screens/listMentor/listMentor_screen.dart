@@ -2,16 +2,21 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/mentors/mentors_bloc.dart';
 import 'package:lms/blocs/mentors/mentors_event.dart';
 import 'package:lms/blocs/mentors/mentors_state.dart';
 import 'package:lms/models/user_model.dart';
 import 'package:shimmer/shimmer.dart';
+
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
 
 const defaultAvatar = 'https://www.gravatar.com/avatar/?d=mp';
 
@@ -53,14 +58,18 @@ class _ListMentorScreenState extends State<ListMentorScreen> {
           } else if (state is MentorsLoaded) {
             final mentors = state.mentors;
             if (mentors.isEmpty) {
-              return const Center(child: Text('Chưa có giảng viên nào.'));
+              return const EmptyStateWidget(
+                icon: Icons.person_search_outlined,
+                title: 'Chưa có giảng viên nào',
+                message: 'Danh sách giảng viên sẽ xuất hiện ở đây.',
+              );
             }
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<MentorsBloc>().add(RefreshMentorsEvent());
               },
               child: ListView.separated(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: listPaddingWithBottomInset(context, all: 12),
                 itemCount: mentors.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 8),
                 itemBuilder:
@@ -68,7 +77,21 @@ class _ListMentorScreenState extends State<ListMentorScreen> {
               ),
             );
           }
-          return const SizedBox.shrink();
+          // `MentorsError` và trạng thái chưa xác định trước đây trả
+          // `SizedBox.shrink()` → danh sách TRỐNG im lặng, không báo lỗi cũng
+          // không có cách thử lại.
+          if (state is MentorsError) {
+            return EmptyStateWidget(
+              icon: Icons.cloud_off_rounded,
+              title: 'Không tải được danh sách giảng viên',
+              message: state.message,
+              isError: true,
+              actionLabel: 'Thử lại',
+              onAction: () =>
+                  context.read<MentorsBloc>().add(GetAllMentorsEvent()),
+            );
+          }
+          return const Center(child: LoadingIndicator());
         },
       ),
     );
@@ -120,8 +143,8 @@ class _MentorListItem extends StatelessWidget {
                   fadeOutDuration: Duration.zero,
                   placeholder:
                       (_, __) => Shimmer.fromColors(
-                        baseColor: Colors.grey.shade300,
-                        highlightColor: Colors.grey.shade100,
+                        baseColor: _c(context).neutral,
+                        highlightColor: _c(context).neutral,
                         child: Container(
                           width: 60,
                           height: 60,
@@ -132,7 +155,7 @@ class _MentorListItem extends StatelessWidget {
                       (_, __, ___) => Container(
                         width: 60,
                         height: 60,
-                        color: Colors.grey.shade200,
+                        color: _c(context).neutral,
                         child: const Icon(Icons.person, size: 30),
                       ),
                 ),

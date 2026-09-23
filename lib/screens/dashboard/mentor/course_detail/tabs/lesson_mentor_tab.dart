@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
@@ -11,6 +12,9 @@ import 'package:lms/cubits/lessons/lessons_state.dart';
 import 'package:lms/models/lesson_model.dart';
 import 'package:lms/screens/course_detail/lesson_detail_screen.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
+
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
 
 class LessonMentorTab extends StatelessWidget {
   final int courseId;
@@ -44,7 +48,7 @@ class LessonMentorTab extends StatelessWidget {
                 children: [
                   Text(
                     'Có lỗi xảy ra: ${state.message}',
-                    style: const TextStyle(color: Colors.red),
+                    style: TextStyle(color: _c(context).error),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
@@ -196,7 +200,7 @@ class LessonMentorTab extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(context, true),
-                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  style: TextButton.styleFrom(foregroundColor: _c(context).error),
                   child: const Text('Xoá'),
                 ),
               ],
@@ -268,7 +272,7 @@ class LessonCard extends StatelessWidget {
           children: [
             SlidableAction(
               onPressed: (_) => onDelete(),
-              backgroundColor: Colors.red,
+              backgroundColor: _c(context).error,
               foregroundColor: Colors.white,
               icon: Icons.delete,
               label: 'Xoá',
@@ -283,7 +287,7 @@ class LessonCard extends StatelessWidget {
           children: [
             SlidableAction(
               onPressed: (_) => onEdit(),
-              backgroundColor: Colors.orange,
+              backgroundColor: _c(context).warning,
               foregroundColor: Colors.white,
               icon: Icons.edit,
               label: 'Sửa',
@@ -327,7 +331,7 @@ class LessonCard extends StatelessWidget {
                           Text(
                             lesson.content ?? '',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey[600],
+                              color: _c(context).neutral,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -339,21 +343,21 @@ class LessonCard extends StatelessWidget {
                             Icon(
                               Icons.access_time,
                               size: 16,
-                              color: Colors.grey[600],
+                              color: _c(context).neutral,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               lesson.videoDuration ?? '0:00',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey[600],
+                                color: _c(context).neutral,
                               ),
                             ),
                             const SizedBox(width: 16),
                             Icon(
                               Icons.video_library,
                               size: 16,
-                              color: Colors.grey[600],
+                              color: _c(context).neutral,
                             ),
                             const SizedBox(width: 4),
                             Text(
@@ -362,7 +366,7 @@ class LessonCard extends StatelessWidget {
                                   : 'Không có video',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey[600],
+                                color: _c(context).neutral,
                               ),
                             ),
                           ],
@@ -372,7 +376,7 @@ class LessonCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   IconButton(
-                    icon: const Icon(Icons.refresh, color: Colors.blue),
+                    icon: Icon(Icons.refresh, color: _c(context).info),
                     tooltip: 'Cập nhật',
                     onPressed: onRefresh,
                   ),

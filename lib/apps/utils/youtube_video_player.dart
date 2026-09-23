@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
 
 class YoutubeVideoPlayer extends StatefulWidget {
   final String videoId;
@@ -115,7 +119,7 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
         progressColors: ProgressBarColors(
           playedColor: Theme.of(context).colorScheme.primary,
           handleColor: Theme.of(context).colorScheme.primary,
-          backgroundColor: Colors.grey[300]!,
+          backgroundColor: _c(context).neutral!,
           bufferedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
         ),
         onEnded: (data) {

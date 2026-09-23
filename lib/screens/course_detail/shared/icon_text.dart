@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
+
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
 
 class IconText extends StatelessWidget {
   final IconData icon;
@@ -19,7 +23,7 @@ class IconText extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 18, color: iconColor ?? Colors.grey),
+        Icon(icon, size: 18, color: iconColor ?? _c(context).neutral),
         const SizedBox(width: 4),
         Text(text, style: style),
       ],

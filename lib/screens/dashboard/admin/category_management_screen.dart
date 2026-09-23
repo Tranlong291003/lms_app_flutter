@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,6 +13,9 @@ import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/category/category_cubit.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
+
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
 
 class CategoryManagementScreen extends StatefulWidget {
   const CategoryManagementScreen({super.key});
@@ -234,7 +238,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                 _showDeleteConfirmation(context, id, name);
               },
               icon: const Icon(Icons.delete),
-              color: Colors.red,
+              color: _c(context).error,
             ),
           ],
         ),

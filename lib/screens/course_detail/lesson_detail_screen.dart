@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -354,15 +356,17 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.green.withValues(alpha: 0.1),
+                                    color: AppColors.of(
+                                      context,
+                                    ).successContainer,
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         Icons.check_circle,
-                                        color: Colors.green,
+                                        color: AppColors.of(context).success,
                                         size: 16,
                                       ),
                                       const SizedBox(width: 4),
@@ -370,7 +374,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                                         'Đã hoàn thành',
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
-                                              color: Colors.green,
+                                              color: AppColors.of(context).success,
                                               fontWeight: FontWeight.bold,
                                             ),
                                       ),
@@ -624,35 +628,39 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
     IconData fileIcon;
     Color iconColor;
 
+    // Màu icon theo loại tệp lấy từ theme: bộ `Colors.red/blue/green/orange/
+    // purple` cố định chỉ là quy ước phân loại, nhưng ở dark mode chúng chói
+    // và lệch tông hoàn toàn so với phần còn lại của app.
+    final semantic = AppColors.of(context);
     switch (fileType) {
       case 'pdf':
         fileIcon = Icons.picture_as_pdf;
-        iconColor = Colors.red;
+        iconColor = semantic.error;
         break;
       case 'doc':
       case 'docx':
         fileIcon = Icons.description;
-        iconColor = Colors.blue;
+        iconColor = semantic.info;
         break;
       case 'xls':
       case 'xlsx':
         fileIcon = Icons.table_chart;
-        iconColor = Colors.green;
+        iconColor = semantic.success;
         break;
       case 'ppt':
       case 'pptx':
         fileIcon = Icons.slideshow;
-        iconColor = Colors.orange;
+        iconColor = semantic.warning;
         break;
       case 'jpg':
       case 'jpeg':
       case 'png':
         fileIcon = Icons.image;
-        iconColor = Colors.purple;
+        iconColor = semantic.info;
         break;
       default:
         fileIcon = Icons.insert_drive_file;
-        iconColor = Colors.grey;
+        iconColor = semantic.neutral;
     }
 
     return Container(
@@ -706,11 +714,9 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
           IconButton(
             onPressed: () async {
               if (fileUrl.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Không tìm thấy đường dẫn tải xuống'),
-                    backgroundColor: Colors.red,
-                  ),
+                CustomSnackBar.showError(
+                  context: context,
+                  message: 'Không tìm thấy đường dẫn tải xuống.',
                 );
                 return;
               }
@@ -722,21 +728,17 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                   mode: LaunchMode.externalApplication,
                 )) {
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Không thể mở đường dẫn tải xuống'),
-                        backgroundColor: Colors.red,
-                      ),
+                    CustomSnackBar.showError(
+                      context: context,
+                      message: 'Không mở được đường dẫn tải xuống.',
                     );
                   }
                 }
-              } catch (e) {
+              } catch (_) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Lỗi khi tải xuống: ${e.toString()}'),
-                      backgroundColor: Colors.red,
-                    ),
+                  CustomSnackBar.showError(
+                    context: context,
+                    message: 'Không tải xuống được tệp. Vui lòng thử lại.',
                   );
                 }
               }

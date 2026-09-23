@@ -16,6 +16,9 @@ import 'package:lms/screens/login/login_screen.dart';
 import 'package:lms/screens/mentor_request/mentor_request_admin_screen.dart';
 import 'package:lms/services/app_stats_service.dart';
 
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
+
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
 
@@ -302,7 +305,7 @@ class _QuickActionCard extends StatelessWidget {
               color:
                   isDark
                       ? Colors.white.withValues(alpha: 0.1)
-                      : Colors.grey.withValues(alpha: 0.1),
+                      : _c(context).neutral.withValues(alpha: 0.1),
               width: 0.5,
             ),
             boxShadow: [

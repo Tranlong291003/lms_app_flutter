@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
+
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
 
 class ExpandableDescription extends StatefulWidget {
   const ExpandableDescription({super.key});
@@ -32,7 +36,7 @@ class _ExpandableDescriptionState extends State<ExpandableDescription> {
             onPressed: () => setState(() => _expanded = !_expanded),
             child: Text(
               _expanded ? 'Thu gọn' : 'Xem thêm...',
-              style: TextStyle(color: Colors.blue[600]),
+              style: TextStyle(color: _c(context).info),
             ),
           ),
       ],

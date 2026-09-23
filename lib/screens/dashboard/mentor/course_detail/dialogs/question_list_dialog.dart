@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 
 import 'question_form_dialog.dart';
+
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
 
 class QuestionListDialog extends StatefulWidget {
   final Map<String, dynamic> quiz;
@@ -85,7 +89,7 @@ class _QuestionListDialogState extends State<QuestionListDialog> {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('Xoá', style: TextStyle(color: Colors.red)),
+                child: Text('Xoá', style: TextStyle(color: _c(context).error)),
               ),
             ],
           ),
@@ -138,7 +142,7 @@ class _QuestionListDialogState extends State<QuestionListDialog> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete),
-                        color: Colors.red,
+                        color: _c(context).error,
                         onPressed: () => deleteQuestion(i),
                       ),
                     ],

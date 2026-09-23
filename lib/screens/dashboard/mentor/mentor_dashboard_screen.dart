@@ -15,6 +15,9 @@ import 'package:lms/services/app_stats_service.dart';
 
 import 'course_management_screen.dart';
 
+/// Màu ngữ nghĩa của theme hiện tại.
+AppColors _c(BuildContext context) => AppColors.of(context);
+
 class MentorDashboardScreen extends StatelessWidget {
   const MentorDashboardScreen({super.key});
 
@@ -274,7 +277,7 @@ class _QuickActionCard extends StatelessWidget {
               color:
                   isDark
                       ? Colors.white.withValues(alpha: 0.1)
-                      : Colors.grey.withValues(alpha: 0.1),
+                      : _c(context).neutral.withValues(alpha: 0.1),
               width: 0.5,
             ),
             boxShadow: [
