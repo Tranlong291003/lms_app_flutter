@@ -45,7 +45,7 @@ Screen (UI)  →  Bloc/Cubit (state)  →  Repository  →  Service (Dio)  →  
 ```
 lib/
 ├── apps/
-│   ├── config/        # api_config, app_router, app_theme
+│   ├── config/        # api_config, app_router, app_theme, app_dimens
 │   └── utils/         # widget dùng chung (button, app bar, dialog, ...)
 ├── blocs/             # BLoC: mentors, theme, user
 ├── cubits/            # Cubit: admin, bookmark, category, courses, lessons, quiz, ...
@@ -54,6 +54,40 @@ lib/
 ├── screens/           # UI theo từng feature (home, course_detail, quiz, dashboard, ...)
 └── services/          # Gọi API qua Dio, kế thừa BaseService
 ```
+
+## Hệ thống thiết kế
+
+Mọi màu sắc và kích thước lấy từ **một** nguồn, không viết số trực tiếp trong
+màn hình:
+
+| Cần gì | Dùng gì |
+|---|---|
+| Màu theo vai trò Material (nền, chữ, viền…) | `Theme.of(context).colorScheme.*` |
+| Màu trạng thái (thành công / cảnh báo / lỗi / thông tin) | `AppColors.of(context).success` … — tự đổi theo sáng/tối |
+| Khoảng cách | `AppSpacing.xs/sm/md/lg/xl/xxl/xxxl` (bội của 4) |
+| Bo góc | `AppRadius.sm/md/lg/xl/xxl/pill` |
+| Kích thước cố định | `AppSizes.minTapTarget/buttonHeight/appBarHeight` |
+
+Widget dùng chung cho các khối lặp lại nhiều nơi:
+
+- `CourseCard` — thẻ khoá học (trang chủ, tìm kiếm, đã lưu)
+- `EmptyStateWidget` — trạng thái rỗng/lỗi, kèm `listPaddingWithBottomInset`
+- `StatusChip` — nhãn trạng thái (có cả chấm màu **và** chữ)
+- `StatGrid` — lưới số liệu trên dashboard
+- `CustomSnackBar`, `CustomDialog`, `CustomAppBar`, `LoadingIndicator`
+
+### Test bảo vệ giao diện
+
+```bash
+flutter test test/design_consistency_test.dart   # tương phản màu, token
+flutter test test/screen_layout_audit_test.dart  # 17 màn hình × 3 kích thước × 2 chế độ
+flutter test test/stat_grid_layout_test.dart     # lưới số liệu ở cỡ chữ lớn
+flutter test test/layout_responsive_test.dart    # thẻ khoá học, trạng thái rỗng
+```
+
+`design_consistency_test.dart` kiểm tra bằng số (công thức tương phản WCAG) nên
+không phụ thuộc vào việc nhìn ảnh chụp: nếu ai đó đổi một màu làm chữ khó đọc,
+test đổ ngay.
 
 ## Công nghệ sử dụng
 
