@@ -14,6 +14,7 @@ import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/cubits/category/category_cubit.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
+import 'package:lms/cubits/notifications/notification_cubit.dart';
 import 'package:lms/screens/home/appBar_widget.dart';
 import 'package:lms/screens/home/discountSlider_widget.dart';
 import 'package:lms/screens/home/topMentors_widget.dart';
@@ -41,6 +42,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       _loadCourses();
       _checkUserActive();
       context.read<CategoryCubit>().fetchAllCategory();
+      // Số thông báo chưa đọc hiện trên app bar, nên phải nạp ở đây. Trước đây
+      // lời gọi nằm trong `addPostFrameCallback` bên trong app bar — chạy lại
+      // mỗi lần app bar dựng lại, tức là bắn một request mỗi lần nhấn vào tab.
+      context.read<NotificationCubit>().loadNotifications();
       _isFirstLoad = false;
     }
   }
@@ -132,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarHome(context, 'title'),
+      appBar: AppBarHome(context),
       body: RefreshIndicator(
         onRefresh: () async {
           _loadCourses();

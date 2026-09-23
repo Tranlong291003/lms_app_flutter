@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_dimens.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 /// Model slide khuyến mãi
@@ -103,15 +104,23 @@ class _DiscountSliderState extends State<DiscountSlider> {
 
   @override
   Widget build(BuildContext context) {
+    // `PageView` bên trong đòi chiều cao hữu hạn, nên không thể bỏ hẳn con số
+    // này. Thay vào đó cho nó co theo cỡ chữ hệ thống: ở chữ lớn, banner cần
+    // thêm chỗ nếu không phần mô tả bị cắt.
     final promo = _promotions[_currentPage];
+    final textScale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.6);
+    final bannerHeight = 180 * textScale;
 
     return Column(
       children: [
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          height: 180,
+          margin: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.md,
+          ),
+          height: bannerHeight,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: AppRadius.borderXxl,
             child: Stack(
               clipBehavior: Clip.hardEdge, // cắt gọn tất cả hoạ tiết
               children: [
@@ -135,7 +144,7 @@ class _DiscountSliderState extends State<DiscountSlider> {
                   child: IgnorePointer(
                     child: CustomPaint(
                       painter: _PatternPainter(
-                        color: Colors.white.withOpacity(0.04),
+                        color: Colors.white.withValues(alpha: 0.04),
                       ),
                     ),
                   ),
@@ -162,7 +171,7 @@ class _DiscountSliderState extends State<DiscountSlider> {
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        color: Colors.white.withOpacity(0.18),
+                                        color: Colors.white.withValues(alpha: 0.18),
                                       ),
                                       child: Icon(
                                         p.icon,
@@ -229,7 +238,7 @@ class _DiscountSliderState extends State<DiscountSlider> {
                           dotHeight: 8,
                           dotWidth: 8,
                           activeDotColor: Colors.white,
-                          dotColor: Colors.white.withOpacity(0.5),
+                          dotColor: Colors.white.withValues(alpha: 0.5),
                         ),
                       ),
                     ),
@@ -249,7 +258,7 @@ class _DiscountSliderState extends State<DiscountSlider> {
     height: size,
     decoration: BoxDecoration(
       shape: BoxShape.circle,
-      color: Colors.white.withOpacity(0.10),
+      color: Colors.white.withValues(alpha: 0.10),
     ),
   );
 }

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:lms/apps/config/app_dimens.dart';
+import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/custom_dialog.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/notifications/notification_cubit.dart';
 import 'package:lms/cubits/notifications/notification_state.dart';
@@ -20,100 +24,55 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     context.read<NotificationCubit>().loadNotifications();
   }
 
+  Future<void> _reload() =>
+      context.read<NotificationCubit>().loadNotifications();
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Thông báo')),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      // Dùng `CustomAppBar` cho khớp các màn hình khác: trước đây màn này dùng
+      // `AppBar` mặc định nên khác chiều cao, viền dưới và kiểu tiêu đề.
+      appBar: const CustomAppBar(title: 'Thông báo', showBack: true),
       body: BlocBuilder<NotificationCubit, NotificationState>(
         builder: (context, state) {
-          if (state is NotificationInitial) {
-            return const Center(child: LoadingIndicator());
-          }
-
-          if (state is NotificationLoading) {
+          if (state is NotificationInitial || state is NotificationLoading) {
             return const Center(child: LoadingIndicator());
           }
 
           if (state is NotificationError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    state.message,
-                    style: const TextStyle(color: Colors.red),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<NotificationCubit>().loadNotifications();
-                    },
-                    child: const Text('Thử lại'),
-                  ),
-                ],
-              ),
+            return EmptyStateWidget(
+              icon: Icons.cloud_off_rounded,
+              title: 'Không tải được thông báo',
+              message: state.message,
+              isError: true,
+              actionLabel: 'Thử lại',
+              onAction: _reload,
             );
           }
 
           if (state is NotificationLoaded) {
             final notifications = state.notifications;
+
             if (notifications.isEmpty) {
+              // Dùng `EmptyStateWidget` trong `ListView` để vẫn kéo-để-tải-lại
+              // được. Trước đây tự dựng khối rỗng với chiều cao
+              // `MediaQuery.size.height - 200` — một hằng số ma thuật, vừa
+              // thừa chỗ vừa thiếu chỗ tuỳ màn hình.
               return RefreshIndicator(
-                onRefresh: () async {
-                  await context.read<NotificationCubit>().loadNotifications();
-                },
+                onRefresh: _reload,
                 child: ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
                     SizedBox(
-                      height: MediaQuery.of(context).size.height - 200,
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainerHighest
-                                    .withOpacity(0.5),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.notifications_none_rounded,
-                                size: 64,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.primary.withOpacity(0.5),
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            Text(
-                              'Chưa có thông báo nào',
-                              style: Theme.of(
-                                context,
-                              ).textTheme.titleLarge?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Chúng tôi sẽ thông báo cho bạn khi có tin tức mới',
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodyMedium?.copyWith(
-                                color:
-                                    Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                      height: MediaQuery.sizeOf(context).height * 0.6,
+                      child: const EmptyStateWidget(
+                        icon: Icons.notifications_none_rounded,
+                        title: 'Chưa có thông báo nào',
+                        message:
+                            'Tin tức mới về khoá học và bài kiểm tra sẽ xuất hiện ở đây.',
                       ),
                     ),
                   ],
@@ -122,12 +81,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             }
 
             return RefreshIndicator(
-              onRefresh: () async {
-                await context.read<NotificationCubit>().loadNotifications();
-              },
+              onRefresh: _reload,
               child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16),
+                padding: listPaddingWithBottomInset(context),
                 itemCount: notifications.length,
                 itemBuilder: (context, index) {
                   final notification = notifications[index];
@@ -138,51 +95,31 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         notification.notiId,
                       );
                     },
-                    onDelete: () {
-                      _showDeleteConfirmation(context, notification);
-                    },
+                    onDelete: () => _confirmDelete(notification),
                   );
                 },
               ),
             );
           }
 
-          return const SizedBox.shrink();
+          return const Center(child: LoadingIndicator());
         },
       ),
     );
   }
 
-  void _showDeleteConfirmation(
-    BuildContext context,
-    NotificationModel notification,
-  ) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Xác nhận xóa'),
-            content: const Text('Bạn có chắc chắn muốn xóa thông báo này?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Hủy'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  context.read<NotificationCubit>().deleteNotification(
-                    notification.notiId,
-                  );
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Xóa'),
-              ),
-            ],
-          ),
+  Future<void> _confirmDelete(NotificationModel notification) async {
+    final cubit = context.read<NotificationCubit>();
+    await context.showCustomDialog(
+
+      icon: Icons.delete_outline_rounded,
+      title: 'Xoá thông báo',
+      content: 'Thông báo đã xoá sẽ không thể khôi phục. Bạn chắc chắn chứ?',
+      cancelText: 'Huỷ',
+      confirmText: 'Xoá',
+      // `colorScheme.error` thay vì `Colors.red` cố định.
+      confirmColor: Theme.of(context).colorScheme.error,
+      onConfirm: () => cubit.deleteNotification(notification.notiId),
     );
   }
 }
@@ -209,71 +146,85 @@ class _NotificationCard extends StatelessWidget {
     'assignment': Icons.assignment,
     'check': Icons.check,
     'error': Icons.error,
-    // Thêm các icon khác nếu cần
   };
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isUnread = !notification.isRead;
+
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
       child: InkWell(
-        onTap: notification.isRead ? null : onMarkAsRead,
+        borderRadius: AppRadius.borderLg,
+        onTap: isUnread ? onMarkAsRead : null,
         child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    iconMap[notification.icon] ?? Icons.notifications,
-                    color: Colors.blue,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          notification.title,
-                          style: TextStyle(
-                            fontWeight:
-                                notification.isRead
-                                    ? FontWeight.normal
-                                    : FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          DateFormat(
-                            'dd/MM/yyyy HH:mm',
-                          ).format(notification.createdAt),
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (!notification.isRead)
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Colors.blue,
-                        shape: BoxShape.circle,
+              // Chấm báo chưa đọc đặt TRƯỚC nội dung để không chen vào hàng
+              // nút bên phải (trước đây nó nằm giữa tiêu đề và nút xoá, làm
+              // hàng đó chật và dễ tràn).
+              Container(
+                width: 8,
+                height: 8,
+                margin: const EdgeInsets.only(top: AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: isUnread ? scheme.primary : Colors.transparent,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: scheme.primaryContainer,
+                  borderRadius: AppRadius.borderMd,
+                ),
+                child: Icon(
+                  iconMap[notification.icon] ?? Icons.notifications,
+                  size: 20,
+                  color: scheme.onPrimaryContainer,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      notification.title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight:
+                            isUnread ? FontWeight.bold : FontWeight.w500,
+                        color: isUnread ? scheme.onSurface : scheme.onSurfaceVariant,
                       ),
                     ),
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: onDelete,
-                  ),
-                ],
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      DateFormat(
+                        'dd/MM/yyyy HH:mm',
+                      ).format(notification.createdAt),
+                      style: theme.textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      notification.content,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8),
-              Text(notification.content),
+              IconButton(
+                icon: Icon(
+                  Icons.delete_outline_rounded,
+                  color: scheme.onSurfaceVariant,
+                ),
+                tooltip: 'Xoá thông báo',
+                onPressed: onDelete,
+              ),
             ],
           ),
         ),

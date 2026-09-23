@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/config/app_dimens.dart';
 import 'package:lms/apps/config/app_router.dart'; // import hằng số route
 import 'package:lms/models/user_model.dart';
 
@@ -47,14 +48,27 @@ class _TopMentorsState extends State<TopMentors> {
     const defaultAvatar = 'https://www.gravatar.com/avatar/?d=mp';
     final theme = Theme.of(context);
 
+    // Chiều cao suy ra từ nội dung (avatar + khe + một dòng nhãn) thay vì
+    // `height: 90` cứng: ở cỡ chữ lớn, dòng nhãn cần thêm chỗ và khung cứng sẽ
+    // cắt mất chân chữ.
+    const avatarRadius = 30.0;
+    final labelStyle = theme.textTheme.bodySmall?.copyWith(fontSize: 12);
+    final labelHeight =
+        (labelStyle?.fontSize ?? 12) * (theme.textTheme.bodySmall?.height ?? 1.3);
+    final rowHeight = avatarRadius * 2 + AppSpacing.sm + labelHeight;
+
+    if (_randomizedMentors.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return SizedBox(
-      // Danh sách cuộn ngang: đệm phải để avatar cuối không dính mép khi cuộn hết.
-      height: 90,
+      height: rowHeight,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.only(right: 16),
+        // Đệm phải để avatar cuối không dính mép khi cuộn hết.
+        padding: const EdgeInsets.only(right: AppSpacing.lg),
         itemCount: _randomizedMentors.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 16),
+        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.lg),
         itemBuilder: (context, index) {
           final mentor = _randomizedMentors[index];
           final displayName = getDisplayName(mentor.name);
@@ -65,38 +79,44 @@ class _TopMentorsState extends State<TopMentors> {
           final imageProvider = NetworkImage(avatarUrl);
 
           return InkWell(
-            borderRadius: BorderRadius.circular(30),
+            customBorder: const CircleBorder(),
             onTap: () async {
-              await precacheImage(imageProvider, context);
+              final ctx = context;
+              await precacheImage(imageProvider, ctx);
+              if (!ctx.mounted) return;
               Navigator.pushNamed(
-                context,
+                ctx,
                 AppRouter.mentorDetail,
                 arguments: mentor.uid,
               );
             },
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.transparent,
-                  backgroundImage: imageProvider,
-                  onBackgroundImageError: (_, __) {},
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: 60,
-                  child: Text(
-                    displayName,
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    // Lấy màu từ theme thay vì hardcode đen/trắng: hardcode sẽ
-                    // lệch khi đổi tông màu hoặc dùng theme khác.
-                    style: theme.textTheme.bodySmall?.copyWith(fontSize: 12),
+            child: Semantics(
+              // Vùng chạm chỉ rộng 60px; công bố rõ đây là nút mở hồ sơ giảng
+              // viên để trình đọc màn hình không đọc trơ ra tên.
+              label: 'Xem hồ sơ giảng viên $displayName',
+              button: true,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(
+                    radius: avatarRadius,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    backgroundImage: imageProvider,
+                    onBackgroundImageError: (_, __) {},
                   ),
-                ),
-              ],
+                  const SizedBox(height: AppSpacing.sm),
+                  SizedBox(
+                    width: 60,
+                    child: Text(
+                      displayName,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: labelStyle,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
