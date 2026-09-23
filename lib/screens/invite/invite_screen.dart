@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
 
 class InviteScreen extends StatelessWidget {
   const InviteScreen({super.key});
@@ -19,27 +21,21 @@ class InviteScreen extends StatelessWidget {
             icon: Icons.share,
             title: 'Chia sẻ qua tin nhắn',
             subtitle: 'Gửi link qua SMS, Messenger, Zalo...',
-            onTap: () {
-              // Handle share via message
-            },
+            onTap: () => _showUnavailable(context, 'Chia sẻ qua tin nhắn'),
             theme: theme,
           ),
           _buildShareOption(
             icon: Icons.copy,
             title: 'Sao chép link',
             subtitle: 'Copy link và chia sẻ với bạn bè',
-            onTap: () {
-              // Handle copy link
-            },
+            onTap: () => _showUnavailable(context, 'Sao chép link'),
             theme: theme,
           ),
           _buildShareOption(
             icon: Icons.qr_code,
             title: 'Mã QR',
             subtitle: 'Quét mã QR để tham gia',
-            onTap: () {
-              // Handle QR code
-            },
+            onTap: () => _showUnavailable(context, 'Mã QR'),
             theme: theme,
           ),
           const SizedBox(height: 32),
@@ -47,6 +43,13 @@ class InviteScreen extends StatelessWidget {
           _buildFriendList(theme),
         ],
       ),
+    );
+  }
+
+  void _showUnavailable(BuildContext context, String feature) {
+    CustomSnackBar.showInfo(
+      context: context,
+      message: '$feature chưa được hỗ trợ trên phiên bản này.',
     );
   }
 
@@ -160,58 +163,18 @@ class InviteScreen extends StatelessWidget {
     );
   }
 
+  /// Danh sách bạn bè đã tham gia.
+  ///
+  /// Trước đây hàm này tự SINH ra 3 "Bạn bè 1/2/3" kèm "Đã tham gia N ngày
+  /// trước" và "10%/20%/30%" — dữ liệu bịa hoàn toàn, không lấy từ đâu cả.
+  /// Người dùng bị dẫn tới tin rằng đã mời được bạn và đang được hưởng ưu đãi.
+  /// App chưa có API cho tính năng mời bạn, nên hiển thị trạng thái rỗng thật.
   Widget _buildFriendList(ThemeData theme) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 3,
-      itemBuilder: (context, index) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          elevation: 4,
-          color: theme.cardColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: ListTile(
-            leading: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: theme.primaryColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.person, color: theme.primaryColor),
-            ),
-            title: Text(
-              'Bạn bè ${index + 1}',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            subtitle: Text(
-              'Đã tham gia ${index + 1} ngày trước',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
-              ),
-            ),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: theme.primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                '${(index + 1) * 10}%',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: theme.primaryColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        );
-      },
+    return const EmptyStateWidget(
+      icon: Icons.group_outlined,
+      title: 'Chưa có bạn bè nào tham gia',
+      message:
+          'Khi bạn bè dùng link của bạn để đăng ký, họ sẽ xuất hiện ở đây.',
     );
   }
 }

@@ -9,11 +9,13 @@ import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:lms/apps/config/api_config.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
 import 'package:lms/blocs/user/user_event.dart';
 import 'package:lms/blocs/user/user_state.dart';
 import 'package:lms/cubits/notifications/notification_cubit.dart';
+import 'package:lms/screens/login/cubit/auth_cubit.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -164,6 +166,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           builder: (context, state) {
             if (state is UserLoading && _isLoading) {
               return const Center(child: LoadingIndicator());
+            }
+
+            // `UserError` truoc day roi vao nhanh nay nen man hinh xoay vo
+            // han, khong thong bao va khong co nut thu lai.
+            if (state is UserError) {
+              return EmptyStateWidget(
+                icon: Icons.cloud_off_rounded,
+                title: 'Khong tai duoc ho so',
+                message: state.message,
+                isError: true,
+                actionLabel: 'Thu lai',
+                onAction: () {
+                  final uid = context.read<AuthCubit>().state.userId;
+                  if (uid != null && uid.isNotEmpty) {
+                    context.read<UserBloc>().add(GetUserByUidEvent(uid));
+                  }
+                },
+              );
             }
 
             if (state is! UserLoaded) {

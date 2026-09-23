@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
 
 class PaymentScreen extends StatelessWidget {
@@ -58,45 +59,17 @@ class PaymentScreen extends StatelessWidget {
           const SizedBox(height: 24),
           _buildSectionTitle('Lịch sử giao dịch', theme),
 
-          // Lịch sử giao dịch trống
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 16),
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color:
-                  isDark
-                      ? colorScheme.surfaceContainerHighest.withOpacity(0.3)
-                      : colorScheme.surfaceContainerHighest.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
-                width: 1,
-              ),
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.receipt_long_outlined,
-                  size: 64,
-                  color: colorScheme.onSurface.withOpacity(0.3),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Chưa có giao dịch nào',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onSurface.withOpacity(0.7),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Lịch sử giao dịch của bạn sẽ xuất hiện ở đây',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface.withOpacity(0.5),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
+          // Lịch sử giao dịch.
+          //
+          // Khối này trước đây vẽ CỨNG "Chưa có giao dịch nào" mà không gọi API
+          // nào cả — nên người dùng ĐÃ có giao dịch vẫn thấy thông báo trống,
+          // tức là thông tin sai. App chưa có API thanh toán, nên nói rõ tính
+          // năng chưa có thay vì khẳng định sai về dữ liệu.
+          const EmptyStateWidget(
+            icon: Icons.receipt_long_outlined,
+            title: 'Lịch sử giao dịch chưa được hỗ trợ',
+            message:
+                'Tính năng thanh toán chưa hoàn thiện nên chưa có lịch sử giao dịch.',
           ),
 
           const SizedBox(height: 24),

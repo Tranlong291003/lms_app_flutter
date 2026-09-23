@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/question/question_cubit.dart';
 import 'package:lms/models/quiz/question_model.dart';
@@ -43,15 +44,25 @@ class _QuizQuestionListView extends StatelessWidget {
           if (state.status == QuestionStatus.loading) {
             return const Center(child: LoadingIndicator());
           }
+          // Loi mang truoc day bi bao thanh "Chua co cau hoi nao" — nguoi dung
+          // tuong quiz khong co du lieu nen khong thu lai.
           if (state.status == QuestionStatus.error) {
-            return const Center(
-              child: Text('Chưa có câu hỏi nào cho quiz này.'),
+            return EmptyStateWidget(
+              icon: Icons.cloud_off_rounded,
+              title: 'Khong tai duoc cau hoi',
+              message: state.errorMessage,
+              isError: true,
+              actionLabel: 'Thu lai',
+              onAction: () =>
+                  context.read<QuestionCubit>().loadQuestionsByQuizId(quizId),
             );
           }
           final questions = state.questions;
           if (questions.isEmpty) {
-            return const Center(
-              child: Text('Chưa có câu hỏi nào cho quiz này.'),
+            return const EmptyStateWidget(
+              icon: Icons.quiz_outlined,
+              title: 'Quiz chua co cau hoi',
+              message: 'Bai kiem tra nay chua duoc them cau hoi nao.',
             );
           }
           return RefreshIndicator(
