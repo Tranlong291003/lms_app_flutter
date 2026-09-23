@@ -613,6 +613,9 @@ class AppColors {
   final Color error;
   final Color info;
 
+  /// Trạng thái trung tính/không xác định (chưa trả lời, đã kết thúc).
+  final Color neutral;
+
   /// Bản nhạt dùng làm NỀN cho chip trạng thái (chữ đậm nằm trên).
   final Color successContainer;
   final Color warningContainer;
@@ -624,6 +627,7 @@ class AppColors {
     required this.warning,
     required this.error,
     required this.info,
+    required this.neutral,
     required this.successContainer,
     required this.warningContainer,
     required this.errorContainer,
@@ -641,6 +645,7 @@ class AppColors {
       warning: isDark ? AppPalette.warningOnDark : AppPalette.accent,
       error: isDark ? AppPalette.errorOnDark : AppPalette.error,
       info: theme.colorScheme.primary,
+      neutral: theme.colorScheme.onSurfaceVariant,
       successContainer: theme.colorScheme.secondaryContainer,
       warningContainer: theme.colorScheme.tertiaryContainer,
       errorContainer: theme.colorScheme.errorContainer,

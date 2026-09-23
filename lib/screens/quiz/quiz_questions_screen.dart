@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/config/app_theme.dart';
+import 'package:lms/apps/utils/custom_snackbar.dart';
+import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/json_parse.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/user/user_bloc.dart';
@@ -9,7 +12,6 @@ import 'package:lms/blocs/user/user_state.dart';
 import 'package:lms/cubits/question/question_cubit.dart';
 import 'package:lms/models/quiz/quiz_model.dart';
 import 'package:lms/repositories/question_repository.dart';
-import 'package:lms/screens/quiz/components/quiz_detailed_result.dart';
 import 'package:lms/screens/quiz/components/quiz_navigation.dart';
 import 'package:lms/screens/quiz/components/quiz_question_card.dart';
 import 'package:lms/screens/quiz/components/quiz_question_list.dart';
@@ -213,47 +215,14 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
     setState(() {
       _submitFailed = true;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$message\nNhấn "Nộp bài" để thử lại.'),
-        backgroundColor: Colors.red,
-        duration: const Duration(seconds: 6),
-      ),
+    CustomSnackBar.show(
+      context: context,
+      message: '$message\nNhấn "Nút nộp bài" để thử lại.',
+      icon: Icons.error_outline,
+      backgroundColor: AppPalette.errorFill,
+      // Lâu hơn mặc định vì thông báo có hướng dẫn cần đọc.
+      duration: const Duration(seconds: 6),
     );
-  }
-
-  String _formatRemainingTime() {
-    final minutes = _remainingSeconds ~/ 60;
-    final seconds = _remainingSeconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-  }
-
-  Color _getTimerColor() {
-    if (_remainingSeconds < 60) {
-      return Colors.red;
-    } else if (_remainingSeconds < 300) {
-      return Colors.orange;
-    } else {
-      return Colors.green;
-    }
-  }
-
-  Color _getTimerBackgroundColor() {
-    if (_remainingSeconds < 60) {
-      return Colors.red.withOpacity(0.2);
-    } else if (_remainingSeconds < 300) {
-      return Colors.orange.withOpacity(0.2);
-    } else {
-      return Colors.green.withOpacity(0.2);
-    }
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _pageController.dispose();
-    _questionCubit.close();
-    super.dispose();
   }
 
   void _selectAnswer(int questionIndex, int answerIndex) {
@@ -268,25 +237,9 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
     );
   }
 
-  Future<void> _resetQuiz() async {
-    Navigator.of(context).pop();
-
-    setState(() {
-      _isLoading = true;
-      _explanationText = '';
-    });
-
-    // Reset timer nếu có
-    _timer?.cancel();
-
-    // Reset state
-    _questionCubit.reset();
-
-    // Tải lại câu hỏi
-    await _loadQuestions();
-  }
-
   void _showResult() {
+    final theme = Theme.of(context);
+    final semantic = AppColors.of(context);
     final totalCorrect = _questionCubit.getCorrectAnswersCount();
     final totalQuestions = _questionCubit.state.questions.length;
     final score = _questionCubit.getScore();
@@ -318,9 +271,9 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.emoji_events,
-                        color: Colors.blue,
+                        color: theme.colorScheme.primary,
                         size: 28,
                       ),
                       const SizedBox(width: 8),
@@ -336,16 +289,18 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                   const SizedBox(height: 22),
                   Text(
                     score.toStringAsFixed(1),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 44,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                      // Điểm số dùng màu nhấn của theme; `Colors.blue` cố định
+                      // lệch tông và không đổi theo chế độ sáng/tối.
+                      color: theme.colorScheme.primary,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     'điểm',
-                    style: TextStyle(fontSize: 12, color: Colors.blueGrey),
+                    style: theme.textTheme.bodySmall,
                   ),
                   const SizedBox(height: 22),
                   Row(
@@ -353,16 +308,16 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                     children: [
                       Column(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.check_circle,
-                            color: Colors.green,
+                            color: semantic.success,
                             size: 28,
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Đúng',
                             style: TextStyle(
-                              color: Colors.green,
+                              color: semantic.success,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -375,12 +330,16 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                       const SizedBox(width: 40),
                       Column(
                         children: [
-                          const Icon(Icons.cancel, color: Colors.red, size: 28),
+                          Icon(
+                            Icons.cancel,
+                            color: semantic.error,
+                            size: 28,
+                          ),
                           const SizedBox(height: 4),
                           Text(
                             'Sai',
                             style: TextStyle(
-                              color: Colors.red,
+                              color: semantic.error,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -405,17 +364,6 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                             // Lùi thêm 1 màn hình nữa
                             Navigator.of(context).pop();
                           },
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.blue,
-                            side: const BorderSide(
-                              color: Colors.blue,
-                              width: 1.5,
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
                           child: const Text(
                             'Đóng',
                             style: TextStyle(
@@ -439,18 +387,9 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                                     );
                                   }
                                   : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                resultId != null
-                                    ? Colors.blue
-                                    : Colors.grey[300],
-                            foregroundColor:
-                                resultId != null ? Colors.white : Colors.grey,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
+                          // Không truyền style: nút dùng `elevatedButtonTheme`
+                          // và tự chuyển sang màu vô hiệu hoá chuẩn của theme
+                          // khi `onPressed == null` (trước đây tự pha màu xám).
                           child: const Text(
                             'Xem chi tiết kết quả',
                             style: TextStyle(
@@ -467,66 +406,6 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
             ),
           ),
     );
-  }
-
-  void _showDetailedResult() {
-    if (_questionCubit.state.quizResult == null) {
-      // Hiển thị kết quả dựa trên dữ liệu local nếu không có kết quả từ API
-      final questions = _questionCubit.state.questions;
-      final userAnswers = _questionCubit.state.userAnswers;
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder:
-            (context) => QuizDetailedResult(
-              result: {
-                'questions':
-                    questions
-                        .map(
-                          (q) => {
-                            'text': q.question,
-                            'options': q.options,
-                            'user_answer':
-                                userAnswers[questions.indexOf(q)] >= 0
-                                    ? q.options[userAnswers[questions.indexOf(
-                                      q,
-                                    )]]
-                                    : 'Chưa trả lời',
-                            'correct_answer': q.options[q.correctIndex],
-                            'is_correct':
-                                userAnswers[questions.indexOf(q)] ==
-                                q.correctIndex,
-                            'explanation': q.expectedKeywords,
-                          },
-                        )
-                        .toList(),
-                'score': _questionCubit.getScore(),
-              },
-              onClose: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-            ),
-      );
-    } else {
-      // Hiển thị kết quả từ API
-      final quizResult = _questionCubit.state.quizResult!;
-      final questions = quizResult['questions'] as List<dynamic>;
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder:
-            (context) => QuizDetailedResult(
-              result: quizResult,
-              onClose: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-            ),
-      );
-    }
   }
 
   void _showQuestionList() {
@@ -624,13 +503,11 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                   if (result['success'] == true) {
                     _showResult();
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          result['message'] ?? 'Có lỗi xảy ra khi nộp bài',
-                        ),
-                        backgroundColor: Colors.red,
-                      ),
+                    CustomSnackBar.showError(
+                      context: context,
+                      message:
+                          result['message']?.toString() ??
+                          'Có lỗi xảy ra khi nộp bài',
                     );
                   }
                 }
@@ -639,11 +516,9 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                   setState(() {
                     _isLoading = false;
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Lỗi khi nộp bài: $e'),
-                      backgroundColor: Colors.red,
-                    ),
+                  CustomSnackBar.showError(
+                    context: context,
+                    message: 'Lỗi khi nộp bài. Vui lòng thử lại.',
                   );
                 }
               }
@@ -654,6 +529,8 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final semantic = AppColors.of(context);
     // Dùng `PopScope` thay cho `WillPopScope` (đã deprecated từ Flutter 3.12).
     //
     // AndroidManifest bật `android:enableOnBackInvokedCallback="true"`, mà với
@@ -737,30 +614,23 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                       }
 
                       if (state.status == QuestionStatus.error) {
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Đã xảy ra lỗi: ${state.errorMessage ?? ''}',
-                                style: const TextStyle(color: Colors.red),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: _loadQuestions,
-                                child: const Text('Thử lại'),
-                              ),
-                            ],
-                          ),
+                        return EmptyStateWidget(
+                          icon: Icons.cloud_off_rounded,
+                          title: 'Không tải được câu hỏi',
+                          message:
+                              state.errorMessage ??
+                              'Vui lòng kiểm tra kết nối và thử lại.',
+                          isError: true,
+                          actionLabel: 'Thử lại',
+                          onAction: _loadQuestions,
                         );
                       }
-
                       if (state.questions.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            'Không có câu hỏi nào cho bài kiểm tra này',
-                          ),
+                        return const EmptyStateWidget(
+                          icon: Icons.quiz_outlined,
+                          title: 'Bài kiểm tra chưa có câu hỏi',
+                          message:
+                              'Giảng viên chưa thêm câu hỏi cho bài kiểm tra này.',
                         );
                       }
 
@@ -845,7 +715,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                                         children: [
                                           Icon(
                                             Icons.help_outline,
-                                            color: Colors.purple.shade400,
+                                            color: semantic.info,
                                             size: 20,
                                           ),
                                           const SizedBox(width: 6),
@@ -863,7 +733,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                                             '${state.questions.length}',
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.purple.shade400,
+                                              color: theme.colorScheme.primary,
                                             ),
                                           ),
                                         ],
@@ -877,7 +747,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                                         children: [
                                           Icon(
                                             Icons.refresh,
-                                            color: Colors.orange.shade400,
+                                            color: semantic.warning,
                                             size: 20,
                                           ),
                                           const SizedBox(width: 6),
@@ -895,7 +765,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                                             '${widget.quizInfo?.attemptsUsed ?? 0}/${widget.quizInfo?.attemptLimit ?? 0}',
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.orange.shade400,
+                                              color: semantic.warning,
                                             ),
                                           ),
                                         ],
@@ -905,7 +775,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                                         children: [
                                           Icon(
                                             Icons.check_circle,
-                                            color: Colors.green.shade400,
+                                            color: semantic.success,
                                             size: 20,
                                           ),
                                           const SizedBox(width: 6),
@@ -923,7 +793,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                                             '${state.userAnswers.where((a) => a >= 0).length}/${state.questions.length}',
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.green.shade400,
+                                              color: semantic.success,
                                             ),
                                           ),
                                         ],

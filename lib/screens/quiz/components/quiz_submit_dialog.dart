@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 
 class QuizSubmitDialog extends StatelessWidget {
   final int totalAnswered;
@@ -20,6 +21,7 @@ class QuizSubmitDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final semantic = AppColors.of(context);
     final hasUnansweredQuestions = totalAnswered < totalQuestions;
 
     return AlertDialog(
@@ -48,15 +50,15 @@ class QuizSubmitDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: semantic.warning.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                border: Border.all(color: semantic.warning.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
                   Icon(
                     Icons.warning_amber_rounded,
-                    color: Colors.orange,
+                    color: semantic.warning,
                     size: 24,
                   ),
                   const SizedBox(width: 12),
@@ -64,7 +66,7 @@ class QuizSubmitDialog extends StatelessWidget {
                     child: Text(
                       'Bạn còn ${totalQuestions - totalAnswered} câu chưa trả lời. Bạn có chắc chắn muốn nộp bài?',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.orange.shade800,
+                        color: semantic.warning,
                       ),
                     ),
                   ),
@@ -75,19 +77,19 @@ class QuizSubmitDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
+                color: semantic.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.green.withOpacity(0.3)),
+                border: Border.all(color: semantic.success.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.check_circle, color: Colors.green, size: 24),
+                  Icon(Icons.check_circle, color: semantic.success, size: 24),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       'Bạn đã trả lời tất cả các câu hỏi!',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.green.shade800,
+                        color: semantic.success,
                       ),
                     ),
                   ),
@@ -109,7 +111,7 @@ class QuizSubmitDialog extends StatelessWidget {
               filled: true,
               fillColor: Theme.of(
                 context,
-              ).colorScheme.surfaceContainerHighest.withOpacity(0.4),
+              ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
             ),
           ),
         ],

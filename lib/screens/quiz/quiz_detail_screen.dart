@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../apps/config/app_router.dart';
 import '../../models/quiz/quiz_model.dart';
 import '../../repositories/question_repository.dart';
 import '../../services/question_service.dart';
+
+
+/// Màu ngữ nghĩa của theme hiện tại — gọi tại chỗ để không phải khai báo biến
+/// trong từng phương thức dựng giao diện.
+AppColors _semantic(BuildContext context) => AppColors.of(context);
 
 class QuizDetailScreen extends StatefulWidget {
   const QuizDetailScreen({super.key});
@@ -184,7 +190,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
             ),
             title: Row(
               children: [
-                const Icon(Icons.block, color: Colors.red),
+                Icon(Icons.block, color: _semantic(context).error),
                 const SizedBox(width: 8),
                 const Text('Đã đạt giới hạn'),
               ],
@@ -199,23 +205,23 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: _semantic(context).error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.red.withOpacity(0.5)),
+                    border: Border.all(color: _semantic(context).error.withValues(alpha: 0.5)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.info_outline,
-                        color: Colors.red,
+                        color: _semantic(context).error,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'Mỗi bài kiểm tra chỉ được làm tối đa $limit lần.',
-                          style: const TextStyle(
-                            color: Colors.red,
+                          style: TextStyle(
+                            color: _semantic(context).error,
                             fontSize: 13,
                           ),
                         ),
@@ -267,7 +273,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
     }
 
     final quiz = args;
-    final quizColor = quiz['color'] as Color? ?? Colors.blue;
+    final quizColor = quiz['color'] as Color? ?? _semantic(context).info;
     final quizInfo = quiz['quizInfo'] as QuizModel?;
     final attemptsUsed = quizInfo?.attemptsUsed ?? 0;
     final attemptLimit = quizInfo?.attemptLimit ?? 3;
@@ -296,8 +302,8 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    quizColor.withOpacity(0.2),
-                    quizColor.withOpacity(0.1),
+                    quizColor.withValues(alpha: 0.2),
+                    quizColor.withValues(alpha: 0.1),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -308,7 +314,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: quizColor.withOpacity(0.1),
+                      color: quizColor.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -360,7 +366,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                         children: [
                           Icon(
                             Icons.warning_amber_rounded,
-                            color: Colors.orange,
+                            color: _semantic(context).warning,
                             size: 20,
                           ),
                           const SizedBox(width: 8),
@@ -368,7 +374,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                             child: Text(
                               'Bài kiểm tra này chưa có câu hỏi nào. Vui lòng liên hệ quản trị viên để bổ sung.',
                               style: TextStyle(
-                                color: Colors.orange[800],
+                                color: _semantic(context).warning,
                                 fontSize: 13,
                               ),
                             ),
@@ -381,27 +387,27 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
+                      color: _semantic(context).info.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                      border: Border.all(color: _semantic(context).info.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.info_outline,
-                              color: Colors.blue,
+                              color: _semantic(context).info,
                               size: 20,
                             ),
                             const SizedBox(width: 8),
-                            const Expanded(
+                            Expanded(
                               child: Text(
                                 'Quy tắc làm bài',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.blue,
+                                  color: _semantic(context).info,
                                 ),
                               ),
                             ),
@@ -413,7 +419,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                           textAlign: TextAlign.justify,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.blue.shade700,
+                            color: _semantic(context).info,
                           ),
                         ),
                       ],
@@ -449,7 +455,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                               : () => _startQuiz(context, quiz),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: quizColor,
-                        disabledBackgroundColor: Colors.grey,
+                        disabledBackgroundColor: _semantic(context).neutral,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),

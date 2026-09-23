@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/quiz/quiz_cubit.dart';
 import 'package:lms/repositories/quiz_repository.dart';
 import 'package:lms/services/quiz_service.dart';
+
+
+/// Màu ngữ nghĩa của theme hiện tại — gọi tại chỗ để không phải khai báo biến
+/// trong từng phương thức dựng giao diện.
+AppColors _semantic(BuildContext context) => AppColors.of(context);
 
 class UserQuizResultsScreen extends StatelessWidget {
   final String userUid;
@@ -46,7 +52,7 @@ class UserQuizResultsScreen extends StatelessWidget {
                         Icon(
                           Icons.assignment_turned_in_outlined,
                           size: 64,
-                          color: colorScheme.primary.withOpacity(0.3),
+                          color: colorScheme.primary.withValues(alpha: 0.3),
                         ),
                         const SizedBox(height: 20),
                         Text(
@@ -55,7 +61,7 @@ class UserQuizResultsScreen extends StatelessWidget {
                             context,
                           ).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurface.withOpacity(0.8),
+                            color: colorScheme.onSurface.withValues(alpha: 0.8),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -65,7 +71,7 @@ class UserQuizResultsScreen extends StatelessWidget {
                           style: Theme.of(
                             context,
                           ).textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface.withOpacity(0.6),
+                            color: colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -97,7 +103,7 @@ class UserQuizResultsScreen extends StatelessWidget {
                       ),
                       leading: CircleAvatar(
                         radius: 24,
-                        backgroundColor: isPassed ? Colors.green : Colors.red,
+                        backgroundColor: isPassed ? _semantic(context).success : _semantic(context).error,
                         child: Text(
                           r.score.toStringAsFixed(1),
                           style: const TextStyle(
@@ -132,7 +138,7 @@ class UserQuizResultsScreen extends StatelessWidget {
                             child: Text(
                               isPassed ? 'Trạng thái: Đậu' : 'Trạng thái: Rớt',
                               style: TextStyle(
-                                color: isPassed ? Colors.green : Colors.red,
+                                color: isPassed ? _semantic(context).success : _semantic(context).error,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
                               ),

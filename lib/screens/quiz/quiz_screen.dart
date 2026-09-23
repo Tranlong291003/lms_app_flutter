@@ -87,7 +87,9 @@ class QuizScreen extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(height: 16),
         itemBuilder: (context, index) {
           final quiz = quizzes[index];
-          final quizColor = quiz['color'] as Color? ?? Colors.blue;
+          // Màu dự phòng lấy từ theme thay vì `Colors.blue` cố định.
+          final quizColor =
+              quiz['color'] as Color? ?? Theme.of(context).colorScheme.primary;
 
           return Container(
             decoration: BoxDecoration(

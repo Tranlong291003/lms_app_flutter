@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 
 class QuizDetailedResult extends StatelessWidget {
   final Map<String, dynamic> result;
@@ -12,6 +13,7 @@ class QuizDetailedResult extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final semantic = AppColors.of(context);
     final questions = result['questions'] as List<dynamic>;
     final totalQuestions = questions.length;
     final correctAnswers =
@@ -51,10 +53,10 @@ class QuizDetailedResult extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Theme.of(
                   context,
-                ).colorScheme.surfaceContainerHighest.withOpacity(0.4),
+                ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               child: Column(
@@ -74,7 +76,7 @@ class QuizDetailedResult extends StatelessWidget {
                         label: 'Đúng',
                         value:
                             '$correctAnswers (${(correctAnswers / totalQuestions * 100).toStringAsFixed(1)}%)',
-                        color: Colors.green,
+                        color: semantic.success,
                       ),
                       _buildStatItem(
                         context,
@@ -82,7 +84,7 @@ class QuizDetailedResult extends StatelessWidget {
                         label: 'Sai',
                         value:
                             '${totalQuestions - correctAnswers} (${((totalQuestions - correctAnswers) / totalQuestions * 100).toStringAsFixed(1)}%)',
-                        color: Colors.red,
+                        color: semantic.error,
                       ),
                     ],
                   ),
@@ -95,7 +97,7 @@ class QuizDetailedResult extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(
                         context,
-                      ).colorScheme.primary.withOpacity(0.1),
+                      ).colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -139,7 +141,7 @@ class QuizDetailedResult extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                       side: BorderSide(
-                        color: isCorrect ? Colors.green : Colors.red,
+                        color: isCorrect ? semantic.success : semantic.error,
                         width: 2,
                       ),
                     ),
@@ -156,7 +158,7 @@ class QuizDetailedResult extends StatelessWidget {
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: isCorrect ? Colors.green : Colors.red,
+                                  color: isCorrect ? semantic.success : semantic.error,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
@@ -170,7 +172,7 @@ class QuizDetailedResult extends StatelessWidget {
                               const SizedBox(width: 8),
                               Icon(
                                 isCorrect ? Icons.check_circle : Icons.cancel,
-                                color: isCorrect ? Colors.green : Colors.red,
+                                color: isCorrect ? semantic.success : semantic.error,
                               ),
                             ],
                           ),
@@ -205,7 +207,7 @@ class QuizDetailedResult extends StatelessWidget {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .surfaceContainerHighest
-                                    .withOpacity(0.4),
+                                    .withValues(alpha: 0.4),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Column(
@@ -271,13 +273,14 @@ class QuizDetailedResult extends StatelessWidget {
     required String answer,
     required bool isCorrect,
   }) {
+    final semantic = AppColors.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: (isCorrect ? Colors.green : Colors.red).withOpacity(0.1),
+        color: (isCorrect ? semantic.success : semantic.error).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: (isCorrect ? Colors.green : Colors.red).withOpacity(0.3),
+          color: (isCorrect ? semantic.success : semantic.error).withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -287,7 +290,7 @@ class QuizDetailedResult extends StatelessWidget {
             label,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: isCorrect ? Colors.green : Colors.red,
+              color: isCorrect ? semantic.success : semantic.error,
             ),
           ),
           const SizedBox(height: 4),

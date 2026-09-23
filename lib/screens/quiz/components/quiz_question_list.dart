@@ -58,7 +58,7 @@ class QuizQuestionList extends StatelessWidget {
             width: 60,
             height: 5,
             decoration: BoxDecoration(
-              color: colorScheme.outline.withOpacity(0.15),
+              color: colorScheme.outline.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -71,12 +71,12 @@ class QuizQuestionList extends StatelessWidget {
               boxShadow: [
                 if (!isDark)
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
               ],
-              border: Border.all(color: colorScheme.outline.withOpacity(0.08)),
+              border: Border.all(color: colorScheme.outline.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -97,10 +97,10 @@ class QuizQuestionList extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(vertical: 16),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest.withOpacity(0.4),
+                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: colorScheme.outline.withOpacity(0.3),
+                      color: colorScheme.outline.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
@@ -111,7 +111,7 @@ class QuizQuestionList extends StatelessWidget {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: _getTimerColor(colorScheme).withOpacity(0.18),
+                          color: _getTimerColor(colorScheme).withValues(alpha: 0.18),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Row(
@@ -193,7 +193,7 @@ class QuizQuestionList extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -289,7 +289,7 @@ class QuizQuestionList extends StatelessWidget {
           color:
               isCurrent
                   ? colorScheme.primary
-                  : colorScheme.outline.withOpacity(0.2),
+                  : colorScheme.outline.withValues(alpha: 0.2),
           width: 2,
         ),
       ),
@@ -321,7 +321,7 @@ class QuizQuestionList extends StatelessWidget {
             color: color,
             borderRadius: BorderRadius.circular(6),
             border: Border.all(
-              color: colorScheme.outline.withOpacity(0.3),
+              color: colorScheme.outline.withValues(alpha: 0.3),
               width: 2,
             ),
           ),

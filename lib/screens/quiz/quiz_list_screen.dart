@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
@@ -11,6 +12,11 @@ import 'package:lms/repositories/quiz_repository.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/screens/quiz/user_quiz_results_screen.dart';
 import 'package:lms/services/quiz_service.dart';
+
+
+/// Màu ngữ nghĩa của theme hiện tại — gọi tại chỗ để không phải khai báo biến
+/// trong từng phương thức dựng giao diện.
+AppColors _semantic(BuildContext context) => AppColors.of(context);
 
 class QuizListScreen extends StatefulWidget {
   const QuizListScreen({super.key});
@@ -126,7 +132,7 @@ class _QuizListScreenState extends State<QuizListScreen>
             labelColor: Theme.of(context).colorScheme.primary,
             unselectedLabelColor: Theme.of(
               context,
-            ).colorScheme.onSurface.withOpacity(0.7),
+            ).colorScheme.onSurface.withValues(alpha: 0.7),
             labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               fontSize: 16,
@@ -161,7 +167,7 @@ class _QuizListScreenState extends State<QuizListScreen>
                   children: [
                     Text(
                       'Đã xảy ra lỗi: ${state.errorMessage}',
-                      style: const TextStyle(color: Colors.red),
+                      style: TextStyle(color: _semantic(context).error),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
@@ -206,7 +212,7 @@ class _QuizListScreenState extends State<QuizListScreen>
               Icon(
                 Icons.quiz_outlined,
                 size: 64,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               ),
               const SizedBox(height: 20),
               Text(
@@ -215,7 +221,7 @@ class _QuizListScreenState extends State<QuizListScreen>
                   fontWeight: FontWeight.bold,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.8),
+                  ).colorScheme.onSurface.withValues(alpha: 0.8),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -225,7 +231,7 @@ class _QuizListScreenState extends State<QuizListScreen>
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -319,8 +325,8 @@ class _QuizListScreenState extends State<QuizListScreen>
           side: BorderSide(
             color:
                 isEnrolled
-                    ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-                    : Theme.of(context).colorScheme.outline.withOpacity(0.1),
+                    ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
+                    : Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
@@ -367,7 +373,7 @@ class _QuizListScreenState extends State<QuizListScreen>
                     ),
                     const Spacer(),
                     if (!isEnrolled)
-                      const Icon(Icons.lock, size: 16, color: Colors.grey),
+                      Icon(Icons.lock, size: 16, color: _semantic(context).neutral),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -414,11 +420,11 @@ class _QuizListScreenState extends State<QuizListScreen>
   Color _getQuizTypeColor(String type) {
     switch (type) {
       case 'trac_nghiem':
-        return Colors.blue;
+        return _semantic(context).info;
       case 'tu_luan':
-        return Colors.orange;
+        return _semantic(context).warning;
       default:
-        return Colors.grey;
+        return _semantic(context).neutral;
     }
   }
 

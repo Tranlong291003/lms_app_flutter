@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 
 class QuizResultDialog extends StatelessWidget {
   final int totalCorrect;
@@ -24,6 +25,7 @@ class QuizResultDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final semantic = AppColors.of(context);
     final hasRemainingAttempts = attemptsUsed < attemptLimit;
     final percentage = (totalCorrect / totalQuestions * 100).toStringAsFixed(1);
 
@@ -48,7 +50,7 @@ class QuizResultDialog extends StatelessWidget {
             height: 120,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               border: Border.all(
                 color: Theme.of(context).colorScheme.primary,
                 width: 4,
@@ -83,10 +85,10 @@ class QuizResultDialog extends StatelessWidget {
             decoration: BoxDecoration(
               color: Theme.of(
                 context,
-              ).colorScheme.surfaceContainerHighest.withOpacity(0.4),
+              ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
               ),
             ),
             child: Column(
@@ -99,14 +101,14 @@ class QuizResultDialog extends StatelessWidget {
                       icon: Icons.check_circle,
                       label: 'Đúng',
                       value: '$totalCorrect câu',
-                      color: Colors.green,
+                      color: semantic.success,
                     ),
                     _buildStatItem(
                       context,
                       icon: Icons.cancel,
                       label: 'Sai',
                       value: '${totalQuestions - totalCorrect} câu',
-                      color: Colors.red,
+                      color: semantic.error,
                     ),
                   ],
                 ),
@@ -119,7 +121,7 @@ class QuizResultDialog extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.1),
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -153,14 +155,14 @@ class QuizResultDialog extends StatelessWidget {
             decoration: BoxDecoration(
               color:
                   hasRemainingAttempts
-                      ? Colors.blue.withOpacity(0.1)
-                      : Colors.orange.withOpacity(0.1),
+                      ? semantic.info.withValues(alpha: 0.1)
+                      : semantic.warning.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color:
                     hasRemainingAttempts
-                        ? Colors.blue.withOpacity(0.3)
-                        : Colors.orange.withOpacity(0.3),
+                        ? semantic.info.withValues(alpha: 0.3)
+                        : semantic.warning.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
@@ -169,7 +171,7 @@ class QuizResultDialog extends StatelessWidget {
                   hasRemainingAttempts
                       ? Icons.info_outline
                       : Icons.warning_amber_rounded,
-                  color: hasRemainingAttempts ? Colors.blue : Colors.orange,
+                  color: hasRemainingAttempts ? semantic.info : semantic.warning,
                   size: 24,
                 ),
                 const SizedBox(width: 12),
@@ -181,8 +183,8 @@ class QuizResultDialog extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color:
                           hasRemainingAttempts
-                              ? Colors.blue.shade800
-                              : Colors.orange.shade800,
+                              ? semantic.info
+                              : semantic.warning,
                     ),
                   ),
                 ),

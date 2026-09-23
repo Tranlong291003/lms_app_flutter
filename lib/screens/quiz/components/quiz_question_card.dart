@@ -31,10 +31,10 @@ class QuizQuestionCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: Theme.of(
                 context,
-              ).colorScheme.surfaceContainerHighest.withOpacity(0.4),
+              ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
               ),
             ),
             child: Text(
@@ -68,11 +68,11 @@ class QuizQuestionCard extends StatelessWidget {
                           isSelected
                               ? Theme.of(
                                 context,
-                              ).colorScheme.primary.withOpacity(0.1)
+                              ).colorScheme.primary.withValues(alpha: 0.1)
                               : Theme.of(context)
                                   .colorScheme
                                   .surfaceContainerHighest
-                                  .withOpacity(0.4),
+                                  .withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color:
@@ -80,7 +80,7 @@ class QuizQuestionCard extends StatelessWidget {
                                 ? Theme.of(context).colorScheme.primary
                                 : Theme.of(
                                   context,
-                                ).colorScheme.outline.withOpacity(0.3),
+                                ).colorScheme.outline.withValues(alpha: 0.3),
                         width: isSelected ? 2 : 1,
                       ),
                     ),
@@ -104,7 +104,7 @@ class QuizQuestionCard extends StatelessWidget {
                                       ? Theme.of(context).colorScheme.primary
                                       : Theme.of(
                                         context,
-                                      ).colorScheme.outline.withOpacity(0.3),
+                                      ).colorScheme.outline.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Center(
@@ -148,7 +148,7 @@ class QuizQuestionCard extends StatelessWidget {
                                   isDisabled && !isSelected
                                       ? Theme.of(
                                         context,
-                                      ).colorScheme.onSurface.withOpacity(0.5)
+                                      ).colorScheme.onSurfaceVariant
                                       : Theme.of(context).colorScheme.onSurface,
                             ),
                             textAlign: TextAlign.justify,

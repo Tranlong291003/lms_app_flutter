@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/utils/json_parse.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
@@ -6,6 +7,10 @@ import 'package:lms/cubits/quiz/quiz_cubit.dart';
 import 'package:lms/models/quiz/quiz_result_model.dart';
 import 'package:lms/repositories/question_repository.dart';
 import 'package:lms/services/question_service.dart';
+
+/// Màu ngữ nghĩa của theme hiện tại — gọi tại chỗ để không phải khai báo biến
+/// trong từng phương thức dựng giao diện.
+AppColors _colors(BuildContext context) => AppColors.of(context);
 
 class QuizResultDetailScreen extends StatelessWidget {
   const QuizResultDetailScreen({super.key});
@@ -50,7 +55,7 @@ class _QuizResultDetailView extends StatelessWidget {
             return Center(
               child: Text(
                 state.message,
-                style: const TextStyle(color: Colors.red),
+                style: TextStyle(color: _colors(context).error),
               ),
             );
           }
@@ -76,20 +81,20 @@ class _QuizResultDetailView extends StatelessWidget {
                       boxShadow: [
                         if (Theme.of(context).brightness == Brightness.light)
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.06),
+                            color: Colors.black.withValues(alpha: 0.06),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
                       ],
                       border: Border.all(
-                        color: colorScheme.outline.withOpacity(0.08),
+                        color: colorScheme.outline.withValues(alpha: 0.08),
                       ),
                     ),
                     child: Column(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.emoji_events,
-                          color: Colors.blue,
+                          color: _colors(context).info,
                           size: 36,
                         ),
                         const SizedBox(height: 10),
@@ -108,7 +113,7 @@ class _QuizResultDetailView extends StatelessWidget {
                             _buildStat(
                               context,
                               icon: Icons.check_circle,
-                              color: Colors.green,
+                              color: _colors(context).success,
                               label: 'Đúng',
                               value: correctAnswers,
                             ),
@@ -116,7 +121,7 @@ class _QuizResultDetailView extends StatelessWidget {
                             _buildStat(
                               context,
                               icon: Icons.cancel,
-                              color: Colors.red,
+                              color: _colors(context).error,
                               label: 'Sai',
                               value: wrongAnswers,
                             ),
@@ -134,7 +139,7 @@ class _QuizResultDetailView extends StatelessWidget {
                         Text(
                           'Tổng số câu: $totalQuestions',
                           style: TextStyle(
-                            color: colorScheme.onSurface.withOpacity(0.7),
+                            color: colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -159,7 +164,7 @@ class _QuizResultDetailView extends StatelessWidget {
                       child: Text(
                         'Không có dữ liệu câu hỏi',
                         style: TextStyle(
-                          color: colorScheme.onSurface.withOpacity(0.7),
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                     )
@@ -237,8 +242,8 @@ class _QuizResultDetailView extends StatelessWidget {
         border: Border.all(
           color:
               isCorrect
-                  ? Colors.green
-                  : (userAnswer == null ? Colors.grey : Colors.red),
+                  ? _colors(context).success
+                  : (userAnswer == null ? _colors(context).neutral : _colors(context).error),
           width: 2,
         ),
       ),
@@ -251,8 +256,8 @@ class _QuizResultDetailView extends StatelessWidget {
               CircleAvatar(
                 backgroundColor:
                     isCorrect
-                        ? Colors.green
-                        : (userAnswer == null ? Colors.grey : Colors.red),
+                        ? _colors(context).success
+                        : (userAnswer == null ? _colors(context).neutral : _colors(context).error),
                 radius: 14,
                 child: Icon(
                   isCorrect
@@ -304,8 +309,8 @@ class _QuizResultDetailView extends StatelessWidget {
                             Flexible(
                               child: Text(
                                 userAnswer,
-                                style: const TextStyle(
-                                  color: Colors.blue,
+                                style: TextStyle(
+                                  color: _colors(context).info,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                 ),
@@ -323,24 +328,24 @@ class _QuizResultDetailView extends StatelessWidget {
                         ? Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.verified,
                               size: 16,
-                              color: Colors.green,
+                              color: _colors(context).success,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               'Đáp án đúng: ',
                               style: TextStyle(
-                                color: Colors.green,
+                                color: _colors(context).success,
                                 fontSize: 13,
                               ),
                             ),
                             Flexible(
                               child: Text(
                                 correctAnswer ?? '',
-                                style: const TextStyle(
-                                  color: Colors.green,
+                                style: TextStyle(
+                                  color: _colors(context).success,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                 ),
@@ -371,18 +376,18 @@ class _QuizResultDetailView extends StatelessWidget {
               decoration: BoxDecoration(
                 color:
                     isRight
-                        ? Colors.green.withOpacity(0.12)
+                        ? _colors(context).success.withValues(alpha: 0.12)
                         : (isUser
-                            ? Colors.blue.withOpacity(0.10)
+                            ? _colors(context).info.withValues(alpha: 0.10)
                             : colorScheme.surface),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color:
                       isRight
-                          ? Colors.green
+                          ? _colors(context).success
                           : (isUser
                               ? colorScheme.primary
-                              : colorScheme.outline.withOpacity(0.15)),
+                              : colorScheme.outline.withValues(alpha: 0.15)),
                   width: isRight || isUser ? 2 : 1,
                 ),
               ),
@@ -390,11 +395,11 @@ class _QuizResultDetailView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (isRight)
-                    const Icon(Icons.check, color: Colors.green, size: 18),
+                    Icon(Icons.check, color: _colors(context).success, size: 18),
                   if (!isRight && isUser)
-                    const Icon(
+                    Icon(
                       Icons.radio_button_checked,
-                      color: Colors.blue,
+                      color: _colors(context).info,
                       size: 18,
                     ),
                   if (!isRight && !isUser) const SizedBox(width: 18),
@@ -405,7 +410,7 @@ class _QuizResultDetailView extends StatelessWidget {
                       style: TextStyle(
                         color:
                             isRight
-                                ? Colors.green
+                                ? _colors(context).success
                                 : (isUser
                                     ? colorScheme.primary
                                     : colorScheme.onSurface),

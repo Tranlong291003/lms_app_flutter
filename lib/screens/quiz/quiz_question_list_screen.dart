@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lms/apps/config/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
@@ -9,6 +10,11 @@ import 'package:lms/models/quiz/question_model.dart';
 import 'package:lms/repositories/question_repository.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
 import 'package:lms/services/question_service.dart';
+
+
+/// Màu ngữ nghĩa của theme hiện tại — gọi tại chỗ để không phải khai báo biến
+/// trong từng phương thức dựng giao diện.
+AppColors _semantic(BuildContext context) => AppColors.of(context);
 
 class QuizQuestionListScreen extends StatelessWidget {
   final int quizId;
@@ -97,7 +103,7 @@ class _QuizQuestionListView extends StatelessWidget {
                             );
                           }
                         },
-                        backgroundColor: Colors.orange,
+                        backgroundColor: _semantic(context).warning,
                         foregroundColor: Colors.white,
                         icon: Icons.edit,
                         label: 'Sửa',
@@ -127,9 +133,11 @@ class _QuizQuestionListView extends StatelessWidget {
                                     ),
                                     TextButton(
                                       onPressed: () => Navigator.pop(ctx, true),
-                                      child: const Text(
+                                      child: Text(
                                         'Xoá',
-                                        style: TextStyle(color: Colors.red),
+                                        style: TextStyle(
+                                          color: _semantic(context).error,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -164,7 +172,7 @@ class _QuizQuestionListView extends StatelessWidget {
                             }
                           }
                         },
-                        backgroundColor: Colors.red,
+                        backgroundColor: _semantic(context).error,
                         foregroundColor: Colors.white,
                         icon: Icons.delete,
                         label: 'Xoá',
@@ -195,7 +203,7 @@ class _QuizQuestionListView extends StatelessWidget {
                                   isCorrect
                                       ? Icons.check_circle
                                       : Icons.circle_outlined,
-                                  color: isCorrect ? Colors.green : Colors.grey,
+                                  color: isCorrect ? _semantic(context).success : _semantic(context).neutral,
                                   size: 18,
                                 ),
                                 const SizedBox(width: 8),
@@ -206,9 +214,9 @@ class _QuizQuestionListView extends StatelessWidget {
                           const SizedBox(height: 8),
                           Text(
                             'Tạo lúc: ${q.getFormattedCreatedDate()}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey,
+                              color: _semantic(context).neutral,
                             ),
                           ),
                         ],
@@ -612,7 +620,7 @@ class _CreateQuestionAIDialogState extends State<_CreateQuestionAIDialog> {
                     borderSide: BorderSide(
                       color: Theme.of(
                         context,
-                      ).colorScheme.outline.withOpacity(0.5),
+                      ).colorScheme.outline.withValues(alpha: 0.5),
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
@@ -620,7 +628,7 @@ class _CreateQuestionAIDialogState extends State<_CreateQuestionAIDialog> {
                     borderSide: BorderSide(
                       color: Theme.of(
                         context,
-                      ).colorScheme.outline.withOpacity(0.5),
+                      ).colorScheme.outline.withValues(alpha: 0.5),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
