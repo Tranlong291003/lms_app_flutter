@@ -6,7 +6,6 @@ import 'package:lms/apps/config/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:lms/apps/config/api_config.dart';
-import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/blocs/mentors/mentor_detail_bloc.dart';
 import 'package:lms/blocs/mentors/mentors_event.dart';
@@ -460,15 +459,10 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
                     child: ElevatedButton.icon(
-                      onPressed:
-                          mentor.isActive
-                              ? () {
-                                CustomSnackBar.showInfo(
-                                  context: context,
-                                  message: 'Chức năng đang được phát triển',
-                                );
-                              }
-                              : null,
+                      // Chưa có tính năng nhắn tin: nút ở trạng thái vô hiệu
+                      // hoá kèm nhãn rõ ràng, thay vì bấm được rồi báo
+                      // "Chức năng đang được phát triển".
+                      onPressed: null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.primary,
                         foregroundColor: colorScheme.onPrimary,
@@ -480,7 +474,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                       ),
                       icon: const Icon(Icons.message_outlined),
                       label: const Text(
-                        'Liên hệ giảng viên',
+                        'Liên hệ giảng viên (sắp ra mắt)',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,

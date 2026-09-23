@@ -7,8 +7,8 @@ import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/empty_state_widget.dart';
-import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/stat_grid.dart';
+import 'package:lms/apps/utils/status_chip.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/cubits/admin/app_stats_cubit.dart';
 import 'package:lms/repositories/app_stats_repository.dart';
@@ -246,12 +246,8 @@ class _QuickActionsList extends StatelessWidget {
           title: 'Quản lý thanh toán',
           subtitle: 'Xem và quản lý các giao dịch thanh toán',
           color: c.success,
-          onTap: () {
-            CustomSnackBar.showInfo(
-              context: context,
-              message: 'Chức năng đang được phát triển',
-            );
-          },
+          // Chưa có màn hình/API: không bấm được, hiện nhãn "Sắp ra mắt" để
+          // người dùng biết trước thay vì bấm rồi mới thấy thông báo.
         ),
         const SizedBox(height: AppSpacing.md),
         _QuickActionCard(
@@ -259,12 +255,8 @@ class _QuickActionsList extends StatelessWidget {
           title: 'Cài đặt hệ thống',
           subtitle: 'Cấu hình chung và tuỳ chỉnh giao diện người dùng',
           color: c.warning,
-          onTap: () {
-            CustomSnackBar.showInfo(
-              context: context,
-              message: 'Chức năng đang được phát triển',
-            );
-          },
+          // Chưa có màn hình tương ứng.
+          isComingSoon: true,
         ),
       ],
     );
@@ -277,14 +269,18 @@ class _QuickActionCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final Color color;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+
+  /// `true` khi tính năng chưa có: thẻ không bấm được và hiện nhãn "Sắp ra mắt".
+  final bool isComingSoon;
 
   const _QuickActionCard({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.color,
-    required this.onTap,
+    this.onTap,
+    this.isComingSoon = false,
   });
 
   @override
@@ -352,11 +348,18 @@ class _QuickActionCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: colors.onSurfaceVariant,
-              ),
+              if (isComingSoon)
+                const StatusChip(
+                  label: 'Sắp ra mắt',
+                  tone: StatusTone.neutral,
+                  showDot: false,
+                )
+              else
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16,
+                  color: colors.onSurfaceVariant,
+                ),
             ],
           ),
         ),

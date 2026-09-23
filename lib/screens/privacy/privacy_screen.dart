@@ -2,9 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/empty_state_widget.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PrivacyScreen extends StatelessWidget {
   const PrivacyScreen({super.key});
+
+  static const _supportEmail = 'tranlong291003@example.com';
+
+  /// Mở ứng dụng email của hệ thống. Nếu không có ứng dụng nào xử lý được thì
+  /// báo cho người dùng biết thay vì im lặng.
+  Future<void> _launchEmail(
+    BuildContext context, {
+    String subject = 'Phản hồi về chính sách bảo mật',
+  }) async {
+    final uri = Uri(
+      scheme: 'mailto',
+      path: _supportEmail,
+      query: 'subject=${Uri.encodeComponent(subject)}',
+    );
+    try {
+      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!ok && context.mounted) {
+        CustomSnackBar.showError(
+          context: context,
+          message: 'Không mở được ứng dụng email.',
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        CustomSnackBar.showError(
+          context: context,
+          message: 'Không mở được ứng dụng email.',
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,12 +140,8 @@ class PrivacyScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {
-                            CustomSnackBar.showInfo(
-                              context: context,
-                              message: 'Chức năng đang được phát triển',
-                            );
-                          },
+                          // Mở ứng dụng email thay vì báo "đang phát triển".
+                          onPressed: () => _launchEmail(context),
                           icon: const Icon(Icons.feedback_outlined),
                           label: const Text('Gửi phản hồi'),
                           style: OutlinedButton.styleFrom(
@@ -127,12 +155,10 @@ class PrivacyScreen extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            CustomSnackBar.showInfo(
-                              context: context,
-                              message: 'Chức năng đang được phát triển',
-                            );
-                          },
+                          onPressed: () => _launchEmail(
+                            context,
+                            subject: 'Cần hỗ trợ về chính sách bảo mật',
+                          ),
                           icon: const Icon(Icons.support_agent),
                           label: const Text('Liên hệ hỗ trợ'),
                           style: ElevatedButton.styleFrom(
