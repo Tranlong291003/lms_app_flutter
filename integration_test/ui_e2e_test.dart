@@ -59,18 +59,25 @@ Future<void> waitFor(
   fail('Hết thời gian chờ nhưng không thấy: $finder');
 }
 
+/// Khởi động app với phiên đã đăng nhập và intro đã xem.
+///
+/// Đăng nhập THẬT qua `AuthService` (không mock) để app mở lên đã ở trạng thái
+/// đã xác thực — tránh phải thao tác trên form đăng nhập, vốn dễ vỡ khi giao
+/// diện đổi và không phải thứ đang cần kiểm chứng ở đây.
+Future<void> launchLoggedIn(WidgetTester tester) async {
+  SharedPreferences.setMockInitialValues({'intro_seen': true});
+  final login = await AuthService().login(email: _email, password: _password);
+  expect(login['access_token'], isNotNull, reason: 'Đăng nhập phải trả token');
+
+  app.main();
+  await pumpFor(tester, duration: const Duration(seconds: 6));
+}
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('Mở app và đi qua từng tab dưới của học viên', (tester) async {
-    // Đăng nhập THẬT qua service để app khởi động đã có phiên, tránh phải thao
-    // tác trên form đăng nhập (dễ vỡ khi giao diện đổi).
-    SharedPreferences.setMockInitialValues({});
-    final login = await AuthService().login(email: _email, password: _password);
-    expect(login['access_token'], isNotNull, reason: 'Đăng nhập phải trả token');
-
-    app.main();
-    await pumpFor(tester, duration: const Duration(seconds: 6));
+    await launchLoggedIn(tester);
 
     // Vào được app: thanh điều hướng dưới hiện ra.
     await waitFor(tester, find.text('Trang chủ'), timeout: const Duration(seconds: 60));
@@ -104,11 +111,7 @@ void main() {
 
   testWidgets('Chi tiết khoá học trả phí hiển thị giá thật, không ghi "miễn phí"',
       (tester) async {
-    SharedPreferences.setMockInitialValues({});
-    await AuthService().login(email: _email, password: _password);
-
-    app.main();
-    await pumpFor(tester, duration: const Duration(seconds: 6));
+    await launchLoggedIn(tester);
     await waitFor(tester, find.text('Trang chủ'), timeout: const Duration(seconds: 60));
 
     // Mở thẳng màn chi tiết khoá học trả phí qua router của app.

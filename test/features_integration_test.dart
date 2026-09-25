@@ -238,7 +238,25 @@ void main() {
         expect(q.questionId, greaterThan(0));
         expect(q.question, isNotEmpty);
         expect(q.options, isNotEmpty);
-        expect(q.correctIndex, greaterThanOrEqualTo(0));
+        // API có thể KHÔNG trả `correct_index` cho một số câu hỏi cũ (đã gặp
+        // thật ở quiz 131/133/149/152). Model quy ước `-1` = "không có dữ
+        // liệu", và app phải chịu được giá trị đó (không tính là đúng, không
+        // ném RangeError khi lấy đáp án).
+        //
+        // Điều bắt buộc là: NẾU có `correct_index` thì nó phải nằm trong khoảng
+        // hợp lệ của `options` — chỉ số ngoài khoảng mới là lỗi thật.
+        if (q.correctIndex != -1) {
+          expect(
+            q.correctIndex,
+            greaterThanOrEqualTo(0),
+            reason: 'correct_index chỉ được là -1 (thiếu dữ liệu) hoặc >= 0',
+          );
+          expect(
+            q.correctIndex,
+            lessThan(q.options.length),
+            reason: 'correct_index phải trỏ tới một đáp án có thật',
+          );
+        }
       }
     });
 

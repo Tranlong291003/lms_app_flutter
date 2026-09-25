@@ -48,6 +48,14 @@ class QuestionState {
   bool isQuestionAnswered(int index) {
     return index >= 0 && index < userAnswers.length && userAnswers[index] >= 0;
   }
+
+  /// Câu trả lời của người dùng; `null` khi chưa trả lời.
+  int? getUserAnswer(int index) {
+    if (index >= 0 && index < userAnswers.length && userAnswers[index] >= 0) {
+      return userAnswers[index];
+    }
+    return null;
+  }
 }
 
 class QuestionCubit extends Cubit<QuestionState> {
@@ -149,20 +157,62 @@ class QuestionCubit extends Cubit<QuestionState> {
     return -1;
   }
 
+  /// Số câu trả lời đúng theo dữ liệu ĐÃ TẢI.
+  ///
+  /// Chỉ dùng khi không có kết quả chính thức từ server (xem [serverScore]).
+  ///
+  /// Hai điều kiện đều bắt buộc:
+  /// - Câu phải được trả lời. `userAnswers` khởi tạo bằng `-1` cho mọi câu, và
+  ///   một số quiz (dữ liệu cũ) không có `correct_index` nên model mặc định
+  ///   cũng là `-1` → so sánh `-1 == -1` tính câu BỎ TRỐNG là đúng.
+  /// - `correctIndex` phải hợp lệ (>= 0). Cùng lý do trên, `-1` nghĩa là "không
+  ///   có đáp án đúng trong dữ liệu", không phải một đáp án.
   int getCorrectAnswersCount() {
     int count = 0;
     for (int i = 0; i < state.questions.length; i++) {
-      if (state.userAnswers[i] == state.questions[i].correctIndex) {
+      final userAnswer = state.getUserAnswer(i);
+      if (userAnswer != null && userAnswer == state.questions[i].correctIndex) {
         count++;
       }
     }
     return count;
   }
 
+  /// Điểm do server chấm (`POST /api/quiz-results/submit` trả `score` thang 10).
+  ///
+  /// Server là nguồn chân lý: nó tính trên đúng tập câu đã gửi và trả cả
+  /// `correct_answers`. Trả `null` khi chưa nộp bài.
+  double? get serverScore {
+    final value = state.quizResult?['score'];
+    if (value is num) return value.toDouble();
+    return null;
+  }
+
+  /// Số câu đúng do server chấm, `null` nếu chưa nộp bài.
+  int? get serverCorrectAnswers {
+    final raw = state.quizResult?['data'];
+    final value = raw is Map ? raw['correctAnswers'] : null;
+    if (value is num) return value.toInt();
+    return null;
+  }
+
+  /// Số câu đã trả lời (dùng để chấm điểm dự phòng khi server không trả điểm).
+  int get answeredCount {
+    int count = 0;
+    for (int i = 0; i < state.questions.length; i++) {
+      if (state.getUserAnswer(i) != null) count++;
+    }
+    return count;
+  }
+
+  /// Điểm dự phòng khi server không trả `score`.
+  ///
+  /// Công thức theo API: `correct / totalAnswered * 10` — chia cho số câu ĐÃ
+  /// TRẢ LỜI, không phải tổng số câu (bỏ trống không bị trừ điểm).
   double getScore() {
-    if (state.questions.isEmpty) return 0;
-    final correctAnswers = getCorrectAnswersCount();
-    return (correctAnswers / state.questions.length) * 10;
+    final answered = answeredCount;
+    if (answered == 0) return 0;
+    return (getCorrectAnswersCount() / answered) * 10;
   }
 
   Future<Map<String, dynamic>> submitQuizResult(

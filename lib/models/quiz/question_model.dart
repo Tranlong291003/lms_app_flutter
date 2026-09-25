@@ -75,8 +75,15 @@ class QuestionModel {
     return formatter.format(updatedAt!);
   }
 
+  /// Đáp án đúng dạng chữ, hoặc thông báo khi không xác định được.
+  ///
+  /// `correctIndex` có thể là `-1`: model mặc định như vậy khi API không trả
+  /// `correct_index` (một số câu hỏi cũ thiếu dữ liệu). `options[-1]` sẽ ném
+  /// RangeError, nên phải chặn cả hai đầu.
   String getCorrectAnswer() {
-    if (options.isEmpty || correctIndex >= options.length) {
+    if (correctIndex < 0 ||
+        options.isEmpty ||
+        correctIndex >= options.length) {
       return "Không có đáp án";
     }
     return options[correctIndex];

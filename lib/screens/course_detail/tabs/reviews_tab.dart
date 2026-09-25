@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/config/app_theme.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
-import 'package:lms/cubits/lessons/lessons_cubit.dart';
-import 'package:lms/cubits/lessons/lessons_state.dart';
 import 'package:lms/cubits/reviews/review_cubit.dart';
 import 'package:lms/cubits/reviews/review_state.dart';
 import 'package:lms/models/reivew_model.dart';
@@ -25,17 +23,6 @@ class _ReviewsTabState extends State<ReviewsTab> {
     super.initState();
     // Load reviews when entering the tab
     context.read<ReviewCubit>().loadCourseReviews(widget.courseId);
-  }
-
-  Future<bool> _checkCourseCompletion(BuildContext context) async {
-    final lessonsState = context.read<LessonsCubit>().state;
-    if (lessonsState is! LessonsLoaded) return false;
-
-    final lessons = lessonsState.lessons;
-    if (lessons.isEmpty) return false;
-
-    // Check if all lessons are completed
-    return lessons.every((lesson) => lesson.isCompleted);
   }
 
   void _showReviewDialog(
@@ -218,44 +205,25 @@ class _ReviewsTabState extends State<ReviewsTab> {
           return Column(
             children: [
               if (userReview.reviewId == -1)
-                FutureBuilder<bool>(
-                  future: _checkCourseCompletion(context),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: LoadingIndicator());
-                    }
-
-                    final canReview = snapshot.data ?? false;
-                    if (!canReview) {
-                      return Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          'Hoàn thành tất cả bài học để đánh giá khoá học này.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: AppColors.of(context).neutral,
-                            fontStyle: FontStyle.italic,
-                          ),
+                // `POST /api/reviews/create` không yêu cầu hoàn thành bài học —
+                // nó chỉ từ chối khi đã đánh giá rồi (400). Trước đây màn hình
+                // tự đặt điều kiện "hoàn thành tất cả bài học", lấy trạng thái
+                // từ `LessonsCubit` (tải bất đồng bộ, không có nhánh lỗi/thử
+                // lại), nên người đã học xong vẫn bị chặn đánh giá.
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ElevatedButton.icon(
+                    onPressed:
+                        () => _showReviewDialog(
+                          context,
+                          reviewCubit: context.read<ReviewCubit>(),
                         ),
-                      );
-                    }
-
-                    return Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: ElevatedButton.icon(
-                        onPressed:
-                            () => _showReviewDialog(
-                              context,
-                              reviewCubit: context.read<ReviewCubit>(),
-                            ),
-                        icon: const Icon(Icons.rate_review),
-                        label: const Text('Đánh giá khóa học'),
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 48),
-                        ),
-                      ),
-                    );
-                  },
+                    icon: const Icon(Icons.rate_review),
+                    label: const Text('Đánh giá khóa học'),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 48),
+                    ),
+                  ),
                 ),
               Expanded(
                 child: ListView.builder(

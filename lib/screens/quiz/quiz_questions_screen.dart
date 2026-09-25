@@ -240,9 +240,15 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
   void _showResult() {
     final theme = Theme.of(context);
     final semantic = AppColors.of(context);
-    final totalCorrect = _questionCubit.getCorrectAnswersCount();
     final totalQuestions = _questionCubit.state.questions.length;
-    final score = _questionCubit.getScore();
+    // Điểm phải lấy từ SERVER (`POST /api/quiz-results/submit` trả `score` thang
+    // 10 và `correct_answers`). Trước đây màn hình tự chấm lại ở client, chia
+    // cho TỔNG số câu, nên bỏ trống câu nào là bị trừ điểm oan — trong khi API
+    // tính `correct / totalAnswered * 10`.
+    final score = _questionCubit.serverScore ?? _questionCubit.getScore();
+    final totalCorrect =
+        _questionCubit.serverCorrectAnswers ??
+        _questionCubit.getCorrectAnswersCount();
     // `result_id` là SERIAL nên PostgreSQL trả về dạng CHUỖI trong JSON.
     // Phải đọc qua `asIntOrNull` thay vì `as int?` (sẽ ném lỗi ép kiểu).
     final resultId = asIntOrNull(
