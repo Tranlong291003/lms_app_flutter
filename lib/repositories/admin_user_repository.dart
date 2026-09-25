@@ -70,4 +70,21 @@ class AdminUserRepository extends BaseRepository<AdminUserService> {
       throw Exception('Không thể cập nhật vai trò người dùng: $e');
     }
   }
+
+  /* ---------- Xoá người dùng ---------- */
+  /// `DELETE /api/users/delete/:id` (chỉ admin).
+  ///
+  /// `AdminUserService.deleteUser` đã có sẵn nhưng chưa từng được nối ra UI,
+  /// nên admin không thực hiện được thao tác mà API vẫn hỗ trợ.
+  Future<void> deleteUser(String uid) async {
+    debugPrint('📚 AdminUserRepository: Deleting user $uid');
+    try {
+      await service.deleteUser(uid);
+    } catch (e) {
+      debugPrint('❌ AdminUserRepository: deleteUser failed with error: $e');
+      // Giữ nguyên thông điệp đã xử lý ở tầng service (409 → còn dữ liệu liên
+      // quan) thay vì bọc thêm một lớp "Exception:".
+      rethrow;
+    }
+  }
 }

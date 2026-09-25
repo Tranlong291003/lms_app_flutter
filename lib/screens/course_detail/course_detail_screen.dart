@@ -133,6 +133,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                       child: EnrollButton(
                         userUid: userUid,
                         courseId: detail.courseId,
+                        price: detail.price,
+                        discountPrice: detail.discountPrice,
                       ),
                     ),
                   );
@@ -259,6 +261,8 @@ class _CourseBody extends StatelessWidget {
                 reviewCount: detail.reviewCount,
                 enrollmentCount: detail.enrollmentCount,
                 duration: detail.totalVideoDuration,
+                price: detail.price,
+                discountPrice: detail.discountPrice,
               ),
               const SizedBox(height: 24),
               CourseTabView(

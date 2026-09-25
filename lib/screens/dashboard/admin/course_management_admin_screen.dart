@@ -7,6 +7,7 @@ import 'package:lms/apps/config/app_router.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
 import 'package:lms/apps/utils/searchBarWidget.dart';
+import 'package:lms/cubits/category/category_cubit.dart';
 import 'package:lms/cubits/courses/course_cubit.dart';
 import 'package:lms/models/courses/courses_model.dart';
 import 'package:lms/screens/login/cubit/auth_cubit.dart';
@@ -28,11 +29,16 @@ class _CourseManagementAdminScreenState
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
 
+  /// Danh mục đang lọc; `null` = tất cả.
+  int? _categoryFilter;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     context.read<CourseCubit>().fetchAllCourses();
+    // Nạp danh mục để dialog lọc có dữ liệu chọn.
+    context.read<CategoryCubit>().fetchAllCategory();
   }
 
   @override
@@ -230,32 +236,96 @@ class _CourseManagementAdminScreenState
     );
   }
 
-  void _showFilterDialog(BuildContext context) {
-    showDialog(
+  /// Lọc khoá học theo danh mục.
+  ///
+  /// `GET /api/courses` nhận tham số `category`, và `CourseCubit.loadCourses`
+  /// đã truyền được xuống tới API — trước đây dialog chỉ hiện "Chức năng đang
+  /// phát triển" rồi đóng, còn nút "Áp dụng" không lọc gì cả.
+  Future<void> _showFilterDialog(BuildContext context) async {
+    // Danh mục chỉ có khi đã tải xong (`CategoryLoaded`).
+    final categoryState = context.read<CategoryCubit>().state;
+    final categories =
+        categoryState is CategoryLoaded ? categoryState.categories : const [];
+    // `null` = "Tất cả danh mục".
+    int? selected = _categoryFilter;
+
+    final applied = await showDialog<int?>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Lọc khóa học'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // TODO: Add filter options
-              const Text('Chức năng đang phát triển'),
-            ],
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (ctx, setDialogState) => AlertDialog(
+                  title: const Text('Lọc khóa học'),
+                  content: SizedBox(
+                    width: double.maxFinite,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Danh mục'),
+                        const SizedBox(height: 8),
+                        if (categories.isEmpty)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            child: Text('Chưa tải được danh mục nào.'),
+                          )
+                        else
+                          Flexible(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  RadioListTile<int?>(
+                                    value: null,
+                                    groupValue: selected,
+                                    title: const Text('Tất cả danh mục'),
+                                    contentPadding: EdgeInsets.zero,
+                                    onChanged:
+                                        (v) => setDialogState(
+                                          () => selected = v,
+                                        ),
+                                  ),
+                                  ...categories.map(
+                                    (category) => RadioListTile<int?>(
+                                      value: category.categoryId,
+                                      groupValue: selected,
+                                      title: Text(category.name),
+                                      contentPadding: EdgeInsets.zero,
+                                      onChanged:
+                                          (v) => setDialogState(
+                                            () => selected = v,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Huỷ'),
+                    ),
+                    FilledButton(
+                      // `-1` = đã bấm "Áp dụng" với lựa chọn "Tất cả danh
+                      // mục". Cần sentinel vì `null` cũng là giá trị của nút
+                      // "Huỷ" (đóng dialog không trả gì).
+                      onPressed: () => Navigator.pop(ctx, selected ?? -1),
+                      child: const Text('Áp dụng'),
+                    ),
+                  ],
+                ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Đóng'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Áp dụng'),
-            ),
-          ],
-        );
-      },
     );
+
+    // Huỷ (null) → giữ nguyên bộ lọc đang áp dụng.
+    if (applied == null) return;
+    final categoryId = applied < 0 ? null : applied;
+    _categoryFilter = categoryId;
+    await context.read<CourseCubit>().loadCourses(categoryId: categoryId);
   }
 
   void _showApproveConfirmation(BuildContext context, Course course) {

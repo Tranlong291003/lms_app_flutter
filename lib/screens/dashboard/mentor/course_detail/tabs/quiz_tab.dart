@@ -159,7 +159,10 @@ class QuizTab extends StatelessWidget {
                       title: quiz.title,
                       type: quiz.displayType,
                       timeLimit: quiz.timeLimit,
-                      passingScore: 0,
+                      // Trước đây truyền cứng `0` nên thẻ nào cũng hiện
+                      // "Điểm đạt: 0%". API không có trường điểm đạt; dùng
+                      // tỉ lệ đạt thật (`passing_rate`) mà endpoint trả về.
+                      passingRate: quiz.passingRate,
                       questionCount: quiz.totalQuestions,
                       averageScore: quiz.averageScore,
                       onTap: () {
@@ -275,7 +278,11 @@ class QuizTab extends StatelessWidget {
                         final data = {
                           if (!isEdit) 'course_id': courseId,
                           'title': title,
-                          'type': 'trac_nghiem',
+                          // Khi SỬA phải giữ nguyên loại quiz hiện có: dialog
+                          // không có ô chọn loại, nên trước đây mọi lần sửa đều
+                          // ghi đè `tu_luan` thành `trac_nghiem` — bài tự luận
+                          // bị chuyển thành trắc nghiệm và bị chấm tự động.
+                          'type': isEdit ? quiz.type : 'trac_nghiem',
                           'time_limit': selectedTimeLimit,
                           'attempt_limit': selectedAttemptLimit,
                           'uid': adminUid,
@@ -324,7 +331,9 @@ class _QuizCard extends StatelessWidget {
   final String title;
   final String type;
   final int timeLimit;
-  final int passingScore;
+
+  /// Tỉ lệ đạt (%) của các lượt làm bài — `passing_rate` từ API.
+  final double passingRate;
   final int questionCount;
   final double averageScore;
   final VoidCallback onTap;
@@ -333,7 +342,7 @@ class _QuizCard extends StatelessWidget {
     required this.title,
     required this.type,
     required this.timeLimit,
-    required this.passingScore,
+    required this.passingRate,
     required this.questionCount,
     required this.averageScore,
     required this.onTap,
@@ -384,7 +393,7 @@ class _QuizCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '$questionCount câu hỏi · Điểm đạt: $passingScore% · TB: ${averageScore.toStringAsFixed(1)}',
+                        '$questionCount câu hỏi · Tỉ lệ đạt: ${passingRate.toStringAsFixed(0)}% · TB: ${averageScore.toStringAsFixed(1)}',
                         style: textTheme.bodySmall?.copyWith(
                           color: colors.onSurface.withValues(alpha: 0.7),
                         ),
@@ -438,8 +447,8 @@ class _QuizCard extends StatelessWidget {
                 const SizedBox(width: 16),
                 _QuizInfoItem(
                   icon: Icons.check_circle_outline,
-                  label: 'Điểm đạt',
-                  value: '$passingScore%',
+                  label: 'Tỉ lệ đạt',
+                  value: '${passingRate.toStringAsFixed(0)}%',
                   color: _c(context).success,
                 ),
               ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/config/app_dimens.dart';
+import 'package:lms/apps/utils/course_card.dart' show formatVnd;
 import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/repositories/course_repository.dart';
 import 'package:lms/services/notification_service.dart';
@@ -9,10 +10,19 @@ import 'package:provider/provider.dart';
 class EnrollButton extends StatefulWidget {
   final String userUid;
   final int courseId;
+
+  /// Giá gốc và giá khuyến mãi của khoá học. Trước đây nút luôn ghi "miễn phí"
+  /// kể cả với khoá có phí, khiến người dùng không biết mình đang đăng ký khoá
+  /// trả tiền.
+  final int price;
+  final int discountPrice;
+
   const EnrollButton({
     super.key,
     required this.userUid,
     required this.courseId,
+    this.price = 0,
+    this.discountPrice = 0,
   });
 
   @override
@@ -46,6 +56,14 @@ class _EnrollButtonState extends State<EnrollButton> {
     } catch (_) {
       // Thông báo hệ thống là phần phụ; không được làm hỏng luồng đăng ký.
     }
+  }
+
+  /// Nhãn nút theo giá thật của khoá học.
+  String _label() {
+    if (widget.price <= 0) return 'Đăng ký khoá học miễn phí';
+    final effective =
+        widget.discountPrice > 0 ? widget.discountPrice : widget.price;
+    return 'Đăng ký khoá học · ${formatVnd(effective)} đ';
   }
 
   Future<void> _registerCourse() async {
@@ -127,10 +145,7 @@ class _EnrollButtonState extends State<EnrollButton> {
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 )
-                : const Text(
-                  'Đăng ký khoá học miễn phí',
-                  style: TextStyle(fontSize: 16),
-                ),
+                : Text(_label(), style: const TextStyle(fontSize: 16)),
       ),
     );
   }

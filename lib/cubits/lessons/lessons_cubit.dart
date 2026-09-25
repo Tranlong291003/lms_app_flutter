@@ -35,14 +35,26 @@ class LessonsCubit extends Cubit<LessonsState> {
   ///
   /// [lessonId] - ID của bài học cần tải
   Future<Lesson> loadLessonDetail(int lessonId) async {
+    final wasLoaded = state is LessonsLoaded;
     try {
-      emit(const LessonsLoading());
+      // Chỉ phát `LessonsLoading` khi chưa có danh sách. Nếu đang ở
+      // `LessonsLoaded`, phát loading sẽ khiến màn danh sách bài học của mentor
+      // nhảy về vòng xoay rồi dựng lại toàn bộ ListView chỉ để làm mới một bài.
+      if (!wasLoaded) emit(const LessonsLoading());
       final lesson = await _repository.getLessonDetail(lessonId);
 
       // Cập nhật state
       if (state is LessonsLoaded) {
         final currentState = state as LessonsLoaded;
-        emit(currentState.copyWith(currentLesson: lesson));
+        // Thay bản ghi cũ trong danh sách bằng dữ liệu vừa tải để thẻ bài học
+        // hiển thị nội dung mới thay vì dữ liệu cũ.
+        final updatedLessons =
+            currentState.lessons
+                .map((l) => l.lessonId == lesson.lessonId ? lesson : l)
+                .toList();
+        emit(
+          LessonsLoaded(lessons: updatedLessons, currentLesson: lesson),
+        );
       } else {
         emit(LessonsLoaded(lessons: const [], currentLesson: lesson));
       }
@@ -50,9 +62,8 @@ class LessonsCubit extends Cubit<LessonsState> {
       // Trả về lesson cho caller
       return lesson;
     } catch (e) {
-      if (isClosed) rethrow;
       print('[LessonsCubit] Lỗi khi tải chi tiết bài học: $e');
-      emit(LessonsError(e.toString()));
+      if (!isClosed) emit(LessonsError(e.toString()));
       rethrow; // Throw lại lỗi để caller xử lý
     }
   }
@@ -81,8 +92,10 @@ class LessonsCubit extends Cubit<LessonsState> {
       );
       await loadLessons(courseId: courseId, userUid: uid);
     } catch (e) {
-      if (isClosed) return;
-      emit(LessonsError(e.toString()));
+      // Ném lại để nơi gọi không báo thành công khi API đã lỗi.
+      print('[LessonsCubit] ❌ Lỗi tạo bài học: $e');
+      if (!isClosed) emit(LessonsError(e.toString()));
+      rethrow;
     }
   }
 
@@ -119,9 +132,8 @@ class LessonsCubit extends Cubit<LessonsState> {
 
       await loadLessons(courseId: courseId, userUid: uid);
     } catch (e) {
-      if (isClosed) return;
       print('[LessonsCubit] ❌ Lỗi cập nhật bài học: $e');
-      emit(LessonsError(e.toString()));
+      if (!isClosed) emit(LessonsError(e.toString()));
       rethrow;
     }
   }
@@ -142,9 +154,10 @@ class LessonsCubit extends Cubit<LessonsState> {
       // Reload danh sách bài học sau khi xoá
       await loadLessons(courseId: courseId, userUid: userUid);
     } catch (e) {
-      if (isClosed) return;
+      // Phải ném lại trong MỌI trường hợp: nếu thoát êm ở đây, nơi gọi
+      // (`_deleteLesson`) sẽ hiện "Xoá bài học thành công" dù API đã lỗi.
       print('[LessonsCubit] ❌ Lỗi xoá bài học: $e');
-      emit(LessonsError(e.toString()));
+      if (!isClosed) emit(LessonsError(e.toString()));
       rethrow;
     }
   }

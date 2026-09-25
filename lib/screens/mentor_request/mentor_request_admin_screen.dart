@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lms/apps/config/api_config.dart';
 import 'package:lms/apps/utils/customAppBar.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/config/app_theme.dart';
@@ -209,9 +210,17 @@ class _MentorRequestAdminScreenState extends State<MentorRequestAdminScreen> {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child:
-                              req['image_url'] != null
+                              (req['image_url']?.toString().isNotEmpty ??
+                                      false)
                                   ? Image.network(
-                                    req['image_url'],
+                                    // API trả đường dẫn TƯƠNG ĐỐI
+                                    // (`/uploads/mentor_requests/...`), phải
+                                    // ghép base URL mới tải được. Trước đây
+                                    // truyền thẳng chuỗi tương đối nên ảnh
+                                    // minh chứng luôn hiện icon lỗi.
+                                    ApiConfig.getImageUrl(
+                                      req['image_url'].toString(),
+                                    ),
                                     width: 60,
                                     height: 60,
                                     fit: BoxFit.cover,

@@ -87,6 +87,22 @@ class AdminUserCubit extends Cubit<AdminUserState> {
     }
   }
 
+  /* ---------- Xoá người dùng ---------- */
+  /// `DELETE /api/users/delete/:id` (chỉ admin).
+  Future<void> deleteUser(String uid) async {
+    debugPrint('🧩 AdminUserCubit: Deleting user $uid');
+    emit(AdminUserLoading());
+    try {
+      await _repository.deleteUser(uid);
+      await getAllUsers();
+    } catch (e) {
+      debugPrint('❌ AdminUserCubit: deleteUser failed with error: $e');
+      if (!isClosed) emit(AdminUserError(e.toString()));
+      // Ném lại để màn hình không báo "đã xoá" khi máy chủ từ chối.
+      rethrow;
+    }
+  }
+
   @override
   void onChange(Change<AdminUserState> change) {
     super.onChange(change);

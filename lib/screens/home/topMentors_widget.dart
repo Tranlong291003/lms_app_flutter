@@ -53,8 +53,19 @@ class _TopMentorsState extends State<TopMentors> {
     // cắt mất chân chữ.
     const avatarRadius = 30.0;
     final labelStyle = theme.textTheme.bodySmall?.copyWith(fontSize: 12);
-    final labelHeight =
-        (labelStyle?.fontSize ?? 12) * (theme.textTheme.bodySmall?.height ?? 1.3);
+    // Đo chiều cao dòng nhãn bằng `TextPainter` thay vì nhân `fontSize * height`:
+    // cách nhân đó bỏ qua `textScaler` của hệ thống và phần leading/descent mà
+    // engine cộng thêm, nên dòng chữ vẫn cao hơn ước lượng một chút và `Column`
+    // tràn (đã thấy tràn 0.04px trên iPhone 17 ở cỡ chữ mặc định).
+    final labelPainter =
+        TextPainter(
+            text: TextSpan(text: 'Ag', style: labelStyle),
+            textDirection: TextDirection.ltr,
+            maxLines: 1,
+            textScaler: MediaQuery.textScalerOf(context),
+          )
+          ..layout();
+    final labelHeight = labelPainter.height.ceilToDouble();
     final rowHeight = avatarRadius * 2 + AppSpacing.sm + labelHeight;
 
     if (_randomizedMentors.isEmpty) {

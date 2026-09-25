@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
 import 'package:lms/apps/utils/loading_animation_widget.dart';
+import 'package:lms/services/base_service.dart' show extractApiError;
 import 'package:lms/cubits/lessons/lessons_cubit.dart';
 import 'package:lms/cubits/lessons/lessons_state.dart';
 import 'package:lms/models/lesson_model.dart';
@@ -232,13 +233,28 @@ class LessonMentorTab extends StatelessWidget {
     }
   }
 
-  void _refreshLesson(BuildContext context, Lesson lesson) {
-    // TODO: Gọi API cập nhật trạng thái hoặc reload chi tiết bài học
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Chức năng cập nhật bài học đang phát triển!'),
-      ),
-    );
+  /// Tải lại chi tiết bài học từ API (`GET /api/lessons/detail/:lessonId`) rồi
+  /// thay bản ghi cũ trong danh sách.
+  ///
+  /// Trước đây nút này chỉ báo "Chức năng cập nhật bài học đang phát triển!"
+  /// dù endpoint đã có sẵn.
+  Future<void> _refreshLesson(BuildContext context, Lesson lesson) async {
+    final ctx = context;
+    final cubit = ctx.read<LessonsCubit>();
+    try {
+      final fresh = await cubit.loadLessonDetail(lesson.lessonId);
+      if (!ctx.mounted) return;
+      CustomSnackBar.showSuccess(
+        context: ctx,
+        message: 'Đã cập nhật bài học "${fresh.title}"',
+      );
+    } catch (e) {
+      if (!ctx.mounted) return;
+      CustomSnackBar.showError(
+        context: ctx,
+        message: 'Không tải được bài học: ${extractApiError(e, fallback: '$e')}',
+      );
+    }
   }
 }
 

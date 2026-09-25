@@ -57,7 +57,12 @@ class CourseService extends BaseService {
   /// [categoryId] - Lọc khóa học theo ID danh mục
   /// [search] - Tìm kiếm khóa học theo từ khóa
   ///
-  /// Trả về [CourseListResponse] chứa danh sách khóa học theo trạng thái
+  /// Trả về [CourseListResponse] chứa danh sách khóa học theo trạng thái.
+  ///
+  /// Ném ngoại lệ khi gọi API thất bại để tầng trên hiển thị trạng thái lỗi kèm
+  /// nút "Thử lại". Trước đây hàm này nuốt mọi lỗi rồi trả danh sách rỗng, nên
+  /// mất mạng lại hiện "Không có khoá học nào đang chờ duyệt" — người dùng hiểu
+  /// sai là dữ liệu rỗng thay vì lỗi tải.
   Future<CourseListResponse> fetchAllCourses({
     String? status,
     int? categoryId,
@@ -72,43 +77,24 @@ class CourseService extends BaseService {
       params['search'] = search!.trim();
     }
 
-    try {
-      final response = await get(
-        ApiConfig.getAllCourses,
-        queryParameters: params.isEmpty ? null : params,
-      );
+    final response = await get(
+      ApiConfig.getAllCourses,
+      queryParameters: params.isEmpty ? null : params,
+    );
 
-      if (response.statusCode == 200) {
-        final data = response.data;
-
-        if (data == null) {
-          print('[CourseService] API trả về dữ liệu null');
-          return _emptyResponse();
-        }
-
-        if (data is Map<String, dynamic>) {
-          try {
-            return CourseListResponse.fromJson(data);
-          } catch (parseError) {
-            print(
-              '[CourseService] Lỗi khi phân tích dữ liệu JSON: $parseError',
-            );
-            return _emptyResponse();
-          }
-        }
-
-        print(
-          '[CourseService] Định dạng dữ liệu không chính xác. Kiểu: ${data.runtimeType}, dữ liệu: $data',
-        );
-        return _emptyResponse();
-      }
-
-      print('[CourseService] API trả về mã trạng thái: ${response.statusCode}');
-      return _emptyResponse();
-    } catch (e) {
-      print('[CourseService] Lỗi khi tải danh sách khóa học: $e');
-      return _emptyResponse();
+    if (response.statusCode != 200) {
+      throw Exception('Máy chủ trả về mã ${response.statusCode}');
     }
+
+    final data = response.data;
+    // `GET /api/courses` trả `{ message: "Không có khóa học" }` khi CSDL rỗng —
+    // đúng là rỗng, không phải lỗi.
+    if (data == null) return _emptyResponse();
+    if (data is Map<String, dynamic>) {
+      return CourseListResponse.fromJson(data);
+    }
+
+    throw Exception('Dữ liệu khoá học trả về không đúng định dạng');
   }
 
   /// Lấy danh sách khóa học theo ID giảng viên

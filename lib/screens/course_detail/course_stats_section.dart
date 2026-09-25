@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lms/apps/config/app_theme.dart';
+import 'package:lms/apps/utils/course_card.dart' show formatVnd;
 import 'package:lms/screens/course_detail/shared/icon_text.dart';
 
 class CourseStatsSection extends StatelessWidget {
@@ -8,6 +9,13 @@ class CourseStatsSection extends StatelessWidget {
   final int reviewCount;
   final int enrollmentCount;
   final String duration;
+
+  /// Giá gốc và giá khuyến mãi (`GET /api/courses/:course_id` trả cả hai).
+  /// Trước đây màn chi tiết không hiển thị giá nên người dùng không biết khoá
+  /// học có phí trước khi bấm đăng ký.
+  final int price;
+  final int discountPrice;
+
   const CourseStatsSection({
     super.key,
     required this.category,
@@ -15,6 +23,8 @@ class CourseStatsSection extends StatelessWidget {
     required this.reviewCount,
     required this.enrollmentCount,
     required this.duration,
+    required this.price,
+    required this.discountPrice,
   });
 
   @override
@@ -77,10 +87,17 @@ class CourseStatsSection extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
+                // Trước đây chỗ này là "Có chứng chỉ" — một lời hứa cứng, vì
+                // API không có endpoint/bảng nào cấp chứng chỉ. Thay bằng giá
+                // thật lấy từ `price`/`discount_price`, thứ người học cần biết
+                // trước khi bấm đăng ký.
                 IconText(
-                  icon: Icons.verified,
-                  text: 'Có chứng chỉ',
-                  iconColor: AppColors.of(context).success,
+                  icon: isFree ? Icons.lock_open_rounded : Icons.sell_outlined,
+                  text: _priceLabel(),
+                  iconColor:
+                      isFree
+                          ? AppColors.of(context).success
+                          : theme.colorScheme.secondary,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
@@ -91,6 +108,19 @@ class CourseStatsSection extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  /// Khoá học miễn phí khi giá gốc bằng 0.
+  bool get isFree => price <= 0;
+
+  /// Giá hiển thị: dùng giá khuyến mãi nếu có, kèm giá gốc gạch ngang.
+  String _priceLabel() {
+    if (isFree) return 'Miễn phí';
+    final effective = discountPrice > 0 ? discountPrice : price;
+    if (discountPrice > 0 && price > discountPrice) {
+      return '${formatVnd(effective)} đ (${formatVnd(price)} đ)';
+    }
+    return '${formatVnd(effective)} đ';
   }
 
   Widget _chip(BuildContext context, String label) => Container(

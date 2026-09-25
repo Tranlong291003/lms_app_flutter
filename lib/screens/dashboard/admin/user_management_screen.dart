@@ -12,6 +12,7 @@ import 'package:lms/cubits/admin/admin_user_cubit.dart';
 import 'package:lms/models/role_model.dart';
 import 'package:lms/models/user_model.dart';
 import 'package:lms/apps/utils/custom_snackbar.dart';
+import 'package:lms/services/base_service.dart' show extractApiError;
 
 /// Màu ngữ nghĩa của theme hiện tại.
 AppColors _c(BuildContext context) => AppColors.of(context);
@@ -774,6 +775,13 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                             : AppColors.of(context).success,
                     tooltip: isActive ? 'Vô hiệu hoá' : 'Kích hoạt',
                   ),
+                  const SizedBox(height: 8),
+                  IconButton(
+                    onPressed: () => _confirmDeleteUser(user),
+                    icon: const Icon(Icons.delete_outline, size: 22),
+                    color: colorScheme.error,
+                    tooltip: 'Xoá người dùng',
+                  ),
                 ],
               ),
             ],
@@ -781,6 +789,55 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         ),
       ),
     );
+  }
+
+  /// Xoá người dùng (`DELETE /api/users/delete/:id`, chỉ admin).
+  ///
+  /// Nếu người dùng còn dữ liệu liên quan (khoá học, đánh giá...) API trả `409`
+  /// kèm giải thích; thông điệp đó được hiển thị nguyên văn.
+  Future<void> _confirmDeleteUser(User user) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Xoá người dùng'),
+            content: Text(
+              'Bạn có chắc muốn xoá "${user.name}"? '
+              'Thao tác này không thể hoàn tác.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Huỷ'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(ctx).colorScheme.error,
+                ),
+                child: const Text('Xoá'),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    final cubit = context.read<AdminUserCubit>();
+    try {
+      await cubit.deleteUser(user.uid);
+      if (!mounted) return;
+      CustomSnackBar.showSuccess(
+        context: context,
+        message: 'Đã xoá người dùng "${user.name}"',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      CustomSnackBar.showError(
+        context: context,
+        message: extractApiError(e, fallback: 'Không xoá được người dùng'),
+      );
+    }
   }
 
   void _navigateToUserDetail(User user) {
@@ -836,9 +893,12 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const Text('GET /api/users - Lấy danh sách người dùng'),
+                  // Trước đây ghi PUT; API thực tế dùng PATCH (xem
+                  // admin_user_service.dart và tài liệu API mục 3.7).
                   const Text(
-                    'PUT /api/users/:uid/status - Thay đổi trạng thái',
+                    'PATCH /api/users/:id/status - Khoá/mở tài khoản',
                   ),
+                  const Text('PUT /api/users/updaterole - Đổi vai trò'),
                 ],
               ),
             ),

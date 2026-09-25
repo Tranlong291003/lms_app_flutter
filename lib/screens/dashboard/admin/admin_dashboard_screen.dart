@@ -246,8 +246,10 @@ class _QuickActionsList extends StatelessWidget {
           title: 'Quản lý thanh toán',
           subtitle: 'Xem và quản lý các giao dịch thanh toán',
           color: c.success,
-          // Chưa có màn hình/API: không bấm được, hiện nhãn "Sắp ra mắt" để
-          // người dùng biết trước thay vì bấm rồi mới thấy thông báo.
+          // Chưa có màn hình/API thanh toán: không bấm được, hiện nhãn "Sắp ra
+          // mắt" để người dùng biết trước. Trước đây thiếu `isComingSoon` nên
+          // thẻ vẫn vẽ mũi tên "mở được" nhưng bấm không có gì xảy ra.
+          isComingSoon: true,
         ),
         const SizedBox(height: AppSpacing.md),
         _QuickActionCard(
